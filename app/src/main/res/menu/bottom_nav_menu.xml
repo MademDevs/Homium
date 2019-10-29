@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/baseline_shopping_cart_black_18dp"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/baseline_list_black_18dp"
+        android:title="@string/title_dashboard" />
+
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/baseline_receipt_black_18dp"
+        android:title="@string/title_notifications" />
+
+    <item
+        android:id="@+id/navigation_last"
+        android:icon="@drawable/baseline_attach_money_black_18dp"
+        android:title="@string/title_last" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/baseline_settings_applications_black_18dp"
+        android:title="@string/title_settings" />
+
+
+
+
+</menu>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_home">Shopping</string>
+    <string name="title_dashboard">Inventory</string>
+    <string name="title_notifications">Recipes</string>
+    <string name="title_last">Money</string>
+    <string name="title_settings">Settings</string>
+</resources>
