@@ -1,13 +1,13 @@
-package com.andreklein.myapplication.ui.notifications
+package com.andreklein.myapplication.ui.shopping
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class NotificationsViewModel : ViewModel() {
+class ShoppingViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+        value = "This is shopping Fragment"
     }
     val text: LiveData<String> = _text
 }

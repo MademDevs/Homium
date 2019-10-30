@@ -1,13 +1,13 @@
-package com.andreklein.myapplication.ui.home
+package com.andreklein.myapplication.ui.inventory
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class InventoryViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+        value = "This is inventory Fragment"
     }
     val text: LiveData<String> = _text
 }

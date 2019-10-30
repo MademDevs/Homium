@@ -3,36 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_shopping">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.andreklein.myapplication.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_shopping"
+        android:name="com.andreklein.myapplication.ui.shopping.ShoppingFragment"
+        android:label="@string/title_shopping"
+        tools:layout="@layout/fragment_shopping" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.andreklein.myapplication.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_inventory"
+        android:name="com.andreklein.myapplication.ui.inventory.InventoryFragment"
+        android:label="@string/title_inventory"
+        tools:layout="@layout/fragment_inventory" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.andreklein.myapplication.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_recipes"
+        android:name="com.andreklein.myapplication.ui.recipes.RecipesFragment"
+        android:label="@string/title_recipes"
+        tools:layout="@layout/fragment_recipes" />
+
+    <fragment
+        android:id="@+id/navigation_money"
+        android:name="com.andreklein.myapplication.ui.money.MoneyFragment"
+        android:label="@string/title_money"
+        tools:layout="@layout/fragment_money" />
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.andreklein.myapplication.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
-
-    <fragment
-        android:id="@+id/navigation_last"
-        android:name="com.andreklein.myapplication.ui.last.LastFragment"
-        android:label="@string/title_last"
-        tools:layout="@layout/fragment_last" />
 
 </navigation>

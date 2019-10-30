@@ -1,4 +1,4 @@
-package com.andreklein.myapplication.ui.home
+package com.andreklein.myapplication.ui.recipes
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +10,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.andreklein.myapplication.R
 
-class HomeFragment : Fragment() {
+class RecipesFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var recipesViewModel: RecipesViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-        val textView: TextView = root.findViewById(R.id.text_home)
-        homeViewModel.text.observe(this, Observer {
+        recipesViewModel =
+            ViewModelProviders.of(this).get(RecipesViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_recipes, container, false)
+        val textView: TextView = root.findViewById(R.id.text_recipes)
+        recipesViewModel.text.observe(this, Observer {
             textView.text = it
         })
         return root

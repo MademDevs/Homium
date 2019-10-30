@@ -1,4 +1,4 @@
-package com.andreklein.myapplication.ui.last
+package com.andreklein.myapplication.ui.shopping
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +10,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.andreklein.myapplication.R
 
-class LastFragment : Fragment() {
+class ShoppingFragment : Fragment() {
 
-    private lateinit var lastViewModel: LastViewModel
+    private lateinit var shoppingViewModel: ShoppingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        lastViewModel =
-            ViewModelProviders.of(this).get(LastViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_last, container, false)
-        val textView: TextView = root.findViewById(R.id.text_last)
-        lastViewModel.text.observe(this, Observer {
+        shoppingViewModel =
+            ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_shopping, container, false)
+        val textView: TextView = root.findViewById(R.id.text_shopping)
+        shoppingViewModel.text.observe(this, Observer {
             textView.text = it
         })
         return root
