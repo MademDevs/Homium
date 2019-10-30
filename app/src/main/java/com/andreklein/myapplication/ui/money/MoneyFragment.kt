@@ -26,6 +26,7 @@ class MoneyFragment : Fragment() {
         moneyViewModel.text.observe(this, Observer {
             textView.text = it
         })
+        //testcomment
         return root
     }
 }
