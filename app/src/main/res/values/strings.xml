@@ -1,8 +1,45 @@
 <resources>
-    <string name="app_name">My Application</string>
+
+    <!--App secific strings-->
+    <string name="app_name">Homium</string>
+
+    <!--screen headlines-->
+    <string name="screentitle_edit_shopppingitem_add">Add Product</string>
+    <string name="screentitle_edit_shoppingitem_edit">Edit Product</string>
+
+    <!--bottom navigation items titles-->
     <string name="title_shopping">Shopping</string>
     <string name="title_inventory">Inventory</string>
     <string name="title_recipes">Recipes</string>
     <string name="title_money">Money</string>
     <string name="title_settings">Settings</string>
+
+    <!--edit screen texts-->
+    <string name="title_edit_name">What do you want to buy?</string>
+    <string name ="title_edit_quantity">How much?</string>
+    <string name="title_edit_unit">Which Unit?</string>
+    <string name="hint_edit_name">Name of your whished Product</string>
+    <string name="hint_edit_quantity">Quantity of the product</string>
+    <string name="btn_edit_delete">Delete shopping item</string>
+    <string name="actionbar_edit_confirm">Confirm</string>
+
+    <!--Notifications for user-->
+    <string name="notification_edited_shoppingitem_sucess">Product was updated successfully</string>
+    <string name="notification_delete_shoppingitem_sucess">Product was deleted successfully</string>
+
+
+    <!--strings for data transfer e.g. intent-->
+    <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
+
+
+    <!-- dummy Data-->
+    <string-array name="dummy_units">
+        <item>No Unit</item>
+        <item>Kilogramm</item>
+        <item>Gramm</item>
+        <item>Pack</item>
+        <item>Bottles</item>
+    </string-array>
+
+
 </resources>
