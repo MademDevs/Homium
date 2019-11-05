@@ -12,6 +12,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.utilities.switchToActivity
+import kotlinx.android.synthetic.main.fragment_shopping.*
 
 class ShoppingFragment : Fragment() {
 
@@ -42,4 +45,13 @@ class ShoppingFragment : Fragment() {
 
         return root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        btn_test.setOnClickListener {
+            switchToActivity(TestActivity::class)
+        }
+    }
+
 }
