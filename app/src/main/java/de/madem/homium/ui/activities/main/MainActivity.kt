@@ -12,7 +12,8 @@ import androidx.navigation.ui.setupWithNavController
 import de.madem.homium.R
 import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.switchToActivity
-import de.madem.homium.databases.AppDatabase
+
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
