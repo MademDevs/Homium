@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"></activity>
+        <activity android:name=".ui.activities.test.TestActivity"></activity>
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:label="@string/app_name">

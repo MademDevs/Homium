@@ -29,8 +29,8 @@
 
         </TextView>
 
-        <EditText
-            android:id="@+id/shopping_item_edit_editTxt_name"
+        <AutoCompleteTextView
+            android:id="@+id/shopping_item_edit_autoCmplTxt_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/shopping_item_edit_txtView_name"
@@ -39,15 +39,16 @@
             android:layout_marginBottom="8dp"
             android:autofillHints="@string/hint_edit_name"
             android:hint="@string/hint_edit_name"
-            android:inputType="text">
+            android:inputType="text"
+            android:completionThreshold="1">
 
-        </EditText>
+        </AutoCompleteTextView>
 
         <TextView
             android:id="@+id/shopping_item_edit_txtView_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_editTxt_name"
+            android:layout_below="@id/shopping_item_edit_autoCmplTxt_name"
             android:fontFamily="sans-serif-medium"
             android:text="@string/title_edit_quantity"
             android:textSize="18sp"

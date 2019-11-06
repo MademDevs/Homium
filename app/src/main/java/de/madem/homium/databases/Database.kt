@@ -13,7 +13,7 @@ import de.madem.homium.models.ShoppingItem
     entities = [Product::class, ShoppingItem::class, InventoryItem::class],
     version = 1
 )
-abstract class AppDatabase private constructor(): RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
     //userDao for accessing database content
     abstract fun itemDao(): ItemDao
