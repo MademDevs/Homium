@@ -7,6 +7,9 @@
     <string name="screentitle_edit_shopppingitem_add">Add Product</string>
     <string name="screentitle_edit_shoppingitem_edit">Edit Product</string>
 
+    <!--main activity menu-->
+    <string name="actionbar_main_testzone">Testzone</string>
+
     <!--bottom navigation items titles-->
     <string name="title_shopping">Shopping</string>
     <string name="title_inventory">Inventory</string>

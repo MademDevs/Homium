@@ -9,9 +9,12 @@ import de.madem.homium.R
 
 class ShoppingItemEditActivity : AppCompatActivity() {
 
+    //TEST DATA
+    private val smallProductTestData = listOf<String>("Apple","Milk","Bread","Sausage","Cheese")
+
     //GUI Components
     private lateinit var btnDelete : Button
-    private lateinit var editTxtName : EditText
+    private lateinit var autoCmplTxtName : AutoCompleteTextView
     private lateinit var editTxtQuantity : EditText
     private lateinit var spinnerUnits : Spinner
 
@@ -63,7 +66,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
         }
 
-        editTxtName = findViewById(R.id.shopping_item_edit_editTxt_name)
+        autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
+        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
         editTxtQuantity = findViewById(R.id.shopping_item_edit_editTxt_quantity)
         spinnerUnits = findViewById(R.id.shopping_item_edit_spinner_unit)
         //spinnerUnits.adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,resources.getStringArray(R.array.dummy_units))

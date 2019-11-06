@@ -38,20 +38,14 @@ class ShoppingFragment : Fragment() {
 
         btnAddShoppingItem.setOnClickListener {
             //implementing simple navigation to shopping item edit screen via intent
-            startActivity(Intent(activity,ShoppingItemEditActivity::class.java))
+            switchToActivity(ShoppingItemEditActivity::class)
         }
-
-
-
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        btn_test.setOnClickListener {
-            switchToActivity(TestActivity::class)
-        }
     }
 
 }
