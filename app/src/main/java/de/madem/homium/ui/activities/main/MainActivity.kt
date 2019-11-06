@@ -8,6 +8,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
 
 class MainActivity : AppCompatActivity() {
 
