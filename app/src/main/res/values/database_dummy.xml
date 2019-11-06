@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="dummy_database">
+        <item>Ananas</item>
+        <item>Apfel</item>
+        <item>Banane</item>
+        <item>Birne</item>
+        <item>Erdbeer</item>
+        <item>Gurke</item>
+        <item>Himbeer</item>
+        <item>Ingwer</item>
+        <item>Karotte</item>
+        <item>Kartoffel</item>
+        <item>Kiwi</item>
+        <item>Mango</item>
+        <item>Orange</item>
+        <item>Paprika</item>
+        <item>Plaume</item>
+        <item>Salat</item>
+        <item>Tomate</item>
+        <item>Zwiebel</item>
+        <item>Ei</item>
+        <item>Milch</item>
+        <item>Salz</item>
+        <item>Zucker</item>
+        <item>Mehl</item>
+        <item>Pfeffer</item>
+        <item>Öl</item>
+    </string-array>
+
+</resources>
