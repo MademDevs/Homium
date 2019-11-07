@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/shopping_item_edit_actionbar_confirm"
+        android:title="@string/actionbar_edit_confirm"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_check_white"></item>
+</menu>

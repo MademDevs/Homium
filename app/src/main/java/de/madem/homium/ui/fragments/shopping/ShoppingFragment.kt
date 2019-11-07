@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.shopping
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.utilities.switchToActivity
+import kotlinx.android.synthetic.main.fragment_shopping.*
 
 class ShoppingFragment : Fragment() {
 
@@ -26,6 +32,20 @@ class ShoppingFragment : Fragment() {
         shoppingViewModel.text.observe(this, Observer {
             textView.text = it
         })
+
+        //floating action button
+        val btnAddShoppingItem = root.findViewById<FloatingActionButton>(R.id.floatingActionButton_addShoppingItem)
+
+        btnAddShoppingItem.setOnClickListener {
+            //implementing simple navigation to shopping item edit screen via intent
+            switchToActivity(ShoppingItemEditActivity::class)
+        }
         return root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
+
 }

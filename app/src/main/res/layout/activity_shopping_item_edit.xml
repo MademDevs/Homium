@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ui.activities.shoppingitem.ShoppingItemEditActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/shopping_item_edit_txtView_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/title_edit_name"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimaryDark">
+
+        </TextView>
+
+        <AutoCompleteTextView
+            android:id="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shopping_item_edit_txtView_name"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:autofillHints="@string/hint_edit_name"
+            android:hint="@string/hint_edit_name"
+            android:inputType="text"
+            android:completionThreshold="1">
+
+        </AutoCompleteTextView>
+
+        <TextView
+            android:id="@+id/shopping_item_edit_txtView_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shopping_item_edit_autoCmplTxt_name"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/title_edit_quantity"
+            android:textSize="18sp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <EditText
+            android:id="@+id/shopping_item_edit_editTxt_quantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shopping_item_edit_txtView_quantity"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:autofillHints="@string/hint_edit_quantity"
+            android:hint="@string/hint_edit_quantity"
+            android:inputType="number|numberDecimal">
+
+        </EditText>
+
+        <TextView
+            android:id="@+id/shopping_item_edit_txtView_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shopping_item_edit_editTxt_quantity"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/title_edit_unit"
+            android:textSize="18sp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/colorPrimaryDark">
+        </TextView>
+
+        <Spinner
+            android:id="@+id/shopping_item_edit_spinner_unit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/shopping_item_edit_txtView_unit"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:entries="@array/dummy_units"
+            android:minHeight="24dp">
+        </Spinner>
+
+        <Button
+            android:id="@+id/shopping_item_edit_btn_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/btn_edit_delete"
+            android:textColor="@android:color/background_light"
+            android:background="@android:color/holo_red_dark"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_alignParentBottom="true">
+
+        </Button>
+    </RelativeLayout>
+
+</ScrollView>

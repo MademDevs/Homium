@@ -51,6 +51,7 @@ interface ItemDao {
     @Query("DELETE FROM inventoryItem")
     fun deleteAllInventory()
 
+
     //Search for Items -> if partial String (not full name), has to be %String%
 
     @Query("DELETE FROM product WHERE name LIKE :deleteItem")
