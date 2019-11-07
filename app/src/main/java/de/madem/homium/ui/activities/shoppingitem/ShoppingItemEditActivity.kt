@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import de.madem.homium.R
+import de.madem.homium.models.Units
 
 class ShoppingItemEditActivity : AppCompatActivity() {
 
@@ -70,6 +71,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
         editTxtQuantity = findViewById(R.id.shopping_item_edit_editTxt_quantity)
         spinnerUnits = findViewById(R.id.shopping_item_edit_spinner_unit)
-        //spinnerUnits.adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,resources.getStringArray(R.array.dummy_units))
+        spinnerUnits.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Units.stringValueArray(this))
+
     }
 }
