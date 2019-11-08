@@ -34,11 +34,11 @@ class ShoppingListRoomTest {
 
         println(items)
 
-        Assert.assertEquals(0, items.size)
+        Assert.assertTrue(items.isEmpty())
     }
 
     @Test
-    fun insertAndSelct() {
+    fun insertAndSelect() {
         val item = ShoppingItem("Bananen", 5, Units.STUECK.name)
         dao.insertShopping(item)
 
