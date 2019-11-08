@@ -39,7 +39,7 @@ class ShoppingListRoomTest {
 
     @Test
     fun insertAndSelect() {
-        val item = ShoppingItem("Bananen", 5, Units.STUECK.name)
+        val item = ShoppingItem("Bananen", 5, Units.GRAM.name)
         dao.insertShopping(item)
 
         Assert.assertEquals(1, dao.getAllShopping().size)
@@ -47,8 +47,8 @@ class ShoppingListRoomTest {
 
     @Test
     fun insertWithSameUid() {
-        val item1 = ShoppingItem("Bananen", 5, Units.STUECK.name)
-        val item2 = ShoppingItem("Birnen", 4, Units.STUECK.name)
+        val item1 = ShoppingItem("Bananen", 5, Units.GRAM.name)
+        val item2 = ShoppingItem("Birnen", 4, Units.GRAM.name)
         dao.insertShopping(item1)
         dao.insertShopping(item2)
 
