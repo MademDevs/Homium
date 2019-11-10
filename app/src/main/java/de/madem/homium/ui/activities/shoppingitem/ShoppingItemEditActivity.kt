@@ -111,8 +111,16 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
         numPickerUnit.setOnValueChangedListener { np, i, i2 ->
             when(np.value) {
-                1, 3 -> {numPickerCount.minValue = 0; numPickerCount.maxValue = 14; numPickerCount.displayedValues = bigUnits}
-                else -> {numPickerCount.displayedValues = numPickerCountStandardDisplay; numPickerCount.minValue = 1; numPickerCount.maxValue = 20}
+                1, 3 -> {
+                    numPickerCount.minValue = 0
+                    numPickerCount.maxValue = 14
+                    numPickerCount.displayedValues = bigUnits
+                }
+                else -> {
+                    numPickerCount.displayedValues = numPickerCountStandardDisplay
+                    numPickerCount.minValue = 1
+                    numPickerCount.maxValue = 20
+                }
             }
         }
 
