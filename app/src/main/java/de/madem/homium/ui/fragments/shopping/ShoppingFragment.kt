@@ -81,6 +81,8 @@ class ShoppingFragment : Fragment() {
             switchToActivity(ShoppingItemEditActivity::class)
         }
 
+
+
         return root
     }
 
@@ -102,14 +104,14 @@ class ShoppingFragment : Fragment() {
             recyclerView.adapter = adapter
 
             //onclickactions
-            adapter.setOnItemClickListener {
+            adapter.setOnItemClickListener { position ->
                 //TODO: Implement OnClick Action for Shopping item click
                 Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
 
             }
 
-            adapter.setOnItemLongClickListener {
-                //giving haptoc feedback
+            adapter.setOnItemLongClickListener {position ->
+                //giving haptic feedback
                 val vib = context.getSystemService(VIBRATOR_SERVICE) as? Vibrator
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
                     vib?.vibrate(30)
@@ -117,9 +119,6 @@ class ShoppingFragment : Fragment() {
                 else{
                     vib?.vibrate(VibrationEffect.createOneShot(30,10))
                 }
-
-
-
 
                 //TODO: Implement OnClick Action for Shopping item longclick
                 Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()

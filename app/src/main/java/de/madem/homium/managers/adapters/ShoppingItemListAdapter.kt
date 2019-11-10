@@ -13,42 +13,22 @@ private const val quantityUnitTemplate = "quantity unit"
 class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>() {
 
     //fields
-    private var clickListener : OnItemClickListener = object : OnItemClickListener{
-        override fun onItemClicked(position: Int) {
-            //nothing to do here :D
-        }
+    private var clickListener : (position:Int) -> Unit = {
+        //nothing to do here :D
     }
 
-    private var longClickListener : OnItemLongClickListener = object : OnItemLongClickListener{
-        override fun onItemLongClicked(position: Int) : Boolean {
-            //nothing to do here :D
-            return false
-        }
+    private var longClickListener : (position:Int) -> Boolean ={
+        //nothing to do here
+        false
     }
 
-    //Setter for clickListener
-    fun setOnItemClickListener(clickListener : OnItemClickListener){
-        this.clickListener = clickListener
-    }
-
+    //Setter for onClickListener
     fun setOnItemClickListener(function : (Int) -> Unit){
-        this.clickListener = object : OnItemClickListener{
-            override fun onItemClicked(position: Int) {
-                function.invoke(position)
-            }
-        }
-    }
-
-    fun setOnItemLongClickListener(longClickListener: OnItemLongClickListener){
-        this.longClickListener = longClickListener
+        this.clickListener = function
     }
 
     fun setOnItemLongClickListener(function: (Int) -> Boolean){
-        this.longClickListener = object : OnItemLongClickListener{
-            override fun onItemLongClicked(position: Int): Boolean {
-                return function.invoke(position)
-            }
-        }
+        this.longClickListener = function
     }
 
     //functions
@@ -68,7 +48,7 @@ class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : Re
 
 
     //View Holder class
-    class ShoppingItemViewHolder(itemView : View, clickListener: OnItemClickListener, longClickListener: OnItemLongClickListener) : RecyclerView.ViewHolder(itemView){
+    class ShoppingItemViewHolder(itemView : View, clickListener: (Int) -> Unit, longClickListener: (Int) -> Boolean) : RecyclerView.ViewHolder(itemView){
 
         //fields
         val txtTitle : TextView = itemView.findViewById(R.id.txtView_shoppingitemList_title)
@@ -81,7 +61,7 @@ class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : Re
                 val adapterPosition = adapterPosition
 
                 if (adapterPosition != RecyclerView.NO_POSITION){
-                    clickListener.onItemClicked(adapterPosition)
+                    clickListener.invoke(adapterPosition)
                 }
             }
 
@@ -90,7 +70,7 @@ class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : Re
                 val adapterPosition = adapterPosition
 
                 if(adapterPosition != RecyclerView.NO_POSITION){
-                    return@setOnLongClickListener longClickListener.onItemLongClicked(adapterPosition)
+                    return@setOnLongClickListener longClickListener.invoke(adapterPosition)
                 }
                 else{
                     return@setOnLongClickListener false
@@ -98,14 +78,5 @@ class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : Re
             }
         }
 
-    }
-
-    //Adapters ClickListener Interfaces
-    interface OnItemClickListener{
-        fun onItemClicked(position: Int)
-    }
-
-    interface OnItemLongClickListener{
-        fun onItemLongClicked(position : Int) : Boolean
     }
 }
