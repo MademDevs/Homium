@@ -60,8 +60,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             //TODO: Save a shopping item -> addToDatabase()
-            R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
-            android.R.id.home -> switchToActivity(MainActivity::class)
+            //R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+            //android.R.id.home -> switchToActivity(MainActivity::class)
         }
 
         return super.onOptionsItemSelected(item)
