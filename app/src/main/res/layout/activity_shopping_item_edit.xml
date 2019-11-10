@@ -49,60 +49,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/title_edit_quantity"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/shopping_item_edit_editTxt_quantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_txtView_quantity"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:autofillHints="@string/hint_edit_quantity"
-            android:hint="@string/hint_edit_quantity"
-            android:inputType="number|numberDecimal">
-
-        </EditText>
-
-        <TextView
-            android:id="@+id/shopping_item_edit_txtView_unit"
+        <NumberPicker
+            android:id="@+id/numPickerUnit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_editTxt_quantity"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/title_edit_unit"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_below="@+id/shopping_item_edit_txtView_quantity"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/colorPrimaryDark">
-        </TextView>
+            android:layout_toEndOf="@+id/numPickerCount"
+            android:layout_toRightOf="@+id/numPickerCount"></NumberPicker>
 
-        <Spinner
-            android:id="@+id/shopping_item_edit_spinner_unit"
-            android:layout_width="match_parent"
+        <NumberPicker
+            android:id="@+id/numPickerCount"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_txtView_unit"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:entries="@array/dummy_units"
-            android:minHeight="24dp">
-        </Spinner>
+            android:layout_below="@+id/shopping_item_edit_txtView_quantity"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"></NumberPicker>
 
         <Button
             android:id="@+id/shopping_item_edit_btn_delete"

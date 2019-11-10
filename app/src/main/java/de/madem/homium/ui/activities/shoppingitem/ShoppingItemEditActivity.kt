@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import de.madem.homium.R
+import de.madem.homium.ui.activities.test.TestActivity
 
 class ShoppingItemEditActivity : AppCompatActivity() {
 
@@ -68,8 +69,30 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
-        editTxtQuantity = findViewById(R.id.shopping_item_edit_editTxt_quantity)
-        spinnerUnits = findViewById(R.id.shopping_item_edit_spinner_unit)
+
+        val units2: Array<String> = arrayOf("Stück", "gramm")
+        val numPickerCount = findViewById<NumberPicker>(R.id.numPickerCount)
+        numPickerCount.minValue = 1
+        numPickerCount.maxValue = 20
+        numPickerCount.value = 1
+
+
+        val numPickerUnit = findViewById<NumberPicker>(R.id.numPickerUnit)
+        numPickerUnit.minValue = 0
+        numPickerUnit.maxValue = 1
+        numPickerUnit.displayedValues = units2
+        numPickerUnit.value = 0
+
+        val grammUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
+        val grammUnits2 = arrayOf("50", "100", "150", "200", "250", "300")
+        numPickerUnit.setOnValueChangedListener { np, i, i2 ->
+            when(np.value) {
+                0 -> {numPickerCount.minValue = 1; numPickerCount.maxValue = 20}
+                1 -> {numPickerCount.minValue = 0; numPickerCount.maxValue = 5; numPickerCount.displayedValues = grammUnits2}
+            }
+        }
+
+
         //spinnerUnits.adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,resources.getStringArray(R.array.dummy_units))
     }
 }

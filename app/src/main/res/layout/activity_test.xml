@@ -14,10 +14,12 @@
             android:layout_height="wrap_content"
             android:text="Menge: " />
 
-        <NumberPicker
-            android:id="@+id/numPickerCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></NumberPicker>
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number|numberDecimal" />
 
         <TextView
             android:id="@+id/textView2"
