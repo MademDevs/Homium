@@ -72,13 +72,13 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
 
-        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count).also { it.minValue = 1; it.maxValue = 20; it.value = 1
+        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count).also { it.isSaveFromParentEnabled = false; it.isSaveEnabled = false; it.minValue = 1; it.maxValue = 20; it.value = 1
         it.setOnLongClickListener { numPickerCount.isVisible = false; editTextCount.isVisible = true; true }
         }
         val numPickerCountStandardDisplay = numPickerCount.displayedValues
 
         val units = Units.stringValueArray(this)
-        numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also { it.minValue = 0; it.maxValue = units.size-1; it.displayedValues = units; it.value = 0 }
+        numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also { it.isSaveFromParentEnabled = false; it.isSaveEnabled = false; it.minValue = 0; it.maxValue = units.size-1; it.displayedValues = units; it.value = 0 }
 
         editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also { it.isVisible = false
         it.setOnLongClickListener { editTextCount.isVisible = false; numPickerCount.isVisible = true; true }}
