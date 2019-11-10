@@ -1,11 +1,9 @@
 package de.madem.homium.ui.activities.test
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.NumberPicker
 import androidx.appcompat.app.AppCompatActivity
 import de.madem.homium.R
-import kotlinx.android.synthetic.main.activity_test.*
 
 class TestActivity : AppCompatActivity() {
 
@@ -20,7 +18,7 @@ class TestActivity : AppCompatActivity() {
 
 
 
-        val numPickerUnit = findViewById<NumberPicker>(R.id.numPickerUnit)
+        val numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit)
         numPickerUnit.minValue = 0
         numPickerUnit.maxValue = 4
         numPickerUnit.displayedValues = UNITS

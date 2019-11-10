@@ -28,7 +28,7 @@
             android:text="Einheit: " />
 
         <NumberPicker
-            android:id="@+id/numPickerUnit"
+            android:id="@+id/shopping_item_edit_numPick_unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"></NumberPicker>
 

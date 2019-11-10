@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,51 +32,54 @@
             android:id="@+id/shopping_item_edit_autoCmplTxt_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_txtView_name"
+            android:layout_below="@+id/shopping_item_edit_txtView_name"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:autofillHints="@string/hint_edit_name"
+            android:completionThreshold="1"
             android:hint="@string/hint_edit_name"
-            android:inputType="text"
-            android:completionThreshold="1">
+            android:inputType="text">
 
         </AutoCompleteTextView>
 
-        <TextView
-            android:id="@+id/shopping_item_edit_txtView_quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_autoCmplTxt_name"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/title_edit_quantity"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="18sp" />
+        <EditText
+            android:id="@+id/shopping_item_edit_editTxt_count"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginTop="88dp"
+            android:ems="10"
+            android:hint="1,2"
+            android:inputType="number|numberDecimal" />
 
         <NumberPicker
-            android:id="@+id/numPickerUnit"
+            android:id="@+id/shopping_item_edit_numPick_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_txtView_quantity"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_toEndOf="@+id/numPickerCount"
-            android:layout_toRightOf="@+id/numPickerCount"></NumberPicker>
+            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginTop="32dp"></NumberPicker>
 
         <NumberPicker
-            android:id="@+id/numPickerCount"
+            android:id="@+id/shopping_item_edit_numPick_unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_txtView_quantity"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="16dp"></NumberPicker>
+            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_marginTop="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="192dp"
+            android:layout_marginLeft="192dp"
+            ></NumberPicker>
 
         <Button
             android:id="@+id/shopping_item_edit_btn_delete"
@@ -94,6 +96,7 @@
             android:layout_alignParentBottom="true">
 
         </Button>
+
     </RelativeLayout>
 
 </ScrollView>

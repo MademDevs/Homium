@@ -44,4 +44,13 @@
         <item>Bottles</item>
     </string-array>
 
+    <string name="data_units_item">Stück</string>
+    <string name="data_units_gram">Gramm</string>
+    <string name="data_units_kilogram">KiloGramm</string>
+    <string name="data_units_millilitre">MilliLiter</string>
+    <string name="data_units_litre">Liter</string>
+    <string name="data_units_pack">Packung</string>
+
+
+
 </resources>

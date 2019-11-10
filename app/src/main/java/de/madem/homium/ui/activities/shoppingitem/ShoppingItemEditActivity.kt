@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.core.view.isVisible
 import de.madem.homium.R
-import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.models.Units
+import kotlinx.android.synthetic.main.activity_test.*
 
 class ShoppingItemEditActivity : AppCompatActivity() {
 
@@ -16,9 +18,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     //GUI Components
     private lateinit var btnDelete : Button
     private lateinit var autoCmplTxtName : AutoCompleteTextView
-    private lateinit var editTxtQuantity : EditText
-    private lateinit var spinnerUnits : Spinner
-
+    private lateinit var numPickerCount: NumberPicker
+    private lateinit var numPickerUnit: NumberPicker
+    private lateinit var editTextCount: EditText
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +54,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            //TODO: Save a shopping item
+            //TODO: Save a shopping item -> addToDatabase()
             R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
         }
 
@@ -70,29 +72,44 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
 
-        val units2: Array<String> = arrayOf("Stück", "gramm")
-        val numPickerCount = findViewById<NumberPicker>(R.id.numPickerCount)
-        numPickerCount.minValue = 1
-        numPickerCount.maxValue = 20
-        numPickerCount.value = 1
+        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count).also { it.minValue = 1; it.maxValue = 20; it.value = 1
+        it.setOnLongClickListener { numPickerCount.isVisible = false; editTextCount.isVisible = true; true }
+        }
+        val numPickerCountStandardDisplay = numPickerCount.displayedValues
 
+        val units = Units.stringValueArray(this)
+        numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also { it.minValue = 0; it.maxValue = units.size-1; it.displayedValues = units; it.value = 0 }
 
-        val numPickerUnit = findViewById<NumberPicker>(R.id.numPickerUnit)
-        numPickerUnit.minValue = 0
-        numPickerUnit.maxValue = 1
-        numPickerUnit.displayedValues = units2
-        numPickerUnit.value = 0
+        editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also { it.isVisible = false
+        it.setOnLongClickListener { editTextCount.isVisible = false; numPickerCount.isVisible = true; true }}
 
-        val grammUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
-        val grammUnits2 = arrayOf("50", "100", "150", "200", "250", "300")
+        val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
         numPickerUnit.setOnValueChangedListener { np, i, i2 ->
             when(np.value) {
-                0 -> {numPickerCount.minValue = 1; numPickerCount.maxValue = 20}
-                1 -> {numPickerCount.minValue = 0; numPickerCount.maxValue = 5; numPickerCount.displayedValues = grammUnits2}
+                1, 3 -> {numPickerCount.minValue = 0; numPickerCount.maxValue = 14; numPickerCount.displayedValues = bigUnits}
+                else -> {numPickerCount.displayedValues = numPickerCountStandardDisplay; numPickerCount.minValue = 1; numPickerCount.maxValue = 20}
             }
         }
 
+    }
 
-        //spinnerUnits.adapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,resources.getStringArray(R.array.dummy_units))
+    private fun getAmount(): Double {
+        if(numPickerCount.isVisible) {
+            return numPickerCount.value.toDouble()
+        } else {
+            return editTextCount.text.toString().toDouble()
+        }
+    }
+
+    private fun getUnit(): Units {
+        return Units.valueOf(Units.stringValueArray(this)[numPickerUnit.value])
+    }
+
+    private fun getItem(): String {
+        return autoCmplTxtName.text.toString()
+    }
+
+    private fun addToDatabase() {
+        //TODO: Add item to Database
     }
 }
