@@ -22,9 +22,6 @@ class TestActivity : AppCompatActivity() {
         numPickerUnit.minValue = 0
         numPickerUnit.maxValue = 4
         numPickerUnit.displayedValues = UNITS
-
-
-
     }
 
 }
