@@ -8,6 +8,8 @@ import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.models.Units
+import de.madem.homium.ui.activities.main.MainActivity
+import de.madem.homium.utilities.switchToActivity
 import kotlinx.android.synthetic.main.activity_test.*
 
 class ShoppingItemEditActivity : AppCompatActivity() {
@@ -39,6 +41,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
          */
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
         initGuiComponents()
 
     }
@@ -56,6 +61,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         when(item.itemId){
             //TODO: Save a shopping item -> addToDatabase()
             R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+            android.R.id.home -> switchToActivity(MainActivity::class)
         }
 
         return super.onOptionsItemSelected(item)
