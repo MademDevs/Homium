@@ -29,6 +29,7 @@
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Product was updated successfully</string>
     <string name="notification_delete_shoppingitem_sucess">Product was deleted successfully</string>
+    <string name="notification_remove_all_bought_shoppingitems">All bought shopping-items were removed from your shopping list</string>
 
 
     <!--strings for data transfer e.g. intent-->
