@@ -115,6 +115,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
+        val smallUnits = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")
         numPickerUnit.setOnValueChangedListener { np, i, i2 ->
             when(np.value) {
                 1, 3 -> {
@@ -123,9 +124,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     numPickerCount.displayedValues = bigUnits
                 }
                 else -> {
-                    numPickerCount.displayedValues = numPickerCountStandardDisplay
-                    numPickerCount.minValue = 1
-                    numPickerCount.maxValue = 20
+                    numPickerCount.displayedValues = smallUnits
+                    numPickerCount.minValue = 0
+                    numPickerCount.maxValue = 14
                 }
             }
         }
