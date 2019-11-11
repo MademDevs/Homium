@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
@@ -81,20 +82,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
 
         //init numberpicker
-        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count).also {
-            it.isSaveFromParentEnabled = false
-            it.isSaveEnabled = false
-            it.minValue = 1
-            it.maxValue = 20
-            it.value = 1
-            it.setOnLongClickListener {
-                numPickerCount.isVisible = false
-                editTextCount.isVisible = true
-                true
-            }
-        }
-        val numPickerCountStandardDisplay = numPickerCount.displayedValues
-
         val units = Units.stringValueArray(this)
         numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also {
             it.isSaveFromParentEnabled = false
@@ -105,29 +92,49 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             it.value = 0
         }
 
-        editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
-            it.isVisible = false
-            it.setOnLongClickListener {
-                editTextCount.isVisible = false
-                numPickerCount.isVisible = true
+
+        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            numPickerCount.isSaveFromParentEnabled = false
+            numPickerCount.isSaveEnabled = false
+            numPickerCount.minValue = 1
+            numPickerCount.maxValue = 20
+            numPickerCount.value = 1
+            numPickerCount.setOnLongClickListener {
+                numPickerCount.isVisible = false
+                editTextCount.isVisible = true
                 true
             }
+            val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
+            val smallUnits = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")
+            numPickerUnit.setOnValueChangedListener { np, i, i2 ->
+                when(np.value) {
+                    1, 3 -> {
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = 14
+                        numPickerCount.displayedValues = bigUnits
+                    }
+                    else -> {
+                        numPickerCount.displayedValues = smallUnits
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = 14
+                    }
+                }
+            }
+        } else {
+            numPickerCount.isVisible = false
         }
 
-        val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
-        val smallUnits = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")
-        numPickerUnit.setOnValueChangedListener { np, i, i2 ->
-            when(np.value) {
-                1, 3 -> {
-                    numPickerCount.minValue = 0
-                    numPickerCount.maxValue = 14
-                    numPickerCount.displayedValues = bigUnits
+        editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
+            it.isVisible = false
+            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                it.setOnLongClickListener {
+                    editTextCount.isVisible = false
+                    numPickerCount.isVisible = true
+                    true
                 }
-                else -> {
-                    numPickerCount.displayedValues = smallUnits
-                    numPickerCount.minValue = 0
-                    numPickerCount.maxValue = 14
-                }
+            } else {
+                it.isVisible = true
             }
         }
 
