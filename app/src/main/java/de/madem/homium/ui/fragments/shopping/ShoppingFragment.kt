@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -119,6 +120,9 @@ class ShoppingFragment : Fragment() {
                 else{
                     vib?.vibrate(VibrationEffect.createOneShot(30,10))
                 }
+
+                val actvity = context as AppCompatActivity
+                actvity.startSupportActionMode(ShoppingActionModeHandler())
 
                 //TODO: Implement OnClick Action for Shopping item longclick
                 Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()
