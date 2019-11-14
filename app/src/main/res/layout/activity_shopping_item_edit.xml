@@ -40,7 +40,8 @@
             android:autofillHints="@string/hint_edit_name"
             android:completionThreshold="1"
             android:hint="@string/hint_edit_name"
-            android:inputType="text">
+            android:inputType="text"
+            android:imeOptions="flagNoExtractUi">
 
         </AutoCompleteTextView>
 
@@ -48,6 +49,7 @@
             android:id="@+id/shopping_item_edit_txtView_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
@@ -55,34 +57,67 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
-            android:text="How much?"
-            android:textSize="18sp"
-            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:text="@string/question_amount"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_txtView_amount"
-            android:layout_marginTop="32dp"
-            android:orientation="horizontal">
+            android:layout_below="@id/shopping_item_edit_txtView_amount"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:orientation="vertical">
 
-            <NumberPicker
-                android:id="@+id/shopping_item_edit_numPick_count"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/numpick_lin_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="64dp"></NumberPicker>
+                android:layout_marginTop="32dp"
+                android:orientation="horizontal">
 
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                <NumberPicker
+                    android:id="@+id/shopping_item_edit_numPick_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="64dp"
+                    android:layout_marginStart="64dp">
+                </NumberPicker>
 
-            <NumberPicker
-                android:id="@+id/shopping_item_edit_numPick_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="64dp"></NumberPicker>
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <NumberPicker
+                    android:id="@+id/shopping_item_edit_numPick_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="64dp"
+                    android:layout_marginEnd="64dp">
+                </NumberPicker>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/shopping_item_edit_btn_delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@android:color/holo_red_dark"
+                    android:text="@string/btn_edit_delete"
+                    android:textColor="@android:color/background_light"
+                    android:layout_gravity="bottom">
+                </Button>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -97,24 +132,8 @@
             android:layout_marginLeft="64dp"
             android:layout_marginTop="96dp"
             android:ems="10"
-            android:hint="1,2"
             android:inputType="number|numberDecimal" />
 
-        <Button
-            android:id="@+id/shopping_item_edit_btn_delete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@android:color/holo_red_dark"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="@string/btn_edit_delete"
-            android:textColor="@android:color/background_light">
-
-        </Button>
 
     </RelativeLayout>
 

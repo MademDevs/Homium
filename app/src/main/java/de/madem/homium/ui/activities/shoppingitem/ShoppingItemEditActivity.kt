@@ -105,8 +105,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 editTextCount.isVisible = true
                 true
             }
-            val bigUnits = arrayOf("50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "600", "700", "800", "900", "1000")
-            val smallUnits = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15")
+            val bigUnits = resources.getStringArray(R.array.big_units)
+            val smallUnits = resources.getStringArray(R.array.small_units)
             numPickerUnit.setOnValueChangedListener { np, i, i2 ->
                 when(np.value) {
                     1, 3 -> {
