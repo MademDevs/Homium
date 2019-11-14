@@ -4,9 +4,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
+import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.models.Units
+import de.madem.homium.ui.activities.main.MainActivity
+import de.madem.homium.utilities.switchToActivity
+import kotlinx.android.synthetic.main.activity_test.*
 
 class ShoppingItemEditActivity : AppCompatActivity() {
 
@@ -16,9 +21,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     //GUI Components
     private lateinit var btnDelete : Button
     private lateinit var autoCmplTxtName : AutoCompleteTextView
-    private lateinit var editTxtQuantity : EditText
-    private lateinit var spinnerUnits : Spinner
-
+    private lateinit var numPickerCount: NumberPicker
+    private lateinit var numPickerUnit: NumberPicker
+    private lateinit var editTextCount: EditText
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +42,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
          */
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
         initGuiComponents()
 
     }
@@ -52,8 +60,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            //TODO: Save a shopping item
-            R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+            //TODO: Save a shopping item -> addToDatabase()
+            //R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+            //android.R.id.home -> switchToActivity(MainActivity::class)
         }
 
         return super.onOptionsItemSelected(item)
@@ -62,16 +71,92 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     //private fuctions
     private fun initGuiComponents(){
+        //init delete button
         btnDelete = findViewById(R.id.shopping_item_edit_btn_delete)
         btnDelete.setOnClickListener{
             Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
         }
 
+        //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
         autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
-        editTxtQuantity = findViewById(R.id.shopping_item_edit_editTxt_quantity)
-        spinnerUnits = findViewById(R.id.shopping_item_edit_spinner_unit)
-        spinnerUnits.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Units.stringValueArray(this))
 
+        //init numberpicker
+        val units = Units.stringValueArray(this)
+        numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also {
+            it.isSaveFromParentEnabled = false
+            it.isSaveEnabled = false
+            it.minValue = 0
+            it.maxValue = units.size-1
+            it.displayedValues = units
+            it.value = 0
+        }
+
+
+        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            numPickerCount.isSaveFromParentEnabled = false
+            numPickerCount.isSaveEnabled = false
+            numPickerCount.minValue = 1
+            numPickerCount.maxValue = 20
+            numPickerCount.value = 1
+            numPickerCount.setOnLongClickListener {
+                numPickerCount.isVisible = false
+                editTextCount.isVisible = true
+                true
+            }
+            val bigUnits = resources.getStringArray(R.array.big_units)
+            val smallUnits = resources.getStringArray(R.array.small_units)
+            numPickerUnit.setOnValueChangedListener { np, i, i2 ->
+                when(np.value) {
+                    1, 3 -> {
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = 14
+                        numPickerCount.displayedValues = bigUnits
+                    }
+                    else -> {
+                        numPickerCount.displayedValues = smallUnits
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = 14
+                    }
+                }
+            }
+        } else {
+            numPickerCount.isVisible = false
+        }
+
+        editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
+            it.isVisible = false
+            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                it.setOnLongClickListener {
+                    editTextCount.isVisible = false
+                    numPickerCount.isVisible = true
+                    true
+                }
+            } else {
+                it.isVisible = true
+            }
+        }
+
+    }
+
+    private fun getAmount(): Double {
+        if(numPickerCount.isVisible) {
+            return numPickerCount.value.toDouble()
+        } else {
+            return editTextCount.text.toString().toDouble()
+        }
+    }
+
+    private fun getUnit(): Units {
+        return Units.valueOf(Units.stringValueArray(this)[numPickerUnit.value])
+    }
+
+    private fun getItem(): String {
+        return autoCmplTxtName.text.toString()
+    }
+
+    private fun addToDatabase() {
+        //TODO: Add item to Database
     }
 }

@@ -1,15 +1,14 @@
 package de.madem.homium.ui.activities.test
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.widget.NumberPicker
 import androidx.appcompat.app.AppCompatActivity
 import de.madem.homium.R
-import kotlinx.android.synthetic.main.activity_test.*
 
 class TestActivity : AppCompatActivity() {
 
     companion object {
-        val COUNTRIES = arrayOf("Belgium", "France", "Italy", "Germany", "Spain")
+        val UNITS: Array<String> = arrayOf("Stück", "Packung", "gramm", "l", "ml")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,10 +16,12 @@ class TestActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_test)
 
-        val adapter = ArrayAdapter(
-            this, android.R.layout.simple_dropdown_item_1line, COUNTRIES
-        )
-        tvauto_test.setAdapter(adapter)
+
+
+        val numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit)
+        numPickerUnit.minValue = 0
+        numPickerUnit.maxValue = 4
+        numPickerUnit.displayedValues = UNITS
     }
 
 }
