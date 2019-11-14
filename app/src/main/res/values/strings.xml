@@ -29,20 +29,20 @@
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Product was updated successfully</string>
     <string name="notification_delete_shoppingitem_sucess">Product was deleted successfully</string>
+    <string name="notification_remove_all_bought_shoppingitems">All bought shopping-items were removed from your shopping list</string>
 
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
 
+    <!--data for units-->
+    <string name="data_units_gram">Gram</string>
+    <string name="data_units_kilogram">Kilogram</string>
+    <string name="data_units_litre">Litre</string>
+    <string name="data_units_millilitre">Millilitre</string>
+    <string name="data_units_pack">Pack</string>
+    <string name="data_units_item">Item</string>
 
-    <!-- dummy Data-->
-    <string-array name="dummy_units">
-        <item>No Unit</item>
-        <item>Kilogramm</item>
-        <item>Gramm</item>
-        <item>Pack</item>
-        <item>Bottles</item>
-    </string-array>
 
     <string name="data_units_item">Item</string>
     <string name="data_units_gram">Gramm</string>
