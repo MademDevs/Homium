@@ -51,7 +51,7 @@ class ShoppingFragment : Fragment() {
             //recyclerview test button
             val testRecyclerView = root.findViewById<Button>(R.id.btn_testRecyclerView)
             testRecyclerView.setOnClickListener {
-                testData.add(0,ShoppingItem("Testitem",100, Units.KILOGRAM.getString(context!!)))
+                testData.add(0,ShoppingItem("Testitem ${System.currentTimeMillis()}",100, Units.KILOGRAM.getString(context!!)))
                 shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
             }
 
@@ -104,14 +104,17 @@ class ShoppingFragment : Fragment() {
             val adapter = ShoppingItemListAdapter(testData)
             recyclerView.adapter = adapter
 
+            val actionModeHandler = ShoppingActionModeHandler()
+
             //onclickactions
-            adapter.setOnItemClickListener { position ->
+            adapter.setOnItemClickListener { position, view ->
                 //TODO: Implement OnClick Action for Shopping item click
                 Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
 
+                actionModeHandler.selectItemIfMultisectActive(testData[position], view)
             }
 
-            adapter.setOnItemLongClickListener {position ->
+            adapter.setOnItemLongClickListener {position, view ->
                 //giving haptic feedback
                 val vib = context.getSystemService(VIBRATOR_SERVICE) as? Vibrator
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
@@ -122,7 +125,8 @@ class ShoppingFragment : Fragment() {
                 }
 
                 val actvity = context as AppCompatActivity
-                actvity.startSupportActionMode(ShoppingActionModeHandler())
+                actvity.startSupportActionMode(actionModeHandler)
+                actionModeHandler.selectItemIfMultisectActive(testData[position], view)
 
                 //TODO: Implement OnClick Action for Shopping item longclick
                 Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()
