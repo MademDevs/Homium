@@ -36,14 +36,6 @@
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
 
     <!--data for units-->
-    <string name="data_units_gram">Gram</string>
-    <string name="data_units_kilogram">Kilogram</string>
-    <string name="data_units_litre">Litre</string>
-    <string name="data_units_millilitre">Millilitre</string>
-    <string name="data_units_pack">Pack</string>
-    <string name="data_units_item">Item</string>
-
-
     <string name="data_units_item">Item</string>
     <string name="data_units_gram">Gramm</string>
     <string name="data_units_kilogram">Kilogram</string>
