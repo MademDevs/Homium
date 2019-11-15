@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -104,7 +103,8 @@ class ShoppingFragment : Fragment() {
             val adapter = ShoppingItemListAdapter(testData)
             recyclerView.adapter = adapter
 
-            val actionModeHandler = ShoppingActionModeHandler()
+            val actionModeHandler = ShoppingActionModeHandler(context)
+            var actionMode : androidx.appcompat.view.ActionMode? = null
 
             //onclickactions
             adapter.setOnItemClickListener { position, view ->
@@ -112,6 +112,12 @@ class ShoppingFragment : Fragment() {
                 Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
 
                 actionModeHandler.selectItemIfMultisectActive(testData[position], view)
+
+                //end actionmode if there are no selected items anymore
+                if(actionModeHandler.countSelected() == 0){
+                    actionMode?.finish()
+                }
+
             }
 
             adapter.setOnItemLongClickListener {position, view ->
@@ -124,8 +130,9 @@ class ShoppingFragment : Fragment() {
                     vib?.vibrate(VibrationEffect.createOneShot(30,10))
                 }
 
-                val actvity = context as AppCompatActivity
-                actvity.startSupportActionMode(actionModeHandler)
+                val activity = context as AppCompatActivity
+                actionMode = activity.startSupportActionMode(actionModeHandler)
+                actionMode?.setTitle(R.string.screentitle_main_actionmode_shopping)
                 actionModeHandler.selectItemIfMultisectActive(testData[position], view)
 
                 //TODO: Implement OnClick Action for Shopping item longclick

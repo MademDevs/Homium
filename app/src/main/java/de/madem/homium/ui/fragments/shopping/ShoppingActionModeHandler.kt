@@ -1,29 +1,40 @@
 package de.madem.homium.ui.fragments.shopping
 
+import android.content.Context
 import android.graphics.Color
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ActionMode
 import androidx.cardview.widget.CardView
+import de.madem.homium.R
 import de.madem.homium.models.ShoppingItem
 
-class ShoppingActionModeHandler : ActionMode.Callback {
+class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
 
+    //private fields
     private var selectedItems: MutableSet<ShoppingItem> = mutableSetOf()
     private var selectedViews: MutableSet<View> = mutableSetOf()
     private var multiSelect: Boolean = false
 
+    //utility fields
+    private val menuInflater = MenuInflater(context)
+    private lateinit var menu : Menu
+
+    //functions
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return false
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
         multiSelect = true
+        menuInflater.inflate(R.menu.shopping_fragment_actionmode,menu)
+        this.menu = menu
 
-        menu.add("Delete")
-        menu.add("Edit")
-        menu.add("Check")
+        //menu.add("Delete")
+        //menu.add("Edit")
+        //menu.add("Check")
         return true
     }
 
@@ -51,7 +62,18 @@ class ShoppingActionModeHandler : ActionMode.Callback {
                 selectedViews.add(view)
                 view.select()
             }
+
+            if(selectedViews.size == 1){
+                menu.findItem(R.id.main_actionmode_shopping_edit).isVisible = true
+            }
+            else{
+                menu.findItem(R.id.main_actionmode_shopping_edit).isVisible = false
+            }
         }
+    }
+
+    fun countSelected(): Int{
+        return if(selectedViews.size == selectedItems.size) selectedItems.size else -1
     }
 
     private fun View.select() = setBackgroundColor(Color.LTGRAY)
