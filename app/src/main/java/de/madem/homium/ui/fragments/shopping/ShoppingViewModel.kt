@@ -17,4 +17,6 @@ class ShoppingViewModel : ViewModel() {
         //TODO: Implement code to get all shopping items from Database
     }
 
+
+
 }

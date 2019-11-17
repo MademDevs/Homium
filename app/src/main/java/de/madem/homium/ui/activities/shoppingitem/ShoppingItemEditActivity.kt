@@ -8,15 +8,17 @@ import android.view.View
 import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Product
+import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.utilities.switchToActivity
 import kotlinx.android.synthetic.main.activity_test.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ShoppingItemEditActivity : AppCompatActivity() {
-
-    //TEST DATA
-    private val smallProductTestData = listOf<String>("Apple","Milk","Bread","Sausage","Cheese")
 
     //GUI Components
     private lateinit var btnDelete : Button
@@ -24,6 +26,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     private lateinit var numPickerCount: NumberPicker
     private lateinit var numPickerUnit: NumberPicker
     private lateinit var editTextCount: EditText
+    private val db = AppDatabase.getInstance(this)
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +64,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             //TODO: Save a shopping item -> addToDatabase()
-            //R.id.shopping_item_edit_actionbar_confirm -> Toast.makeText(this,resources.getString(R.string.notification_edited_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
-            //android.R.id.home -> switchToActivity(MainActivity::class)
+            R.id.shopping_item_edit_actionbar_confirm -> addToDatabase().also { switchToActivity(MainActivity::class) }
+            android.R.id.home -> switchToActivity(MainActivity::class)
         }
 
         return super.onOptionsItemSelected(item)
@@ -79,7 +82,12 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
-        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,smallProductTestData))
+        val productList = getProducts()
+        var nameList = mutableListOf<String>()
+        for (el in productList) {
+            nameList.add(el.name)
+        }
+        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, nameList))
 
         //init numberpicker
         val units = Units.stringValueArray(this)
@@ -140,16 +148,24 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     }
 
-    private fun getAmount(): Double {
+    private fun getProducts():List<Product> {
+        var list = listOf<Product>()
+        GlobalScope.launch {
+            list = db.itemDao().getAllProduct()
+        }
+        return list
+    }
+
+    private fun getAmount(): Int {
         if(numPickerCount.isVisible) {
-            return numPickerCount.value.toDouble()
+            return numPickerCount.value
         } else {
-            return editTextCount.text.toString().toDouble()
+            return editTextCount.text.toString().toInt()
         }
     }
 
-    private fun getUnit(): Units {
-        return Units.valueOf(Units.stringValueArray(this)[numPickerUnit.value])
+    private fun getUnit(): String {
+        return Units.stringValueArray(this)[numPickerUnit.value]
     }
 
     private fun getItem(): String {
@@ -157,6 +173,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     }
 
     private fun addToDatabase() {
-        //TODO: Add item to Database
+        val item = ShoppingItem(getItem(), getAmount(), getUnit())
+        GlobalScope.launch { db.itemDao().insertShopping(item) }
     }
 }

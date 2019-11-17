@@ -1,5 +1,6 @@
 package de.madem.homium.ui.activities.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,8 +11,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Product
 import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.switchToActivity
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        fillDatabase()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -55,4 +61,21 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
+    //Onboarding -> filling some Data in Database
+    private fun fillDatabase() {
+        val db = AppDatabase.getInstance(this)
+        GlobalScope.launch {
+            db.itemDao().deleteAllProduct()
+            db.itemDao().insertProduct(
+                Product("Apfel", "kg", "2"),
+                Product("Ananas", "Stück", "1"),
+                Product("Brötchen", "Stück", "5"),
+                Product("Hackfleisch", "g", "500")
+            )
+        }
+    }
+
+
 }

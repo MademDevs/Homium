@@ -8,30 +8,17 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textView"
+        <Button
+            android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Menge: " />
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number|numberDecimal" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Einheit: " />
-
-        <NumberPicker
-            android:id="@+id/shopping_item_edit_numPick_unit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></NumberPicker>
-
+            android:layout_weight="1"
+            android:text="Button" />
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

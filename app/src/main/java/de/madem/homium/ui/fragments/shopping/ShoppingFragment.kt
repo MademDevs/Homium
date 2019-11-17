@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.shopping
 
+import android.app.Activity
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
 import android.os.Bundle
@@ -19,11 +20,16 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
+import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.switchToActivity
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ShoppingFragment : Fragment() {
 
@@ -32,8 +38,18 @@ class ShoppingFragment : Fragment() {
 
     private val testData = mutableListOf<ShoppingItem>()
 
+    private lateinit var db: AppDatabase
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        db = AppDatabase.getInstance(context)
+    }
+
+
     //on create
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         //getting viewmodel
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
 
@@ -100,7 +116,11 @@ class ShoppingFragment : Fragment() {
             recyclerView.layoutManager = LinearLayoutManager(context)
 
             //adapter
-            val adapter = ShoppingItemListAdapter(testData)
+            //val adapter = ShoppingItemListAdapter(testData)
+
+            //getShoppingItems
+            val adapter = ShoppingItemListAdapter(getShoppingItemList())
+
             recyclerView.adapter = adapter
 
             //onclickactions
@@ -130,5 +150,14 @@ class ShoppingFragment : Fragment() {
         }
 
     }
+
+    private fun getShoppingItemList(): MutableList<ShoppingItem> {
+        var list = listOf<ShoppingItem>()
+        GlobalScope.launch {
+            list = db.itemDao().getAllShopping()
+        }
+        return list.toMutableList()
+    }
+
 
 }
