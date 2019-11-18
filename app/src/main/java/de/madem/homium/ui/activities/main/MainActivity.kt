@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 db.itemDao().insertProduct(Product(splitted[0], splitted[1], splitted[2]))
                 line = fileReader.readLine()
             }
-            println(db.itemDao().getAllProduct())
+           // println(db.itemDao().getAllProduct())
         }
     }
 
