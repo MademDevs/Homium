@@ -10,6 +10,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
@@ -17,6 +19,8 @@ import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.switchToActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.FileReader
 
 
 class MainActivity : AppCompatActivity() {
@@ -68,12 +72,21 @@ class MainActivity : AppCompatActivity() {
         val db = AppDatabase.getInstance(this)
         GlobalScope.launch {
             db.itemDao().deleteAllProduct()
-            db.itemDao().insertProduct(
-                Product("Apfel", "kg", "2"),
-                Product("Ananas", "Stück", "1"),
-                Product("Brötchen", "Stück", "5"),
-                Product("Hackfleisch", "g", "500")
-            )
+            //db.itemDao().insertProduct(
+                //Product("Apfel", "kg", "2"),
+                //Product("Ananas", "Stück", "1"),
+                //Product("Brötchen", "Stück", "5"),
+                //Product("Hackfleisch", "g", "500")
+           // )
+
+            var fileReader = BufferedReader(FileReader("ProductsCSV.csv"))
+            var line = fileReader.readLine()
+            while(line != null) {
+                val splitted = line.split(";")
+                db.itemDao().insertProduct(Product(splitted[0], splitted[1], splitted[2]))
+                line = fileReader.readLine()
+            }
+            println(db.itemDao().getAllProduct())
         }
     }
 

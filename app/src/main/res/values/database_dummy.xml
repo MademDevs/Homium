@@ -2,31 +2,86 @@
 <resources>
 
     <string-array name="dummy_database">
+
         <item>Ananas</item>
         <item>Apfel</item>
+        <item>Apfelsaft</item>
+        <item>Backpulver</item>
         <item>Banane</item>
+        <item>Bier</item>
         <item>Birne</item>
+        <item>Bratwurst</item>
+        <item>Brot</item>
+        <item>Brot</item>
+        <item>Brötchen</item>
+        <item>Brownie</item>
+        <item>Butter</item>
+        <item>Chips</item>
+        <item>Cola</item>
+        <item>Cornflakes</item>
+        <item>Croissant</item>
+        <item>Donut</item>
+        <item>Duschgel</item>
+        <item>Ei</item>
+        <item>Eiscreme</item>
+        <item>Eistee</item>
+        <item>Energy-Drink</item>
         <item>Erdbeer</item>
+        <item>Erdnuss</item>
+        <item>Fanta</item>
+        <item>Gin</item>
         <item>Gurke</item>
+        <item>Haselnuss</item>
         <item>Himbeer</item>
         <item>Ingwer</item>
         <item>Karotte</item>
         <item>Kartoffel</item>
+        <item>Käse</item>
+        <item>Ketchup</item>
         <item>Kiwi</item>
+        <item>Leberkäse</item>
+        <item>Leberwurst</item>
         <item>Mango</item>
-        <item>Orange</item>
-        <item>Paprika</item>
-        <item>Plaume</item>
-        <item>Salat</item>
-        <item>Tomate</item>
-        <item>Zwiebel</item>
-        <item>Ei</item>
-        <item>Milch</item>
-        <item>Salz</item>
-        <item>Zucker</item>
+        <item>Marmelade</item>
         <item>Mehl</item>
-        <item>Pfeffer</item>
+        <item>Mettwurst</item>
+        <item>Mezzo-Mix</item>
+        <item>Milch</item>
+        <item>Nudeln</item>
+        <item>Nutella</item>
         <item>Öl</item>
+        <item>Orange</item>
+        <item>Orangensaft</item>
+        <item>Paprika</item>
+        <item>Pfeffer</item>
+        <item>Plaume</item>
+        <item>Rindfleisch</item>
+        <item>Salami</item>
+        <item>Salat</item>
+        <item>Salz</item>
+        <item>Schampoo</item>
+        <item>Schinken</item>
+        <item>Schoko-Croissant</item>
+        <item>Schokolade</item>
+        <item>Schweinefleisch</item>
+        <item>Seife</item>
+        <item>Senf</item>
+        <item>Smoothies</item>
+        <item>Tee</item>
+        <item>Tomate</item>
+        <item>Traubensaft</item>
+        <item>Vodka</item>
+        <item>Walnuss</item>
+        <item>Wasser</item>
+        <item>Wassereis</item>
+        <item>Wein</item>
+        <item>Whisky</item>
+        <item>Wiener</item>
+        <item>Zahnbürste</item>
+        <item>Zahnpasta</item>
+        <item>Zucker</item>
+        <item>Zwiebel</item>
+
     </string-array>
 
 </resources>
