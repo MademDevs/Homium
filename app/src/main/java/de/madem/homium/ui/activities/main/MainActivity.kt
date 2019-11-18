@@ -1,6 +1,5 @@
 package de.madem.homium.ui.activities.main
 
-import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,8 +9,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
@@ -19,8 +16,6 @@ import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.switchToActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.FileReader
 
 
 class MainActivity : AppCompatActivity() {
@@ -79,14 +74,14 @@ class MainActivity : AppCompatActivity() {
                 //Product("Hackfleisch", "g", "500")
            // )
 
-            var fileReader = BufferedReader(FileReader("ProductsCSV.csv"))
+            var fileReader = applicationContext.assets.open("productsCSV.csv").bufferedReader()
             var line = fileReader.readLine()
             while(line != null) {
                 val splitted = line.split(";")
                 db.itemDao().insertProduct(Product(splitted[0], splitted[1], splitted[2]))
                 line = fileReader.readLine()
             }
-           // println(db.itemDao().getAllProduct())
+           //println(db.itemDao().getAllProduct())
         }
     }
 
