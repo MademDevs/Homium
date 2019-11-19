@@ -67,6 +67,8 @@ class ShoppingFragment : Fragment() {
             val testRecyclerView = root.findViewById<Button>(R.id.btn_testRecyclerView)
             testRecyclerView.setOnClickListener {
                 testData.add(0,ShoppingItem("Testitem",100, Units.KILOGRAM.getString(context!!)))
+                //TODO: Datenweg sauber ziehen
+                shoppingViewModel.shoppingItemList.value = testData
                 shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
             }
 
@@ -82,8 +84,12 @@ class ShoppingFragment : Fragment() {
                 swipeRefresh.isRefreshing = false
             }
 
+            shoppingViewModel.reloadShoppingItems(context!!)
+
             shoppingViewModel.shoppingItemList.observe(this, Observer {list ->
                 val adapter = (shoopingItemRecyclerView.adapter as ShoppingItemListAdapter)
+
+                println("UPDATE: $list")
 
                 adapter.data = list.toMutableList()
                 adapter.notifyDataSetChanged()

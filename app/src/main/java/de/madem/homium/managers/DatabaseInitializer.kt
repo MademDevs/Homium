@@ -1,24 +1,23 @@
 package de.madem.homium.managers
 
 import android.content.Context
-import android.widget.Toast
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import de.madem.homium.utilities.CoroutineBackgroundTask
 
-@Deprecated("Former class for init the database. Same features can now be called from CoroutineBackgroundTask")
-class DatabaseInitializer(private val context: Context, private val onDone: () -> Unit) {
+class DatabaseInitializer(private val context: Context, private val doneCallback: () -> Unit) {
 
     private val dao = AppDatabase.getInstance(context).itemDao()
+    private val backgroundTask = CoroutineBackgroundTask<Unit>()
 
     init {
-        GlobalScope.launch {
-            deleteAllProducts()
-            loadProductsFromFile()
-            withContext(Main) { onDone() }
+        with(backgroundTask) {
+            executeInBackground {
+                deleteAllProducts()
+                loadProductsFromFile()
+            }
+            onDone { doneCallback.invoke() }
+            start()
         }
     }
 

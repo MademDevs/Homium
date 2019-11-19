@@ -8,7 +8,7 @@ import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.managers.CoroutineBackgroundTask
+import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units

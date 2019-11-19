@@ -6,9 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.ShoppingItem
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import de.madem.homium.utilities.CoroutineBackgroundTask
 
 class ShoppingViewModel : ViewModel() {
 
@@ -22,9 +20,9 @@ class ShoppingViewModel : ViewModel() {
 
     //functions
     fun reloadShoppingItems(context: Context){
-        GlobalScope.launch(IO) {
-            shoppingItemList.value = AppDatabase.getInstance(context).itemDao().getAllShopping()
-        }
+        CoroutineBackgroundTask<List<ShoppingItem>>()
+            .executeInBackground { AppDatabase.getInstance(context).itemDao().getAllShopping() }
+            .onDone { shoppingItemList.value = it }
     }
 
 
