@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        fillDatabase()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,28 +61,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    //Onboarding -> filling some Data in Database
-    private fun fillDatabase() {
-        val db = AppDatabase.getInstance(this)
-        GlobalScope.launch {
-            db.itemDao().deleteAllProduct()
-            //db.itemDao().insertProduct(
-                //Product("Apfel", "kg", "2"),
-                //Product("Ananas", "Stück", "1"),
-                //Product("Brötchen", "Stück", "5"),
-                //Product("Hackfleisch", "g", "500")
-           // )
 
-            var fileReader = applicationContext.assets.open("productsCSV.csv").bufferedReader()
-            var line = fileReader.readLine()
-            while(line != null) {
-                val splitted = line.split(";")
-                db.itemDao().insertProduct(Product(splitted[0], splitted[1], splitted[2]))
-                line = fileReader.readLine()
-            }
-           //println(db.itemDao().getAllProduct())
-        }
-    }
 
 
 }

@@ -1,16 +1,13 @@
 package de.madem.homium.ui.activities.test
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.NumberPicker
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.models.Product
+import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.models.ShoppingItem
+import kotlinx.android.synthetic.main.activity_test.*
 import kotlinx.coroutines.*
 
 class TestActivity : AppCompatActivity() {
@@ -38,6 +35,12 @@ class TestActivity : AppCompatActivity() {
             }
             //
             listView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+        }
+
+        btn_initdb.setOnClickListener {
+            DatabaseInitializer(applicationContext) {
+                Toast.makeText(this, "Datenbank initialisiert!", Toast.LENGTH_SHORT).show()
+            }
         }
 
     }
