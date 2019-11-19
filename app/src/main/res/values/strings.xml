@@ -80,4 +80,9 @@
         <item>900</item>
         <item>1000</item>
     </string-array>
+
+
+    <!--shared prefernces keys -->
+    <string name="sharedprefernce_namespacekey_settings">Settings</string>
+    <string name="sharedpreference_settings_preferencekey_isInitialized">isInizialized</string>
 </resources>

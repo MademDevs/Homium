@@ -4,17 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.managers.CoroutineBackgroundTask
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.utilities.switchToActivity
-import kotlinx.android.synthetic.main.activity_test.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -65,7 +64,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         when(item.itemId){
             //TODO: Save a shopping item -> addToDatabase()
             R.id.shopping_item_edit_actionbar_confirm -> addToDatabase().also { switchToActivity(MainActivity::class) }
-            android.R.id.home -> switchToActivity(MainActivity::class)
+            android.R.id.home -> finish()
         }
 
         return super.onOptionsItemSelected(item)
@@ -82,12 +81,27 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
-        val productList = getProducts()
+
+        CoroutineBackgroundTask<List<Product>>().executeInBackground {
+            val result = db.itemDao().getAllProduct()
+            return@executeInBackground result
+        }.onDone {result ->
+            val productNameList = result.map { it.name }
+            autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
+
+        }.start()
+
+        /*
+        val productNameList = getProducts().map { it.name }
+
         var nameList = mutableListOf<String>()
-        for (el in productList) {
+        for (el in productNameList) {
             nameList.add(el.name)
         }
-        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, nameList))
+
+
+        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
+        */
 
         //init numberpicker
         val units = Units.stringValueArray(this)
@@ -153,6 +167,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         GlobalScope.launch {
             list = db.itemDao().getAllProduct()
         }
+        Toast.makeText(this, "Prdocts geladen ${list.size}",Toast.LENGTH_SHORT).show()
         return list
     }
 
