@@ -81,8 +81,14 @@ class ShoppingFragment : Fragment() {
                 Toast.makeText(context!!,resources.getString(R.string.notification_remove_all_bought_shoppingitems),Toast.LENGTH_SHORT).show()
                 swipeRefresh.isRefreshing = false
             }
-        }
 
+            shoppingViewModel.shoppingItemList.observe(this, Observer {list ->
+                val adapter = (shoopingItemRecyclerView.adapter as ShoppingItemListAdapter)
+
+                adapter.data = list.toMutableList()
+                adapter.notifyDataSetChanged()
+            })
+        }
 
 
         //TODO: Implement Oberserver for RecyclerView
