@@ -10,8 +10,10 @@ import de.madem.homium.utilities.CoroutineBackgroundTask
 
 class ShoppingViewModel : ViewModel() {
 
-    val shoppingItemList = MutableLiveData<List<ShoppingItem>>()
-
+    //list with all shopping items
+    val shoppingItemList = MutableLiveData<List<ShoppingItem>>().apply {
+        value = listOf()
+    }
 
     //live data
     private val _text = MutableLiveData<String>().apply {
@@ -28,6 +30,14 @@ class ShoppingViewModel : ViewModel() {
             .start()
     }
 
+    fun getShoppingItemByPosition(position: Int): ShoppingItem? {
+        val list = shoppingItemList.value
 
+        if (position >= list?.size ?: 0) {
+            return null
+        }
+
+        return list?.get(position)
+    }
 
 }

@@ -1,18 +1,18 @@
 package de.madem.homium.ui.activities.shoppingitem
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
+import de.madem.homium.utilities.CoroutineBackgroundTask
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -77,7 +77,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     fun setShoppingItemToElements(id: Int) {
         CoroutineBackgroundTask<ShoppingItem>()
-            .executeInBackground { return@executeInBackground db.itemDao().getShoppingItemById(id) }
+            .executeInBackground { db.itemDao().getShoppingItemById(id) }
             .onDone {
                 autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name)
             }

@@ -150,7 +150,7 @@ class ShoppingFragment : Fragment() {
 
             //getShoppingItems
 
-            val adapter = ShoppingItemListAdapter(getShoppingItemList())
+            val adapter = ShoppingItemListAdapter(mutableListOf())
 
             recyclerView.adapter = adapter
 
@@ -181,18 +181,7 @@ class ShoppingFragment : Fragment() {
                 return@setOnItemLongClickListener true
             }
 
-
-
         }
-
-    }
-
-    private fun getShoppingItemList(): MutableList<ShoppingItem> {
-        var list = listOf<ShoppingItem>()
-        GlobalScope.launch {
-            list = db.itemDao().getAllShopping()
-        }
-        return list.toMutableList()
     }
 
 
