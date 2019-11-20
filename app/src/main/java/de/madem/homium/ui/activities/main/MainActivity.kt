@@ -14,6 +14,7 @@ import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.getSetting
+import de.madem.homium.utilities.putSetting
 import de.madem.homium.utilities.switchToActivity
 
 
@@ -23,9 +24,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //init database
-        DatabaseInitializer(applicationContext) {
-            Toast.makeText(this,"Initit Database",Toast.LENGTH_SHORT).show()
+        val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
+
+        if(!dataBaseInitialized){
+            //init database (should be done in onboarding later)
+            DatabaseInitializer(applicationContext) {
+                Toast.makeText(this,"Init Database",Toast.LENGTH_SHORT).show()
+                putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),true)
+            }
+
         }
 
 

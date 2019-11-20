@@ -71,5 +71,5 @@ interface ItemDao {
     fun productSize() : Int
 
     @Query("SELECT * FROM shoppingItem WHERE uid = :id")
-    fun getShoppingItemByName(id: Int) : ShoppingItem
+    fun getShoppingItemById(id: Int) : ShoppingItem
 }

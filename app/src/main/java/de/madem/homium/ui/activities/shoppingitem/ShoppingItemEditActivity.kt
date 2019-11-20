@@ -1,6 +1,5 @@
 package de.madem.homium.ui.activities.shoppingitem
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -10,15 +9,10 @@ import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
-import de.madem.homium.ui.activities.main.MainActivity
-import de.madem.homium.ui.fragments.shopping.ShoppingFragment
-import de.madem.homium.ui.fragments.shopping.ShoppingViewModel
-import de.madem.homium.utilities.switchToActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -72,8 +66,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            //TODO: Save a shopping item -> addToDatabase()
-            R.id.shopping_item_edit_actionbar_confirm -> addToDatabase()
+            //TODO: Save a shopping item -> addToDatabaseIfPossible()
+            R.id.shopping_item_edit_actionbar_confirm -> addToDatabaseIfPossible()
             android.R.id.home -> finish()
         }
 
@@ -83,8 +77,10 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     fun setShoppingItemToElements(id: Int) {
         CoroutineBackgroundTask<ShoppingItem>()
-            .executeInBackground { return@executeInBackground db.itemDao().getShoppingItemByName(id) }
-            .onDone { autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name) }
+            .executeInBackground { return@executeInBackground db.itemDao().getShoppingItemById(id) }
+            .onDone {
+                autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name)
+            }
             .start()
     }
 
@@ -135,6 +131,50 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            //getting data for picker
+            val bigUnits = resources.getStringArray(R.array.big_units)
+            val smallUnits = resources.getStringArray(R.array.small_units)
+
+            numPickerCount.isSaveFromParentEnabled = false
+            numPickerCount.isSaveEnabled = false
+            numPickerCount.minValue = 0
+            numPickerCount.maxValue = smallUnits.size-1
+            numPickerCount.value = 0
+            numPickerCount.displayedValues = smallUnits
+            numPickerCount.setOnLongClickListener {
+                numPickerCount.isVisible = false
+                editTextCount.isVisible = true
+                true
+            }
+
+
+
+            numPickerUnit.setOnValueChangedListener { npUnit, i, i2 ->
+                println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
+
+                when(npUnit.value) {
+                    1, 3 -> {
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = bigUnits.size-1
+                        numPickerCount.displayedValues = bigUnits
+                    }
+                    else -> {
+                        numPickerCount.displayedValues = smallUnits
+                        numPickerCount.minValue = 0
+                        numPickerCount.maxValue = smallUnits.size-1
+                    }
+                }
+            }
+        } else {
+            numPickerCount.isVisible = false
+        }
+        /*
+         numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            //getting data for picker
+            val bigUnits = resources.getStringArray(R.array.big_units)
+            val smallUnits = resources.getStringArray(R.array.small_units)
+
             numPickerCount.isSaveFromParentEnabled = false
             numPickerCount.isSaveEnabled = false
             numPickerCount.minValue = 1
@@ -145,8 +185,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 editTextCount.isVisible = true
                 true
             }
-            val bigUnits = resources.getStringArray(R.array.big_units)
-            val smallUnits = resources.getStringArray(R.array.small_units)
+
+
+
             numPickerUnit.setOnValueChangedListener { np, i, i2 ->
                 when(np.value) {
                     1, 3 -> {
@@ -164,6 +205,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         } else {
             numPickerCount.isVisible = false
         }
+
+        */
 
         editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
             it.isVisible = false
@@ -189,11 +232,11 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return list
     }
 
-    private fun getAmount(): Int {
+    private fun getAmount(): Int? {
         if(numPickerCount.isVisible) {
-            return numPickerCount.value
+            return numPickerCount.displayedValues[numPickerCount.value].toIntOrNull()
         } else {
-            return editTextCount.text.toString().toInt()
+            return editTextCount.text.toString().toIntOrNull()
         }
     }
 
@@ -201,15 +244,31 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return Units.stringValueArray(this)[numPickerUnit.value]
     }
 
-    private fun getItem(): String {
+    private fun getItemTitle(): String {
         return autoCmplTxtName.text.toString()
     }
 
-    private fun addToDatabase() {
-        val item = ShoppingItem(getItem(), getAmount(), getUnit())
-        GlobalScope.launch {
-            db.itemDao().insertShopping(item)
+    private fun addToDatabaseIfPossible() {
+
+        //check if all input components are valid
+        val title = getItemTitle()
+        val amount = getAmount()
+        val unit = getUnit()
+
+        if(title.isNotBlank() && title.isNotEmpty() && amount != null){
+            //all input components are valid -> creating object and put it into database via coroutine
+            val item = ShoppingItem(title, amount, unit)
+
+            GlobalScope.launch {
+                db.itemDao().insertShopping(item)
+
+            }
             finish()
         }
+        else{
+            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
+        }
+
+
     }
 }

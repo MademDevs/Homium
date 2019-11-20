@@ -38,7 +38,7 @@ class ShoppingFragment : Fragment() {
     //fields
     private lateinit var shoppingViewModel: ShoppingViewModel
 
-    private val testData = mutableListOf<ShoppingItem>()
+    //private val testData = mutableListOf<ShoppingItem>()
 
     private lateinit var db: AppDatabase
     private lateinit var shoopingItemRecyclerView: RecyclerView
@@ -53,7 +53,11 @@ class ShoppingFragment : Fragment() {
         super.onResume()
         CoroutineBackgroundTask<List<ShoppingItem>>()
             .executeInBackground { AppDatabase.getInstance(context!!).itemDao().getAllShopping() }
-            .onDone { (shoopingItemRecyclerView.adapter as ShoppingItemListAdapter).data = it.toMutableList() }
+            .onDone {
+                val tmpAdapter = shoopingItemRecyclerView.adapter as ShoppingItemListAdapter
+                tmpAdapter.data = it.toMutableList()
+                tmpAdapter.notifyDataSetChanged()
+            }
             .start()
     }
 
@@ -75,6 +79,7 @@ class ShoppingFragment : Fragment() {
 
 
             //recyclerview test button
+            /*
             val testRecyclerView = root.findViewById<Button>(R.id.btn_testRecyclerView)
             testRecyclerView.setOnClickListener {
                 testData.add(0,ShoppingItem("Testitem",100, Units.KILOGRAM.getString(context!!)))
@@ -83,13 +88,15 @@ class ShoppingFragment : Fragment() {
                 shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
             }
 
+             */
+
             //swipe refresh layout
             val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
             swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
             swipeRefresh.setOnRefreshListener {
                 //TODO: Implement action for swipe-refresh
                 swipeRefresh.isRefreshing = true
-                testData.clear()
+                //testData.clear()
                 shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
                 Toast.makeText(context!!,resources.getString(R.string.notification_remove_all_bought_shoppingitems),Toast.LENGTH_SHORT).show()
                 swipeRefresh.isRefreshing = false
@@ -153,7 +160,7 @@ class ShoppingFragment : Fragment() {
 
                 //TODO: Implement OnClick Action for Shopping item click
                 val intent = Intent(activity, ShoppingItemEditActivity::class.java).apply {
-                    putExtra("item", getShoppingItemList()[position].uid)
+                    putExtra("item", adapter.data[position].uid)
                 }
                 startActivity(intent)
 
