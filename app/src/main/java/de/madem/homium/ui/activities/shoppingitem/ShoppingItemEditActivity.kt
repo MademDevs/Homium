@@ -24,14 +24,21 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     private lateinit var numPickerCount: NumberPicker
     private lateinit var numPickerUnit: NumberPicker
     private lateinit var editTextCount: EditText
+
+
+    //fields
     private val db = AppDatabase.getInstance(this)
+    private lateinit var bigUnits : Array<String>
+    private lateinit var smallUnits : Array<String>
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shopping_item_edit)
 
-
+        //getting data from ressources
+        bigUnits = resources.getStringArray(R.array.big_units)
+        smallUnits = resources.getStringArray(R.array.small_units)
         /*
         TODO: implement functionality for getting shoppingitem
         val shoppingitem = intent.getParcelableExtra<ShoppingItem>(resources.getString(R.string.data_transfer_intent_edit_shoppingitem))
@@ -75,11 +82,31 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     }
 
-    fun setShoppingItemToElements(id: Int) {
+    private fun setShoppingItemToElements(id: Int) {
         CoroutineBackgroundTask<ShoppingItem>()
             .executeInBackground { db.itemDao().getShoppingItemById(id) }
             .onDone {
+                //setting name
                 autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name)
+
+                //setting unit
+                numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+
+                //setting amount
+                if(editTextCount.isVisible){
+                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
+                }
+                else{
+                    setValuesForNumPickerCount(numPickerUnit)
+
+                    if(numPickerCount.displayedValues.contains(it.count.toString())){
+                        numPickerCount.value = numPickerCount.displayedValues.indexOf(it.count.toString())
+                    }
+                    else{
+                        assignValueFromPickerToEditText(it.count.toString())
+                    }
+
+                }
             }
             .start()
     }
@@ -132,8 +159,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             //getting data for picker
-            val bigUnits = resources.getStringArray(R.array.big_units)
-            val smallUnits = resources.getStringArray(R.array.small_units)
+
 
             numPickerCount.isSaveFromParentEnabled = false
             numPickerCount.isSaveEnabled = false
@@ -142,16 +168,16 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             numPickerCount.value = 0
             numPickerCount.displayedValues = smallUnits
             numPickerCount.setOnLongClickListener {
-                numPickerCount.isVisible = false
-                editTextCount.isVisible = true
-                true
+                assignValueFromPickerToEditText(numPickerCount.displayedValues[numPickerCount.value])
+
             }
 
 
 
             numPickerUnit.setOnValueChangedListener { npUnit, i, i2 ->
                 println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
-
+                setValuesForNumPickerCount(npUnit)
+                /*
                 when(npUnit.value) {
                     1, 3 -> {
                         numPickerCount.minValue = 0
@@ -164,6 +190,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         numPickerCount.maxValue = smallUnits.size-1
                     }
                 }
+
+                 */
             }
         } else {
             numPickerCount.isVisible = false
@@ -221,6 +249,28 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker){
+        when(numberPickerUnit.value) {
+            1, 3 -> {
+                numPickerCount.minValue = 0
+                numPickerCount.maxValue = bigUnits.size-1
+                numPickerCount.displayedValues = bigUnits
+            }
+            else -> {
+                numPickerCount.displayedValues = smallUnits
+                numPickerCount.minValue = 0
+                numPickerCount.maxValue = smallUnits.size-1
+            }
+        }
+    }
+
+    private fun assignValueFromPickerToEditText(value : String) : Boolean{
+        numPickerCount.isVisible = false
+        editTextCount.isVisible = true
+        editTextCount.text = Editable.Factory.getInstance().newEditable(value)
+        return true
     }
 
     private fun getProducts():List<Product> {
