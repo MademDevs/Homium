@@ -1,18 +1,23 @@
 package de.madem.homium.ui.activities.shoppingitem
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.main.MainActivity
+import de.madem.homium.ui.fragments.shopping.ShoppingFragment
+import de.madem.homium.ui.fragments.shopping.ShoppingViewModel
 import de.madem.homium.utilities.switchToActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,6 +37,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shopping_item_edit)
 
+
         /*
         TODO: implement functionality for getting shoppingitem
         val shoppingitem = intent.getParcelableExtra<ShoppingItem>(resources.getString(R.string.data_transfer_intent_edit_shoppingitem))
@@ -48,6 +54,10 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
 
         initGuiComponents()
+        val id = intent.getIntExtra("item", -1)
+        if(id >= 0) {
+            setShoppingItemToElements(id)
+        }
 
     }
 
@@ -63,7 +73,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             //TODO: Save a shopping item -> addToDatabase()
-            R.id.shopping_item_edit_actionbar_confirm -> addToDatabase().also { switchToActivity(MainActivity::class) }
+            R.id.shopping_item_edit_actionbar_confirm -> addToDatabase()
             android.R.id.home -> finish()
         }
 
@@ -71,8 +81,16 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     }
 
+    fun setShoppingItemToElements(id: Int) {
+        CoroutineBackgroundTask<ShoppingItem>()
+            .executeInBackground { return@executeInBackground db.itemDao().getShoppingItemByName(id) }
+            .onDone { autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name) }
+            .start()
+    }
+
     //private fuctions
     private fun initGuiComponents(){
+
         //init delete button
         btnDelete = findViewById(R.id.shopping_item_edit_btn_delete)
         btnDelete.setOnClickListener{
@@ -189,6 +207,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     private fun addToDatabase() {
         val item = ShoppingItem(getItem(), getAmount(), getUnit())
-        GlobalScope.launch { db.itemDao().insertShopping(item) }
+        GlobalScope.launch {
+            db.itemDao().insertShopping(item)
+            finish()
+        }
     }
 }

@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.utilities.getSetting
 import de.madem.homium.utilities.switchToActivity
 
 
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         DatabaseInitializer(applicationContext) {
             Toast.makeText(this,"Initit Database",Toast.LENGTH_SHORT).show()
         }
+
+
 
         //nav controller for bottom navigation
         val navView: BottomNavigationView = findViewById(R.id.nav_view)

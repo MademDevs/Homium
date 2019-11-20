@@ -3,6 +3,7 @@ package de.madem.homium.ui.fragments.shopping
 import android.app.Activity
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -27,6 +28,7 @@ import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.switchToActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ class ShoppingFragment : Fragment() {
     private val testData = mutableListOf<ShoppingItem>()
 
     private lateinit var db: AppDatabase
+    private lateinit var shoopingItemRecyclerView: RecyclerView
 
 
     override fun onAttach(context: Context) {
@@ -46,6 +49,13 @@ class ShoppingFragment : Fragment() {
         db = AppDatabase.getInstance(context)
     }
 
+    override fun onResume() {
+        super.onResume()
+        CoroutineBackgroundTask<List<ShoppingItem>>()
+            .executeInBackground { AppDatabase.getInstance(context!!).itemDao().getAllShopping() }
+            .onDone { (shoopingItemRecyclerView.adapter as ShoppingItemListAdapter).data = it.toMutableList() }
+            .start()
+    }
 
     //on create
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -53,13 +63,14 @@ class ShoppingFragment : Fragment() {
         //getting viewmodel
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
 
+
         //getting root layout
         val root = inflater.inflate(R.layout.fragment_shopping, container, false)
 
 
         if (this.context != null){
             //recyclerview
-            val shoopingItemRecyclerView = root.findViewById<RecyclerView>(R.id.recyclerView_shopping)
+            shoopingItemRecyclerView = root.findViewById<RecyclerView>(R.id.recyclerView_shopping)
             buildRecyclerView(shoopingItemRecyclerView,context)
 
 
@@ -131,14 +142,20 @@ class ShoppingFragment : Fragment() {
             //val adapter = ShoppingItemListAdapter(testData)
 
             //getShoppingItems
+
             val adapter = ShoppingItemListAdapter(getShoppingItemList())
 
             recyclerView.adapter = adapter
 
             //onclickactions
             adapter.setOnItemClickListener { position ->
-                //TODO: Implement OnClick Action for Shopping item click
                 Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
+
+                //TODO: Implement OnClick Action for Shopping item click
+                val intent = Intent(activity, ShoppingItemEditActivity::class.java).apply {
+                    putExtra("item", getShoppingItemList()[position].uid)
+                }
+                startActivity(intent)
 
             }
 

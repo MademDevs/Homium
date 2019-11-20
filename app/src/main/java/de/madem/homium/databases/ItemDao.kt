@@ -69,4 +69,7 @@ interface ItemDao {
 
     @Query("SELECT COUNT(*) FROM product")
     fun productSize() : Int
+
+    @Query("SELECT * FROM shoppingItem WHERE uid = :id")
+    fun getShoppingItemByName(id: Int) : ShoppingItem
 }
