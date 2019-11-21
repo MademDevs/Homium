@@ -30,7 +30,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     private val db = AppDatabase.getInstance(this)
     private lateinit var bigUnits : Array<String>
     private lateinit var smallUnits : Array<String>
-    private var itemid: Int? = null
+    private var itemid: Int = -1
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,9 +58,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         initGuiComponents()
         itemid = intent.getIntExtra("item", -1)
-        if(itemid!! >= 0) {
+        if(itemid >= 0) {
             btnDelete.isVisible = true
-            setShoppingItemToElements(itemid!!)
+            setShoppingItemToElements(itemid)
             supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
         } else {
             supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
@@ -81,8 +81,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            //TODO: Save a shopping item -> addToDatabaseIfPossible()
-            R.id.shopping_item_edit_actionbar_confirm -> if(itemid!! >= 0) { addToDatabaseIfPossible(itemid!!) }
+            //TODO: Save a shopping item -> addOrUpdateToDatabaseIfPossible()
+            R.id.shopping_item_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
             android.R.id.home -> finish()
         }
 
@@ -127,7 +127,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         btnDelete.setOnClickListener{
             Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
             GlobalScope.launch {
-                db.itemDao().deleteShoppingItemById(itemid!!)
+                db.itemDao().deleteShoppingItemById(itemid)
                 finish()
             }
         }
@@ -310,7 +310,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return autoCmplTxtName.text.toString()
     }
 
-    private fun addToDatabaseIfPossible(id: Int) {
+    private fun addOrUpdateToDatabaseIfPossible() {
 
         //check if all input components are valid
         val title = getItemTitle()
@@ -319,10 +319,16 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         if(title.isNotBlank() && title.isNotEmpty() && amount != null){
             //all input components are valid -> creating object and put it into database via coroutine
-            //val item = ShoppingItem(title, amount, unit)
+            val item = ShoppingItem(title, amount, unit)
 
             GlobalScope.launch {
-                db.itemDao().updateShoppingItemById(id, title, amount, unit)
+                if(itemid >= 0){
+                    db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
+                }
+                else{
+                    db.itemDao().insertShopping(item)
+                }
+
             }
             finish()
         }
