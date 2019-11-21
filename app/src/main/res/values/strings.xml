@@ -30,6 +30,7 @@
     <string name="notification_edited_shoppingitem_sucess">Product was updated successfully</string>
     <string name="notification_delete_shoppingitem_sucess">Product was deleted successfully</string>
     <string name="notification_remove_all_bought_shoppingitems">All bought shopping-items were removed from your shopping list</string>
+    <string name="errormsg_invalid_shoppingitem_parameters">Sorry, your input seems to be invalid and can not be added to your shopping list. Please check your input elements and try again.</string>
 
 
     <!--strings for data transfer e.g. intent-->
@@ -80,4 +81,9 @@
         <item>900</item>
         <item>1000</item>
     </string-array>
+
+
+    <!--shared prefernces keys -->
+    <string name="sharedprefernce_namespacekey_settings">Settings</string>
+    <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
 </resources>

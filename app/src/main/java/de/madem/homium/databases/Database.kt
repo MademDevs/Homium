@@ -11,7 +11,7 @@ import de.madem.homium.models.ShoppingItem
 
 @Database(
     entities = [Product::class, ShoppingItem::class, InventoryItem::class],
-    version = 1
+    version = 1, exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 

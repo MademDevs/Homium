@@ -67,7 +67,9 @@ interface ItemDao {
     @Query("SELECT * FROM product WHERE name LIKE :getItem")
     fun getProduct(getItem: String): List<Product>
 
-    @Query("SELECT * FROM shoppingItem WHERE uid LIKE :itemId")
-    fun getShoppingItemById(itemId: Int): ShoppingItem
+    @Query("SELECT COUNT(*) FROM product")
+    fun productSize() : Int
 
+    @Query("SELECT * FROM shoppingItem WHERE uid = :id")
+    fun getShoppingItemById(id: Int) : ShoppingItem
 }

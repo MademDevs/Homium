@@ -35,7 +35,7 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <Button
+       <!-- <Button
             android:id="@+id/btn_testRecyclerView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             android:layout_marginBottom="32dp"
             android:text="TestRecyclerView"
             app:layout_constraintBottom_toTopOf="@+id/floatingActionButton_addShoppingItem"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />-->
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton_addShoppingItem"
