@@ -5,7 +5,10 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
-import org.junit.*
+import org.junit.Assert
+import org.junit.Before
+import org.junit.BeforeClass
+import org.junit.Test
 
 class ShoppingListRoomTest {
 
@@ -59,4 +62,21 @@ class ShoppingListRoomTest {
 
     }
 
+    @Test
+    fun getNotExistingShoppingElement() {
+        val item = dao.getShoppingItemById(-1)
+
+        Assert.assertEquals(null, item) //not existing item is null
+    }
+
+    @Test
+    fun testAutoUpdateList() {
+
+        val list = dao.getAllShopping()
+        val initSize = list.size
+
+        dao.insertShopping(ShoppingItem("Birnen", 4, Units.GRAM.name))
+
+        Assert.assertEquals(initSize, list.size) //list sadly don't updates on item insert
+    }
 }
