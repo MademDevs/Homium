@@ -13,21 +13,21 @@ private const val quantityUnitTemplate = "quantity unit"
 class ShoppingItemListAdapter(var data : MutableList<ShoppingItem>) : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>() {
 
     //fields
-    private var clickListener : (position:Int) -> Unit = {
+    private var clickListener : (position:Int, view: View) -> Unit = { pos, item ->
         //nothing to do here :D
     }
 
-    private var longClickListener : (position:Int) -> Boolean ={
+    private var longClickListener : (position:Int, view: View) -> Boolean = { pos, item ->
         //nothing to do here
         false
     }
 
     //Setter for onClickListener
-    fun setOnItemClickListener(function : (Int) -> Unit){
+    fun setOnItemClickListener(function : (Int, View) -> Unit){
         this.clickListener = function
     }
 
-    fun setOnItemLongClickListener(function: (Int) -> Boolean){
+    fun setOnItemLongClickListener(function: (Int, View) -> Boolean){
         this.longClickListener = function
     }
 
@@ -48,7 +48,7 @@ class ShoppingItemListAdapter(var data : MutableList<ShoppingItem>) : RecyclerVi
 
 
     //View Holder class
-    class ShoppingItemViewHolder(itemView : View, clickListener: (Int) -> Unit, longClickListener: (Int) -> Boolean) : RecyclerView.ViewHolder(itemView){
+    class ShoppingItemViewHolder(itemView : View, clickListener: (Int, View) -> Unit, longClickListener: (Int, View) -> Boolean) : RecyclerView.ViewHolder(itemView){
 
         //fields
         val txtTitle : TextView = itemView.findViewById(R.id.txtView_shoppingitemList_title)
@@ -61,7 +61,7 @@ class ShoppingItemListAdapter(var data : MutableList<ShoppingItem>) : RecyclerVi
                 val adapterPosition = adapterPosition
 
                 if (adapterPosition != RecyclerView.NO_POSITION){
-                    clickListener.invoke(adapterPosition)
+                    clickListener.invoke(adapterPosition, it)
                 }
             }
 
@@ -70,7 +70,7 @@ class ShoppingItemListAdapter(var data : MutableList<ShoppingItem>) : RecyclerVi
                 val adapterPosition = adapterPosition
 
                 if(adapterPosition != RecyclerView.NO_POSITION){
-                    return@setOnLongClickListener longClickListener.invoke(adapterPosition)
+                    return@setOnLongClickListener longClickListener.invoke(adapterPosition, it)
                 }
                 else{
                     return@setOnLongClickListener false
