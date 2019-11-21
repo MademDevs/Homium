@@ -7,7 +7,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ActionMode
-import androidx.cardview.widget.CardView
 import de.madem.homium.R
 import de.madem.homium.models.ShoppingItem
 
@@ -22,19 +21,20 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     private val menuInflater = MenuInflater(context)
     private lateinit var menu : Menu
 
+    var clickEditButtonHandler: (ShoppingItem) -> Unit = {}
+
     //functions
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        return false
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        if (item.itemId == R.id.shopping_item_am_btn_edit) {
+            clickEditButtonHandler.invoke(selectedItems.first())
+        }
+        return true
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
         multiSelect = true
         menuInflater.inflate(R.menu.shopping_fragment_actionmode,menu)
         this.menu = menu
-
-        //menu.add("Delete")
-        //menu.add("Edit")
-        //menu.add("Check")
         return true
     }
 
@@ -63,12 +63,8 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
                 view.select()
             }
 
-            if(selectedViews.size == 1){
-                menu.findItem(R.id.main_actionmode_shopping_edit).isVisible = true
-            }
-            else{
-                menu.findItem(R.id.main_actionmode_shopping_edit).isVisible = false
-            }
+            //only visible if maximum one item is selected
+            menu.findItem(R.id.shopping_item_am_btn_edit).isVisible = selectedViews.size == 1
         }
     }
 

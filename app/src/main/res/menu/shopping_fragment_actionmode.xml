@@ -2,16 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/actionbar_main_actionmode_delete"
+        android:id="@+id/shopping_item_am_btn_delete"
         android:icon="@drawable/ic_delete"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/actionbar_main_actionmode_delete"
+        app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/main_actionmode_shopping_edit"
+        android:id="@+id/shopping_item_am_btn_edit"
         android:icon="@drawable/ic_edit"
         android:title="@string/actionbar_main_actionmode_edit"
         app:showAsAction="ifRoom"/>
     <item
+        android:id="@+id/shopping_item_am_btn_check"
         android:icon="@drawable/ic_playlist_add_check"
         android:title="@string/actionbar_main_actionmode_check"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

@@ -1,20 +1,16 @@
 package de.madem.homium.ui.fragments.shopping
 
-import android.app.Activity
 import android.content.Context
-import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,23 +18,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
-import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
-import de.madem.homium.models.Units
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.switchToActivity
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import de.madem.homium.utilities.vibrate
 
 class ShoppingFragment : Fragment() {
 
     //fields
     private lateinit var shoppingViewModel: ShoppingViewModel
-
-    //private val testData = mutableListOf<ShoppingItem>()
 
     private lateinit var db: AppDatabase
     private lateinit var shoopingItemRecyclerView: RecyclerView
@@ -155,6 +145,12 @@ class ShoppingFragment : Fragment() {
             recyclerView.adapter = adapter
 
             val actionModeHandler = ShoppingActionModeHandler(context)
+            actionModeHandler.clickEditButtonHandler = { item ->
+                Intent(activity, ShoppingItemEditActivity::class.java)
+                    .apply {putExtra("item", item.uid) }
+                    .also { startActivity(it) }
+            }
+
             var actionMode : androidx.appcompat.view.ActionMode? = null
 
             //onclickactions
@@ -162,13 +158,8 @@ class ShoppingFragment : Fragment() {
                 //TODO: Implement OnClick Action for Shopping item click
                 Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
 
-                //TODO: Implement OnClick Action for Shopping item click
-                val intent = Intent(activity, ShoppingItemEditActivity::class.java).apply {
-                    putExtra("item", adapter.data[position].uid)
-                }
-                startActivity(intent)
 
-                actionModeHandler.selectItemIfMultisectActive(testData[position], view)
+                actionModeHandler.selectItemIfMultisectActive(adapter.data[position], view)
 
                 //end actionmode if there are no selected items anymore
                 if(actionModeHandler.countSelected() == 0){
@@ -176,26 +167,19 @@ class ShoppingFragment : Fragment() {
                 }
             }
 
-            }
 
             adapter.setOnItemLongClickListener {position, view ->
                 //giving haptic feedback
-                val vib = context.getSystemService(VIBRATOR_SERVICE) as? Vibrator
-                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
-                    vib?.vibrate(30)
-                }
-                else{
-                    vib?.vibrate(VibrationEffect.createOneShot(30,10))
-                }
+                context.vibrate()
 
                 val activity = context as AppCompatActivity
                 actionMode = activity.startSupportActionMode(actionModeHandler)
                 actionMode?.setTitle(R.string.screentitle_main_actionmode_shopping)
-                actionModeHandler.selectItemIfMultisectActive(testData[position], view)
+                actionModeHandler.selectItemIfMultisectActive(adapter.data[position], view)
 
                 //TODO: Implement OnClick Action for Shopping item longclick
                 Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()
-                return@setOnItemLongClickListener true
+                true
             }
 
         }
