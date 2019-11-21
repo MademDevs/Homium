@@ -72,4 +72,11 @@ interface ItemDao {
 
     @Query("SELECT * FROM shoppingItem WHERE uid = :id")
     fun getShoppingItemById(id: Int) : ShoppingItem
+
+    @Query("UPDATE shoppingItem SET name = :name, count = :count, unit = :unit WHERE uid = :id")
+    fun updateShoppingItemById(id: Int, name: String, count: Int, unit: String)
+
+    @Query("DELETE FROM shoppingItem WHERE uid = :id")
+    fun deleteShoppingItemById(id: Int)
+
 }
