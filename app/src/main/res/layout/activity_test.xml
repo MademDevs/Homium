@@ -3,12 +3,31 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <AutoCompleteTextView
-        android:id="@+id/tvauto_test"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:completionThreshold="1"
-        android:hint="Testhint">
-    </AutoCompleteTextView>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/btn_initdb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Initialize DB">
+        </Button>
+
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

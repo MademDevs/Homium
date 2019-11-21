@@ -10,7 +10,7 @@ import de.madem.homium.models.ShoppingItem
 
 private const val quantityUnitTemplate = "quantity unit"
 
-class ShoppingItemListAdapter(private val data : MutableList<ShoppingItem>) : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>() {
+class ShoppingItemListAdapter(var data : MutableList<ShoppingItem>) : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>() {
 
     //fields
     private var clickListener : (position:Int, view: View) -> Unit = { pos, item ->
