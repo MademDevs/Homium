@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -158,17 +159,26 @@ class ShoppingFragment : Fragment() {
                     .also { startActivity(it) }
             }
             actionModeHandler.clickDeleteButtonHandler = { items, views ->
-                CoroutineBackgroundTask<Unit>()
-                    .executeInBackground {
-                        items.forEach {
-                            db.itemDao().deleteShoppingItemById(it.uid)
-                        }
+                AlertDialog.Builder(context)
+                    .setMessage(R.string.shopping_list_delete_question)
+                    .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                        CoroutineBackgroundTask<Unit>()
+                            .executeInBackground {
+                                items.forEach {
+                                    db.itemDao().deleteShoppingItemById(it.uid)
+                                }
+                            }
+                            .onDone {
+                                actionMode?.finish()
+                                reloadShoppingItems()
+                                dialog.dismiss()
+                            }
+                            .start()
                     }
-                    .onDone {
+                    .setNegativeButton(android.R.string.no) { dialog, _ ->
                         actionMode?.finish()
-                        reloadShoppingItems()
-                    }
-                    .start()
+                        dialog.dismiss()
+                    }.show()
             }
 
             //onclickactions

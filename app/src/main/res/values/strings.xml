@@ -21,6 +21,9 @@
     <string name="title_money">Money</string>
     <string name="title_settings">Settings</string>
 
+    <!-- shopping list texts-->
+    <string name="shopping_list_delete_question">Sollen die ausgewählten Listenelemente wirklich gelöscht löschen?</string>
+
     <!--edit screen texts-->
     <string name="title_edit_name">What do you want to buy?</string>
     <string name ="title_edit_quantity">How much?</string>
@@ -35,7 +38,6 @@
     <string name="notification_delete_shoppingitem_sucess">Product was deleted successfully</string>
     <string name="notification_remove_all_bought_shoppingitems">All bought shopping-items were removed from your shopping list</string>
     <string name="errormsg_invalid_shoppingitem_parameters">Sorry, your input seems to be invalid and can not be added to your shopping list. Please check your input elements and try again.</string>
-
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
