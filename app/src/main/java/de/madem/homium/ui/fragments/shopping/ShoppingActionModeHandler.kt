@@ -22,13 +22,23 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     private lateinit var menu : Menu
 
     var clickEditButtonHandler: (ShoppingItem) -> Unit = {}
+    var clickDeleteButtonHandler: (Set<ShoppingItem>, Set<View>) -> Unit = { _, _ ->
+
+    }
 
     //functions
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        if (item.itemId == R.id.shopping_item_am_btn_edit) {
-            clickEditButtonHandler.invoke(selectedItems.first())
+        when (item.itemId) {
+            R.id.shopping_item_am_btn_edit -> {
+                clickEditButtonHandler.invoke(selectedItems.first())
+                return true
+            }
+            R.id.shopping_item_am_btn_delete -> {
+                clickDeleteButtonHandler.invoke(selectedItems, selectedViews)
+                return true
+            }
         }
-        return true
+        return false
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {

@@ -41,6 +41,10 @@ class ShoppingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        this.reloadShoppingItems()
+    }
+
+    private fun reloadShoppingItems() {
         CoroutineBackgroundTask<List<ShoppingItem>>()
             .executeInBackground { AppDatabase.getInstance(context!!).itemDao().getAllShopping() }
             .onDone {
@@ -144,14 +148,28 @@ class ShoppingFragment : Fragment() {
 
             recyclerView.adapter = adapter
 
+            var actionMode : androidx.appcompat.view.ActionMode? = null
+
             val actionModeHandler = ShoppingActionModeHandler(context)
             actionModeHandler.clickEditButtonHandler = { item ->
+                actionMode?.finish()
                 Intent(activity, ShoppingItemEditActivity::class.java)
                     .apply {putExtra("item", item.uid) }
                     .also { startActivity(it) }
             }
-
-            var actionMode : androidx.appcompat.view.ActionMode? = null
+            actionModeHandler.clickDeleteButtonHandler = { items, views ->
+                CoroutineBackgroundTask<Unit>()
+                    .executeInBackground {
+                        items.forEach {
+                            db.itemDao().deleteShoppingItemById(it.uid)
+                        }
+                    }
+                    .onDone {
+                        actionMode?.finish()
+                        reloadShoppingItems()
+                    }
+                    .start()
+            }
 
             //onclickactions
             adapter.setOnItemClickListener { position, view ->
