@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import de.madem.homium.R
@@ -125,11 +126,33 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         //init delete button
         btnDelete = findViewById(R.id.shopping_item_edit_btn_delete)
         btnDelete.setOnClickListener{
-            Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
-            GlobalScope.launch {
+
+            AlertDialog.Builder(this)
+                .setMessage(R.string.shopping_item_delete_question)
+                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                    CoroutineBackgroundTask<Unit>()
+                        .executeInBackground {
+                            if(itemid >= 0) {
+                                db.itemDao().deleteShoppingItemById(itemid)
+                            }
+                        }
+                        .onDone {
+                            Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                            finish()
+                        }
+                        .start()
+                }
+                .setNegativeButton(android.R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }.show()
+
+            /*GlobalScope.launch {
                 db.itemDao().deleteShoppingItemById(itemid)
                 finish()
             }
+
+             */
         }
 
         //init txt autocomplete
