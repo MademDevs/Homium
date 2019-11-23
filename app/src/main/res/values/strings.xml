@@ -23,6 +23,7 @@
 
     <!-- shopping list texts-->
     <string name="shopping_list_delete_question">Sollen die ausgewählten Listenelemente wirklich gelöscht löschen?</string>
+    <string name="shopping_item_delete_question">Sollen das ausgewählte Einkaufselement wirklich gelöscht löschen?</string>
 
     <!--edit screen texts-->
     <string name="title_edit_name">What do you want to buy?</string>
