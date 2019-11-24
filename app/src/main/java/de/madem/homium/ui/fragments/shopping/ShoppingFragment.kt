@@ -45,6 +45,14 @@ class ShoppingFragment : Fragment() {
         shoppingViewModel.reloadShoppingItems(context!!)
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        if (::actionModeHandler.isInitialized) {
+            actionModeHandler.finishActionMode()
+        }
+    }
+
     //on create
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
