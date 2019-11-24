@@ -19,17 +19,31 @@ fun <T : Any> Activity.switchToActivity(clazz: KClass<T>) {
     startActivity(Intent(this, clazz.java))
 }
 
-fun Context.showToastShort(resource: Int, vararg arguments: Any)
-        = showToast(Toast.LENGTH_SHORT, resource, arguments)
-
-fun Context.showToastLong(resource: Int, vararg arguments: Any)
-        = showToast(Toast.LENGTH_LONG, resource, arguments)
-
-private fun Context.showToast(duration: Int, resource: Int, vararg arguments: Any) {
-    Toast.makeText(this, getString(resource, arguments), duration).show()
+fun Fragment.showToastShort(string: String) {
+    showToast(context, Toast.LENGTH_SHORT, R.string.dummy, string)
 }
 
+fun Fragment.showToastLong(string: String) {
+    showToast(context, Toast.LENGTH_LONG, R.string.dummy, string)
+}
 
+fun Fragment.showToastShort(resource: Int, vararg arguments: Any)
+        = showToast(context, Toast.LENGTH_SHORT, resource, arguments)
+
+fun Fragment.showToastLong(resource: Int, vararg arguments: Any)
+        = showToast(context, Toast.LENGTH_LONG, resource, arguments)
+
+fun Activity.showToastShort(resource: Int, vararg arguments: Any)
+        = showToast(this, Toast.LENGTH_SHORT, resource, arguments)
+
+fun Activity.showToastLong(resource: Int, vararg arguments: Any)
+        = showToast(this, Toast.LENGTH_LONG, resource, arguments)
+
+private fun showToast(context: Context?, duration: Int, resource: Int, vararg arguments: Any) {
+    context.notNull {
+        Toast.makeText(it, it.getString(resource, arguments), duration).show()
+    }
+}
 
 fun <T : Any> Activity.getSetting(key : String, type : KClass<T>) : T?{
     //getting shared preferences
@@ -88,7 +102,10 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
 
 }
 
-fun Context.vibrate() {
+fun Activity.vibrate() = vibrateInContext()
+fun Fragment.vibrate() = context?.vibrateInContext()
+
+private fun Context.vibrateInContext() {
     val vib = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
         vib?.vibrate(30)

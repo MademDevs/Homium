@@ -98,14 +98,14 @@ class ShoppingFragment : Fragment() {
 
         adapter.longClickListener = {shoppingItem, viewHolder ->
             //giving haptic feedback
-            context?.vibrate()
+            vibrate()
 
             //start action mode
             actionModeHandler.startActionMode()
             actionModeHandler.clickItem(shoppingItem, viewHolder)
 
             //show tmp toast
-            context?.showToastShort(R.string.dummy, "OnItemLongClicked")
+            showToastShort("OnItemLongClicked")
             true
         }
 
@@ -122,7 +122,7 @@ class ShoppingFragment : Fragment() {
                 swipeRefresh.isRefreshing = false
                 shoppingViewModel.reloadShoppingItems(context!!)
 
-                context?.showToastShort(R.string.notification_remove_all_bought_shoppingitems)
+                showToastShort(R.string.notification_remove_all_bought_shoppingitems)
             }
         }
     }
