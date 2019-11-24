@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +19,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
-import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.switchToActivity
@@ -34,7 +32,6 @@ class ShoppingFragment : Fragment() {
     private lateinit var db: AppDatabase
     private lateinit var shoopingItemRecyclerView: RecyclerView
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         db = AppDatabase.getInstance(context)
@@ -42,18 +39,9 @@ class ShoppingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        this.reloadShoppingItems()
-    }
 
-    private fun reloadShoppingItems() {
-        CoroutineBackgroundTask<List<ShoppingItem>>()
-            .executeInBackground { AppDatabase.getInstance(context!!).itemDao().getAllShopping() }
-            .onDone {
-                val tmpAdapter = shoopingItemRecyclerView.adapter as ShoppingItemListAdapter
-                tmpAdapter.data = it.toMutableList()
-                tmpAdapter.notifyDataSetChanged()
-            }
-            .start()
+        //reload shopping items from database
+        shoppingViewModel.reloadShoppingItems(context!!)
     }
 
     //on create
@@ -69,50 +57,23 @@ class ShoppingFragment : Fragment() {
 
         if (this.context != null){
             //recyclerview
-            shoopingItemRecyclerView = root.findViewById<RecyclerView>(R.id.recyclerView_shopping)
+            shoopingItemRecyclerView = root.findViewById(R.id.recyclerView_shopping)
             buildRecyclerView(shoopingItemRecyclerView,context)
-
-
-            //recyclerview test button
-            /*
-            val testRecyclerView = root.findViewById<Button>(R.id.btn_testRecyclerView)
-            testRecyclerView.setOnClickListener {
-                testData.add(0,ShoppingItem("Testitem",100, Units.KILOGRAM.getString(context!!)))
-                //TODO: Datenweg sauber ziehen
-                shoppingViewModel.shoppingItemList.value = testData
-                shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
-            }
-
-             */
 
             //swipe refresh layout
             val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
             swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
             swipeRefresh.setOnRefreshListener {
-                //TODO: Implement action for swipe-refresh
                 swipeRefresh.isRefreshing = true
-                //testData.clear()
-                shoopingItemRecyclerView.adapter?.notifyDataSetChanged()
-                Toast.makeText(context!!,resources.getString(R.string.notification_remove_all_bought_shoppingitems),Toast.LENGTH_SHORT).show()
-                swipeRefresh.isRefreshing = false
+
+                shoppingViewModel.deleteAllCheckedItems(context!!) {
+                    swipeRefresh.isRefreshing = false
+                    shoppingViewModel.reloadShoppingItems(context!!)
+
+                    Toast.makeText(context!!,resources.getString(R.string.notification_remove_all_bought_shoppingitems),Toast.LENGTH_SHORT).show()
+                }
             }
-
-            shoppingViewModel.reloadShoppingItems(context!!)
-
-            shoppingViewModel.shoppingItemList.observe(this, Observer {list ->
-                val adapter = (shoopingItemRecyclerView.adapter as ShoppingItemListAdapter)
-
-                println("UPDATE: $list")
-
-                adapter.data = list.toMutableList()
-                adapter.notifyDataSetChanged()
-            })
         }
-
-
-        //TODO: Implement Oberserver for RecyclerView
-
-
 
         //floating action button
         val btnAddShoppingItem = root.findViewById<FloatingActionButton>(R.id.floatingActionButton_addShoppingItem)
@@ -123,13 +84,11 @@ class ShoppingFragment : Fragment() {
         }
 
 
-
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
     }
 
 
@@ -145,7 +104,9 @@ class ShoppingFragment : Fragment() {
 
             //getShoppingItems
 
-            val adapter = ShoppingItemListAdapter(mutableListOf())
+            val adapter = ShoppingItemListAdapter(
+                this, shoppingViewModel.shoppingItemList
+            )
 
             recyclerView.adapter = adapter
 
@@ -170,7 +131,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .onDone {
                                 actionMode?.finish()
-                                reloadShoppingItems()
+                                shoppingViewModel.reloadShoppingItems(context)
                                 dialog.dismiss()
                             }
                             .start()
@@ -181,29 +142,41 @@ class ShoppingFragment : Fragment() {
                     }.show()
             }
 
-            //onclickactions
-            adapter.setOnItemClickListener { position, view ->
-                //TODO: Implement OnClick Action for Shopping item click
-                Toast.makeText(context,"OnItemClicked",Toast.LENGTH_SHORT).show()
+            //on click listener
+            adapter.shortClickListener = {shoppingItem, viewHolder ->
 
+                if (actionModeHandler.multiSelectActive) {
 
-                actionModeHandler.selectItemIfMultisectActive(adapter.data[position], view)
+                    //select item in action mode
+                    actionModeHandler.selectItemIfMultiSelectActive(
+                        shoppingItem, viewHolder.itemView
+                    )
 
-                //end actionmode if there are no selected items anymore
-                if(actionModeHandler.countSelected() == 0){
-                    actionMode?.finish()
+                    //end action mode if there are no selected items anymore
+                    if(actionModeHandler.countSelected() == 0){
+                        actionMode?.finish()
+                    }
+
+                } else {
+                    val newCheckStatus = !shoppingItem.checked
+
+                    viewHolder.applyCheck(newCheckStatus) //set check status in view
+                    shoppingItem.checked = newCheckStatus //set check status in model
+                    shoppingViewModel.updateShoppingItem(context, shoppingItem) //update check status in database
                 }
+
+
+
             }
 
-
-            adapter.setOnItemLongClickListener {position, view ->
+            adapter.longClickListener = {shoppingItem, viewHolder ->
                 //giving haptic feedback
                 context.vibrate()
 
                 val activity = context as AppCompatActivity
                 actionMode = activity.startSupportActionMode(actionModeHandler)
                 actionMode?.setTitle(R.string.screentitle_main_actionmode_shopping)
-                actionModeHandler.selectItemIfMultisectActive(adapter.data[position], view)
+                actionModeHandler.selectItemIfMultiSelectActive(shoppingItem, viewHolder.itemView)
 
                 //TODO: Implement OnClick Action for Shopping item longclick
                 Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()

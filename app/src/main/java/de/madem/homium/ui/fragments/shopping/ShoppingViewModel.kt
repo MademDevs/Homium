@@ -1,26 +1,24 @@
 package de.madem.homium.ui.fragments.shopping
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.CoroutineBackgroundTask
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 class ShoppingViewModel : ViewModel() {
+
+    private val viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
 
     //list with all shopping items
     val shoppingItemList = MutableLiveData<List<ShoppingItem>>().apply {
         value = listOf()
     }
-
-    //live data
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is shopping Fragment"
-    }
-    val text: LiveData<String> = _text
-
 
     //functions
     fun reloadShoppingItems(context: Context){
@@ -30,14 +28,26 @@ class ShoppingViewModel : ViewModel() {
             .start()
     }
 
-    fun getShoppingItemByPosition(position: Int): ShoppingItem? {
-        val list = shoppingItemList.value
+    fun updateShoppingItem(context: Context, shoppingItem: ShoppingItem) {
+        CoroutineBackgroundTask<Unit>()
+            .executeInBackground {
+                AppDatabase.getInstance(context).itemDao().setShoppingItemChecked(
+                    shoppingItem.uid, shoppingItem.checked
+                )
+            }.start()
+    }
 
-        if (position >= list?.size ?: 0) {
-            return null
-        }
+    fun deleteAllCheckedItems(context: Context, callback: () -> Unit) {
+        CoroutineBackgroundTask<Unit>()
+            .executeInBackground {
+                AppDatabase.getInstance(context).itemDao().deleteAllCheckedShoppingItems()
+            }.onDone { callback() }
+            .start()
+    }
 
-        return list?.get(position)
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 
 }

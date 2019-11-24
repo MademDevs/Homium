@@ -79,4 +79,10 @@ interface ItemDao {
     @Query("DELETE FROM shoppingItem WHERE uid = :id")
     fun deleteShoppingItemById(id: Int)
 
+    @Query("UPDATE shoppingItem SET checked = :checked WHERE uid = :id")
+    fun setShoppingItemChecked(id: Int, checked: Boolean = true)
+
+    @Query("DELETE FROM shoppingItem WHERE checked = 1")
+    fun deleteAllCheckedShoppingItems()
+
 }

@@ -7,6 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ActionMode
+import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.ShoppingItem
 
@@ -15,7 +16,8 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     //private fields
     private var selectedItems: MutableSet<ShoppingItem> = mutableSetOf()
     private var selectedViews: MutableSet<View> = mutableSetOf()
-    private var multiSelect: Boolean = false
+
+    var multiSelectActive: Boolean = false
 
     //utility fields
     private val menuInflater = MenuInflater(context)
@@ -42,7 +44,7 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
-        multiSelect = true
+        multiSelectActive = true
         menuInflater.inflate(R.menu.shopping_fragment_actionmode,menu)
         this.menu = menu
         return true
@@ -53,16 +55,15 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-        multiSelect = false
+        multiSelectActive = false
         selectedItems.clear()
 
         selectedViews.forEach { it.deselect() }
         selectedViews.clear()
     }
 
-    fun selectItemIfMultisectActive(item: ShoppingItem, view: View) {
-        println("Multisect $multiSelect")
-        if (multiSelect) {
+    fun selectItemIfMultiSelectActive(item: ShoppingItem, view: View) {
+        if (multiSelectActive) {
             if (selectedItems.contains(item)) {
                 selectedItems.remove(item)
                 selectedViews.remove(view)
