@@ -12,6 +12,7 @@ import kotlinx.coroutines.Job
 
 class ShoppingViewModel : ViewModel() {
 
+    //TODO @Max
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
 

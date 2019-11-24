@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -18,9 +16,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
+import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.showToastShort
 import de.madem.homium.utilities.switchToActivity
 import de.madem.homium.utilities.vibrate
 
@@ -28,13 +29,13 @@ class ShoppingFragment : Fragment() {
 
     //fields
     private lateinit var shoppingViewModel: ShoppingViewModel
-
-    private lateinit var db: AppDatabase
-    private lateinit var shoopingItemRecyclerView: RecyclerView
+    private lateinit var root: View
+    private lateinit var actionModeHandler: ShoppingActionModeHandler
+    private lateinit var databaseDao: ItemDao
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        db = AppDatabase.getInstance(context)
+        databaseDao = AppDatabase.getInstance(context).itemDao()
     }
 
     override fun onResume() {
@@ -47,144 +48,139 @@ class ShoppingFragment : Fragment() {
     //on create
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        //getting viewmodel
+        //getting view model
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
 
-
         //getting root layout
-        val root = inflater.inflate(R.layout.fragment_shopping, container, false)
+        root = inflater.inflate(R.layout.fragment_shopping, container, false)
 
-
-        if (this.context != null){
-            //recyclerview
-            shoopingItemRecyclerView = root.findViewById(R.id.recyclerView_shopping)
-            buildRecyclerView(shoopingItemRecyclerView,context)
-
-            //swipe refresh layout
-            val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
-            swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
-            swipeRefresh.setOnRefreshListener {
-                swipeRefresh.isRefreshing = true
-
-                shoppingViewModel.deleteAllCheckedItems(context!!) {
-                    swipeRefresh.isRefreshing = false
-                    shoppingViewModel.reloadShoppingItems(context!!)
-
-                    Toast.makeText(context!!,resources.getString(R.string.notification_remove_all_bought_shoppingitems),Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        //floating action button
-        val btnAddShoppingItem = root.findViewById<FloatingActionButton>(R.id.floatingActionButton_addShoppingItem)
-
-        btnAddShoppingItem.setOnClickListener {
-            //implementing simple navigation to shopping item edit screen via intent
-            switchToActivity(ShoppingItemEditActivity::class)
-        }
-
+        registerRecyclerView()
+        registerActionMode()
+        registerSwipeRefresh()
+        registerFloatingActionButton()
 
         return root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
+        val newCheckStatus = !shoppingItem.checked
+
+        viewHolder.applyCheck(newCheckStatus) //set check status in view
+        shoppingItem.checked = newCheckStatus //set check status in model
+        shoppingViewModel.updateShoppingItem(context!!, shoppingItem) //update check status in database
     }
 
-
     //private functions
-    private fun buildRecyclerView(recyclerView : RecyclerView, context: Context?){
+    private fun registerRecyclerView(){
+        val recyclerView = root.findViewById<RecyclerView>(R.id.recyclerView_shopping)
 
-        if(context != null){
-            //layoutmanager
-            recyclerView.layoutManager = LinearLayoutManager(context)
+        //set layout manager
+        recyclerView.layoutManager = LinearLayoutManager(context)
 
-            //adapter
-            //val adapter = ShoppingItemListAdapter(testData)
+        //init adapter
+        val adapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
+        recyclerView.adapter = adapter
 
-            //getShoppingItems
+        //on click listener
+        adapter.shortClickListener = {shoppingItem, viewHolder ->
 
-            val adapter = ShoppingItemListAdapter(
-                this, shoppingViewModel.shoppingItemList
-            )
+            if (actionModeHandler.isActionModeActive()) {
 
-            recyclerView.adapter = adapter
+                //select item in action mode
+                actionModeHandler.clickItem(shoppingItem, viewHolder)
 
-            var actionMode : androidx.appcompat.view.ActionMode? = null
+            } else {
 
-            val actionModeHandler = ShoppingActionModeHandler(context)
-            actionModeHandler.clickEditButtonHandler = { item ->
-                actionMode?.finish()
+                //update check status
+                updateShoppingItemCheckStatus(shoppingItem, viewHolder)
+            }
+        }
+
+        adapter.longClickListener = {shoppingItem, viewHolder ->
+            //giving haptic feedback
+            context?.vibrate()
+
+            //start action mode
+            actionModeHandler.startActionMode()
+            actionModeHandler.clickItem(shoppingItem, viewHolder)
+
+            //show tmp toast
+            context?.showToastShort(R.string.dummy, "OnItemLongClicked")
+            true
+        }
+
+    }
+
+    private fun registerSwipeRefresh() {
+        //swipe refresh layout
+        val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
+        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
+        swipeRefresh.setOnRefreshListener {
+            swipeRefresh.isRefreshing = true
+
+            shoppingViewModel.deleteAllCheckedItems(context!!) {
+                swipeRefresh.isRefreshing = false
+                shoppingViewModel.reloadShoppingItems(context!!)
+
+                context?.showToastShort(R.string.notification_remove_all_bought_shoppingitems)
+            }
+        }
+    }
+
+    private fun registerActionMode() {
+        actionModeHandler = ShoppingActionModeHandler(context!!)
+
+        with(actionModeHandler) {
+
+            clickEditButtonHandler = { item ->
+                finishActionMode()
                 Intent(activity, ShoppingItemEditActivity::class.java)
                     .apply {putExtra("item", item.uid) }
                     .also { startActivity(it) }
             }
-            actionModeHandler.clickDeleteButtonHandler = { items, views ->
+
+            clickDeleteButtonHandler = { items, _ ->
                 AlertDialog.Builder(context)
                     .setMessage(R.string.shopping_list_delete_question)
                     .setPositiveButton(android.R.string.yes) { dialog, _ ->
                         CoroutineBackgroundTask<Unit>()
                             .executeInBackground {
                                 items.forEach {
-                                    db.itemDao().deleteShoppingItemById(it.uid)
+                                    databaseDao.deleteShoppingItemById(it.uid)
                                 }
                             }
                             .onDone {
-                                actionMode?.finish()
+                                finishActionMode()
                                 shoppingViewModel.reloadShoppingItems(context)
                                 dialog.dismiss()
                             }
                             .start()
                     }
                     .setNegativeButton(android.R.string.no) { dialog, _ ->
-                        actionMode?.finish()
+                        finishActionMode()
                         dialog.dismiss()
                     }.show()
             }
 
-            //on click listener
-            adapter.shortClickListener = {shoppingItem, viewHolder ->
-
-                if (actionModeHandler.multiSelectActive) {
-
-                    //select item in action mode
-                    actionModeHandler.selectItemIfMultiSelectActive(
-                        shoppingItem, viewHolder.itemView
-                    )
-
-                    //end action mode if there are no selected items anymore
-                    if(actionModeHandler.countSelected() == 0){
-                        actionMode?.finish()
-                    }
-
-                } else {
-                    val newCheckStatus = !shoppingItem.checked
-
-                    viewHolder.applyCheck(newCheckStatus) //set check status in view
-                    shoppingItem.checked = newCheckStatus //set check status in model
-                    shoppingViewModel.updateShoppingItem(context, shoppingItem) //update check status in database
+            clickCheckButtonHandler = { items, viewHolders ->
+                items.forEachIndexed {index, shoppingItem ->
+                    //update check status
+                    updateShoppingItemCheckStatus(shoppingItem, viewHolders[index])
                 }
-
-
-
             }
-
-            adapter.longClickListener = {shoppingItem, viewHolder ->
-                //giving haptic feedback
-                context.vibrate()
-
-                val activity = context as AppCompatActivity
-                actionMode = activity.startSupportActionMode(actionModeHandler)
-                actionMode?.setTitle(R.string.screentitle_main_actionmode_shopping)
-                actionModeHandler.selectItemIfMultiSelectActive(shoppingItem, viewHolder.itemView)
-
-                //TODO: Implement OnClick Action for Shopping item longclick
-                Toast.makeText(context,"OnItemLongClicked",Toast.LENGTH_SHORT).show()
-                true
-            }
-
         }
     }
 
+    private fun registerFloatingActionButton() {
+        //floating action button
+        val btnAddShoppingItem = root.findViewById<FloatingActionButton>(
+            R.id.floatingActionButton_addShoppingItem
+        )
+
+        btnAddShoppingItem.setOnClickListener {
+            //implementing simple navigation to shopping item edit screen via intent
+            switchToActivity(ShoppingItemEditActivity::class)
+        }
+    }
 
 }

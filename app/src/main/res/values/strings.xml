@@ -1,7 +1,9 @@
 <resources>
-
     <!--App secific strings-->
     <string name="app_name">Homium</string>
+
+    <!-- -->
+    <string name="dummy">{0}</string>
 
     <!--screen headlines-->
     <string name="screentitle_edit_shopppingitem_add">Add Product</string>

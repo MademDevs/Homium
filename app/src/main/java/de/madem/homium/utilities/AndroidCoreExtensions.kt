@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
@@ -17,6 +18,18 @@ fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
 fun <T : Any> Activity.switchToActivity(clazz: KClass<T>) {
     startActivity(Intent(this, clazz.java))
 }
+
+fun Context.showToastShort(resource: Int, vararg arguments: Any)
+        = showToast(Toast.LENGTH_SHORT, resource, arguments)
+
+fun Context.showToastLong(resource: Int, vararg arguments: Any)
+        = showToast(Toast.LENGTH_LONG, resource, arguments)
+
+private fun Context.showToast(duration: Int, resource: Int, vararg arguments: Any) {
+    Toast.makeText(this, getString(resource, arguments), duration).show()
+}
+
+
 
 fun <T : Any> Activity.getSetting(key : String, type : KClass<T>) : T?{
     //getting shared preferences
@@ -38,7 +51,7 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
     //getting shared preferences
     val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
 
-    var result : Boolean = false
+    var result = false
 
     prefs.edit(false){
          result = when(value){
