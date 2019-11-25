@@ -6,25 +6,44 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import de.madem.homium.R
+import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 
 class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
 
+    private val appCompatActivity = context as AppCompatActivity
+    private var actionMode: ActionMode? = null
+
     //private fields
-    private var selectedItems: MutableSet<ShoppingItem> = mutableSetOf()
-    private var selectedViews: MutableSet<View> = mutableSetOf()
-    private var multiSelect: Boolean = false
+    private var selectedItems: MutableList<ShoppingItem> = mutableListOf()
+    private var selectedViewHolders: MutableList<ShoppingItemListAdapter.ShoppingItemViewHolder> = mutableListOf()
 
     //utility fields
     private val menuInflater = MenuInflater(context)
     private lateinit var menu : Menu
 
     var clickEditButtonHandler: (ShoppingItem) -> Unit = {}
-    var clickDeleteButtonHandler: (Set<ShoppingItem>, Set<View>) -> Unit = { _, _ ->
+    var clickDeleteButtonHandler: (List<ShoppingItem>, List<ShoppingItemListAdapter.ShoppingItemViewHolder>) -> Unit = { _, _ ->
+    }
+    var clickCheckButtonHandler: (List<ShoppingItem>, List<ShoppingItemListAdapter.ShoppingItemViewHolder>) -> Unit = { _, _ ->
 
     }
+
+    fun startActionMode() {
+        actionMode = appCompatActivity.startSupportActionMode(this)!!.apply {
+            setTitle(R.string.screentitle_main_actionmode_shopping)
+        }
+    }
+
+    fun finishActionMode() {
+        actionMode?.finish()
+        actionMode = null
+    }
+
+    fun isActionModeActive() = actionMode != null
 
     //functions
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
@@ -34,7 +53,11 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
                 return true
             }
             R.id.shopping_item_am_btn_delete -> {
-                clickDeleteButtonHandler.invoke(selectedItems, selectedViews)
+                clickDeleteButtonHandler.invoke(selectedItems, selectedViewHolders)
+                return true
+            }
+            R.id.shopping_item_am_btn_check -> {
+                clickCheckButtonHandler.invoke(selectedItems, selectedViewHolders)
                 return true
             }
         }
@@ -42,7 +65,6 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
-        multiSelect = true
         menuInflater.inflate(R.menu.shopping_fragment_actionmode,menu)
         this.menu = menu
         return true
@@ -53,33 +75,37 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-        multiSelect = false
         selectedItems.clear()
 
-        selectedViews.forEach { it.deselect() }
-        selectedViews.clear()
+        selectedViewHolders.forEach { it.itemView.deselect() }
+        selectedViewHolders.clear()
     }
 
-    fun selectItemIfMultisectActive(item: ShoppingItem, view: View) {
-        println("Multisect $multiSelect")
-        if (multiSelect) {
-            if (selectedItems.contains(item)) {
-                selectedItems.remove(item)
-                selectedViews.remove(view)
-                view.deselect()
-            } else {
-                selectedItems.add(item)
-                selectedViews.add(view)
-                view.select()
-            }
+    fun clickItem(item: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
+        if (selectedItems.contains(item)) {
+            selectedItems.remove(item)
+            selectedViewHolders.remove(viewHolder)
 
-            //only visible if maximum one item is selected
-            menu.findItem(R.id.shopping_item_am_btn_edit).isVisible = selectedViews.size == 1
+            viewHolder.itemView.deselect()
+        } else {
+            selectedItems.add(item)
+            selectedViewHolders.add(viewHolder)
+
+            viewHolder.itemView.select()
         }
+
+        //only visible if maximum one item is selected
+        menu.findItem(R.id.shopping_item_am_btn_edit).isVisible = selectedViewHolders.size == 1
+
+        //finish action mode if none selected
+        if (countSelected() == 0) {
+            finishActionMode()
+        }
+
     }
 
-    fun countSelected(): Int{
-        return if(selectedViews.size == selectedItems.size) selectedItems.size else -1
+    private fun countSelected(): Int{
+        return if(selectedViewHolders.size == selectedItems.size) selectedItems.size else -1
     }
 
     private fun View.select() = setBackgroundColor(Color.LTGRAY)

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
@@ -16,6 +17,32 @@ fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
 
 fun <T : Any> Activity.switchToActivity(clazz: KClass<T>) {
     startActivity(Intent(this, clazz.java))
+}
+
+fun Fragment.showToastShort(string: String) {
+    showToast(context, Toast.LENGTH_SHORT, R.string.dummy, string)
+}
+
+fun Fragment.showToastLong(string: String) {
+    showToast(context, Toast.LENGTH_LONG, R.string.dummy, string)
+}
+
+fun Fragment.showToastShort(resource: Int, vararg arguments: Any)
+        = showToast(context, Toast.LENGTH_SHORT, resource, arguments)
+
+fun Fragment.showToastLong(resource: Int, vararg arguments: Any)
+        = showToast(context, Toast.LENGTH_LONG, resource, arguments)
+
+fun Activity.showToastShort(resource: Int, vararg arguments: Any)
+        = showToast(this, Toast.LENGTH_SHORT, resource, arguments)
+
+fun Activity.showToastLong(resource: Int, vararg arguments: Any)
+        = showToast(this, Toast.LENGTH_LONG, resource, arguments)
+
+private fun showToast(context: Context?, duration: Int, resource: Int, vararg arguments: Any) {
+    context.notNull {
+        Toast.makeText(it, it.getString(resource, arguments), duration).show()
+    }
 }
 
 fun <T : Any> Activity.getSetting(key : String, type : KClass<T>) : T?{
@@ -38,7 +65,7 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
     //getting shared preferences
     val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
 
-    var result : Boolean = false
+    var result = false
 
     prefs.edit(false){
          result = when(value){
@@ -75,7 +102,10 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
 
 }
 
-fun Context.vibrate() {
+fun Activity.vibrate() = vibrateInContext()
+fun Fragment.vibrate() = context?.vibrateInContext()
+
+private fun Context.vibrateInContext() {
     val vib = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
     if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
         vib?.vibrate(30)
