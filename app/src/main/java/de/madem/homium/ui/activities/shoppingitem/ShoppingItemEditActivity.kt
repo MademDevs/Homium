@@ -129,7 +129,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
             AlertDialog.Builder(this)
                 .setMessage(R.string.shopping_item_delete_question)
-                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
                             if(itemid >= 0) {
@@ -143,7 +143,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         }
                         .start()
                 }
-                .setNegativeButton(android.R.string.no) { dialog, _ ->
+                .setNegativeButton(R.string.answer_no) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
 
