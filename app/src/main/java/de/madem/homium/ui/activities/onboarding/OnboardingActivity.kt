@@ -17,6 +17,7 @@ class OnboardingActivity : AppIntro() {
 
     private lateinit var manager : PreferencesManager
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         manager = PreferencesManager(this)
