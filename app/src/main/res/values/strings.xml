@@ -3,6 +3,15 @@
     <!--App secific strings-->
     <string name="app_name">Homium</string>
 
+    <!--Onboarding Decriptions-->
+    <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
+    Es folgt eine kleine Erklärung zur Bedienung der App</string>
+
+    <string name="onboarding_shopping">Erstelle eine Einkaufsliste für den Wocheneinkauf. Markiere per Antippen deine Produkte und entferne
+        die eingekauften Elemente per Swipe von der Liste. Ein Bearbeiten ist ganz einfach per langem Tippen möglich. </string>
+
+    <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
+
     <!--screen headlines-->
     <string name="screentitle_edit_shopppingitem_add">Add Product</string>
     <string name="screentitle_edit_shoppingitem_edit">Edit Product</string>
@@ -27,7 +36,7 @@
 
     <!--edit screen texts-->
     <string name="title_edit_name">What do you want to buy?</string>
-    <string name ="title_edit_quantity">How much?</string>
+    <string name="title_edit_quantity">How much?</string>
     <string name="title_edit_unit">Which Unit?</string>
     <string name="hint_edit_name">Name of your whished Product</string>
     <string name="hint_edit_quantity">Quantity of the product</string>
