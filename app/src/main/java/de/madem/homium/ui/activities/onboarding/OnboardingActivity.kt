@@ -35,7 +35,7 @@ class OnboardingActivity : AppIntro() {
         manager.setFirstRun()
 
         val pageOne = SliderPagerBuilder()
-            .title("Willkommen zu Homeium")
+            .title("Willkommen zu Homium")
             .description(getString(R.string.onboarding_welcome))
             .imageDrawable(R.drawable.onboarding_logo)
             .bgColor(Color.parseColor("#176A93"))
@@ -56,11 +56,11 @@ class OnboardingActivity : AppIntro() {
             .build()
 
 //Können uns hier noch die Übergangsanimation aussuchen ;)
-        //setFadeAnimation()
+        setFadeAnimation()
         //setZoomAnimation()
         //setFlowAnimation()
         //setSlideOverAnimation()
-        setDepthAnimation()
+        //setDepthAnimation()
 
         addSlide(AppIntro2Fragment.newInstance(pageOne))
         addSlide(AppIntro2Fragment.newInstance(pageTwo))
