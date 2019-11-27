@@ -150,7 +150,7 @@ class ShoppingFragment : Fragment() {
             clickDeleteButtonHandler = { items, _ ->
                 AlertDialog.Builder(context)
                     .setMessage(R.string.shopping_list_delete_question)
-                    .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                    .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                         CoroutineBackgroundTask<Unit>()
                             .executeInBackground {
                                 items.forEach {
@@ -164,7 +164,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .start()
                     }
-                    .setNegativeButton(android.R.string.no) { dialog, _ ->
+                    .setNegativeButton(R.string.answer_no) { dialog, _ ->
                         finishActionMode()
                         dialog.dismiss()
                     }.show()
