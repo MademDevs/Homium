@@ -10,5 +10,6 @@ data class ShoppingItem(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "count") val count: Int,
     @ColumnInfo(name = "unit") val unit: String = "",
+    @ColumnInfo(name = "checked") var checked: Boolean = false,
     @PrimaryKey(autoGenerate = true) val uid: Int = 0
 )
