@@ -111,9 +111,6 @@ class ShoppingFragment : Fragment() {
             //start action mode
             actionModeHandler.startActionMode()
             actionModeHandler.clickItem(shoppingItem, viewHolder)
-
-            //show tmp toast
-            showToastShort("OnItemLongClicked")
             true
         }
 
@@ -130,7 +127,7 @@ class ShoppingFragment : Fragment() {
                 swipeRefresh.isRefreshing = false
                 shoppingViewModel.reloadShoppingItems(context!!)
 
-                showToastShort(R.string.notification_remove_all_bought_shoppingitems)
+                showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
         }
     }

@@ -3,6 +3,7 @@
     <string name="app_name">Homium</string>
     <string name="answer_yes">Ja</string>
     <string name="answer_no">Nein</string>
+    <string name="dummy">{0}</string>
 
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
@@ -47,7 +48,7 @@
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
-    <string name="notification_remove_all_bought_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
+    <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="errormsg_invalid_shoppingitem_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
 
     <!--strings for data transfer e.g. intent-->
@@ -103,6 +104,4 @@
     <!--shared prefernces keys -->
     <string name="sharedprefernce_namespacekey_settings">Settings</string>
     <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
-
-    <string name="dummy">Some Dummy Text</string>
 </resources>
