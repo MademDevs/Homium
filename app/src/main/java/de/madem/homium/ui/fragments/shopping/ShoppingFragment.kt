@@ -77,7 +77,7 @@ class ShoppingFragment : Fragment() {
             if(resultCode == RESULT_OK){
                 val dataChanged = data?.getBooleanExtra("shoppingListChanged",false) ?: false
                 if(dataChanged){
-                    shoppingViewModel.reloadShoppingItems(context!!)
+                    //shoppingViewModel.reloadShoppingItems(context!!)
                 }
             }
         }

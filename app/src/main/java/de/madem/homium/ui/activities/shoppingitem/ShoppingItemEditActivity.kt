@@ -342,6 +342,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 else{
                     db.itemDao().insertShopping(item)
                 }
+            }.onDone {
+                finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
             }.start()
             /*
             GlobalScope.launch {
@@ -355,7 +357,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             }
 
              */
-            finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+
         }
         else{
             Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
