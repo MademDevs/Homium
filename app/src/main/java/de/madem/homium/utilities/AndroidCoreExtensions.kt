@@ -102,6 +102,19 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
 
 }
 
+fun <T : Any> Fragment.switchToActivityForResult(requestCode: Int,clazz: KClass<T>) {
+    startActivityForResult(Intent(context,clazz.java),requestCode)
+}
+
+fun Activity.finishWithBooleanResult(key: String,value : Boolean, resultCode: Int){
+    val resultIntent = Intent()
+    resultIntent.putExtra(key, value)
+
+    setResult(resultCode, resultIntent)
+    finish()
+}
+
+
 fun Activity.vibrate() = vibrateInContext()
 fun Fragment.vibrate() = context?.vibrateInContext()
 

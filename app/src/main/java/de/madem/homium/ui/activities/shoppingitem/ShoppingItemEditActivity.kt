@@ -1,5 +1,6 @@
 package de.madem.homium.ui.activities.shoppingitem
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.view.Menu
@@ -14,6 +15,7 @@ import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.finishWithBooleanResult
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -41,17 +43,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         //getting data from ressources
         bigUnits = resources.getStringArray(R.array.big_units)
         smallUnits = resources.getStringArray(R.array.small_units)
-        /*
-        TODO: implement functionality for getting shoppingitem
-        val shoppingitem = intent.getParcelableExtra<ShoppingItem>(resources.getString(R.string.data_transfer_intent_edit_shoppingitem))
-        if (shoppingitem == null){
-            //adding action
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
-        }
-        else{
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
-        }
-         */
+
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -82,9 +74,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            //TODO: Save a shopping item -> addOrUpdateToDatabaseIfPossible()
             R.id.shopping_item_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finish()
+            android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
         }
 
         return super.onOptionsItemSelected(item)
@@ -139,7 +130,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         .onDone {
                             Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
                             dialog.dismiss()
-                            finish()
+                            finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
                         }
                         .start()
                 }
@@ -344,6 +335,17 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             //all input components are valid -> creating object and put it into database via coroutine
             val item = ShoppingItem(title, amount, unit)
 
+            CoroutineBackgroundTask<Unit>().executeInBackground {
+                if(itemid >= 0){
+                    db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
+                }
+                else{
+                    db.itemDao().insertShopping(item)
+                }
+            }.onDone {
+                finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+            }.start()
+            /*
             GlobalScope.launch {
                 if(itemid >= 0){
                     db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
@@ -353,7 +355,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 }
 
             }
-            finish()
+
+             */
+
         }
         else{
             Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
