@@ -7,7 +7,7 @@ import de.madem.homium.utilities.CoroutineBackgroundTask
 
 class DatabaseInitializer(private val context: Context, private val doneCallback: () -> Unit) {
 
-    private val dao = AppDatabase.getInstance(context).itemDao()
+    private val dao = AppDatabase.getInstance().itemDao()
     private val backgroundTask = CoroutineBackgroundTask<Unit>()
 
     init {

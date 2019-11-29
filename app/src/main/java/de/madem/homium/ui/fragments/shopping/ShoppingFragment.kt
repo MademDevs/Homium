@@ -34,15 +34,14 @@ class ShoppingFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        databaseDao = AppDatabase.getInstance(context).itemDao()
+        databaseDao = AppDatabase.getInstance().itemDao()
     }
 
     override fun onResume() {
         super.onResume()
 
         //reload shopping items from database
-        shoppingViewModel.reloadShoppingItems(context!!)
-        println("FRAGMENT LIVECYCLE: ONRESUME")
+        shoppingViewModel.reloadShoppingItems()
     }
 
     override fun onPause() {
@@ -90,7 +89,7 @@ class ShoppingFragment : Fragment() {
 
         viewHolder.applyCheck(newCheckStatus) //set check status in view
         shoppingItem.checked = newCheckStatus //set check status in model
-        shoppingViewModel.updateShoppingItem(context!!, shoppingItem) //update check status in database
+        shoppingViewModel.updateShoppingItem(shoppingItem) //update check status in database
     }
 
     //private functions
@@ -138,9 +137,9 @@ class ShoppingFragment : Fragment() {
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = true
 
-            shoppingViewModel.deleteAllCheckedItems(context!!) {
+            shoppingViewModel.deleteAllCheckedItems() {
                 swipeRefresh.isRefreshing = false
-                shoppingViewModel.reloadShoppingItems(context!!)
+                shoppingViewModel.reloadShoppingItems()
 
                 showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
@@ -171,7 +170,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .onDone {
                                 finishActionMode()
-                                shoppingViewModel.reloadShoppingItems(context)
+                                shoppingViewModel.reloadShoppingItems()
                                 dialog.dismiss()
                             }
                             .start()
