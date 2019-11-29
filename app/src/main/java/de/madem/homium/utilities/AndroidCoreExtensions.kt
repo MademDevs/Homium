@@ -45,7 +45,8 @@ private fun showToast(context: Context?, duration: Int, resource: Int, vararg ar
     }
 }
 
-fun <T : Any> Activity.getSetting(key : String, type : KClass<T>) : T?{
+//settings for context
+fun <T : Any> Context.getSetting(key : String, type : KClass<T>) : T?{
     //getting shared preferences
     val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
 
@@ -61,7 +62,7 @@ fun <T : Any> Activity.getSetting(key : String, type : KClass<T>) : T?{
     }
 }
 
-fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
+fun <T : Any> Context.putSetting(key : String, value : T) : Boolean{
     //getting shared preferences
     val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
 
@@ -101,6 +102,30 @@ fun <T : Any> Activity.putSetting(key : String, value : T) : Boolean{
     return result
 
 }
+
+//settings for fragment
+fun <T : Any> Fragment.putSetting(key : String, value : T) : Boolean{
+    var result = false
+
+    this.context.notNull {
+        it.putSetting(key, value)
+        result = true
+    }
+
+    return result
+}
+
+fun <T : Any> Fragment.getSetting(key : String, type : KClass<T>) : T?{
+
+    var result : T? = null
+
+    this.context.notNull {
+        result = it.getSetting(key,type)
+    }
+
+    return result
+}
+
 
 fun Activity.vibrate() = vibrateInContext()
 fun Fragment.vibrate() = context?.vibrateInContext()

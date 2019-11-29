@@ -20,10 +20,7 @@ import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.showToastShort
-import de.madem.homium.utilities.switchToActivity
-import de.madem.homium.utilities.vibrate
+import de.madem.homium.utilities.*
 
 class ShoppingFragment : Fragment() {
 
@@ -105,8 +102,11 @@ class ShoppingFragment : Fragment() {
         }
 
         adapter.longClickListener = {shoppingItem, viewHolder ->
-            //giving haptic feedback
-            vibrate()
+            //giving haptic feedback if allowed
+            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            if(vibrationAllowed){
+                vibrate()
+            }
 
             //start action mode
             actionModeHandler.startActionMode()
