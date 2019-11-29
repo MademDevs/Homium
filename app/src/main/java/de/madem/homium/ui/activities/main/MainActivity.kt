@@ -3,7 +3,6 @@ package de.madem.homium.ui.activities.main
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,10 +10,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.madem.homium.R
-import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.test.TestActivity
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.putSetting
 import de.madem.homium.utilities.switchToActivity
 
 

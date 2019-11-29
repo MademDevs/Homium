@@ -28,7 +28,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
 
     //fields
-    private val db = AppDatabase.getInstance(this)
+    private val db = AppDatabase.getInstance()
     private lateinit var bigUnits : Array<String>
     private lateinit var smallUnits : Array<String>
     private var itemid: Int = -1

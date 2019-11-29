@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
@@ -21,10 +22,10 @@ abstract class AppDatabase : RoomDatabase() {
     //Singleton
     companion object{
         private var INSTANCE: AppDatabase? = null
-        fun getInstance(context:Context): AppDatabase{
+        fun getInstance(): AppDatabase{
             if (INSTANCE == null){
                 INSTANCE = Room.databaseBuilder(
-                    context,
+                    HomiumApplication.appContext!!,
                     AppDatabase::class.java,
                     "database")
                     .build()
