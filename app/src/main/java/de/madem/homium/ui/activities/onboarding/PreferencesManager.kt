@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 
 //for checking if app is started for the first time
 //otherwise onboardingactivity will start everytime the app is started
+@Deprecated("Functionality has been replaced by extension functions")
 class PreferencesManager(context: Context) {
     private val preferences: SharedPreferences
     private val editor: SharedPreferences.Editor
