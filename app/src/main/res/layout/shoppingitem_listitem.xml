@@ -19,13 +19,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-black"
+            android:layout_toLeftOf="@id/txtView_shoppingitemList_quantity_unit"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:paddingRight="8dp"
             android:text="Itemtitle"
             android:textSize="18sp" />
 
         <TextView
             android:id="@+id/txtView_shoppingitemList_quantity_unit"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
