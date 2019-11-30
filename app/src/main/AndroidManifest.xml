@@ -12,23 +12,37 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.onboarding.OnboardingActivity">
+        <activity
+            android:name=".ui.activities.launch.LaunchActivity"
+            android:theme="@style/NoActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.activities.onboarding.OnboardingActivity"
+            android:theme="@style/NoActionBarTheme">
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
             android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"
             android:noHistory="true"
-            android:parentActivityName=".ui.activities.main.MainActivity"></activity>
+            android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity android:name=".ui.activities.test.TestActivity" />
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-               <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
     </application>

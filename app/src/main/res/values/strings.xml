@@ -38,7 +38,7 @@
 
     <!--edit screen texts-->
     <string name="title_edit_name">Was möchtest du einkaufen?</string>
-    <string name ="title_edit_quantity">Wie viel?</string>
+    <string name="title_edit_quantity">Wie viel?</string>
     <string name="title_edit_unit">Welche Einheit?</string>
     <string name="hint_edit_name">Name des gewünschten Produktes</string>
     <string name="hint_edit_quantity">Menge des Produktes</string>
@@ -101,7 +101,8 @@
     </string-array>
 
 
-    <!--shared prefernces keys -->
+    <!--shared preferences keys -->
     <string name="sharedprefernce_namespacekey_settings">Settings</string>
     <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
+    <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
 </resources>
