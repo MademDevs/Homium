@@ -30,7 +30,7 @@ class TestActivity : AppCompatActivity() {
 
             //Code for getting Products
             GlobalScope.launch {
-                val dao = AppDatabase.getInstance(context).itemDao()
+                val dao = AppDatabase.getInstance().itemDao()
                 list = dao.getAllShopping()
             }
             //

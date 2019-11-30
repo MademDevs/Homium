@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.shopping
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
@@ -32,14 +34,14 @@ class ShoppingFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        databaseDao = AppDatabase.getInstance(context).itemDao()
+        databaseDao = AppDatabase.getInstance().itemDao()
     }
 
     override fun onResume() {
         super.onResume()
 
         //reload shopping items from database
-        shoppingViewModel.reloadShoppingItems(context!!)
+        shoppingViewModel.reloadShoppingItems()
     }
 
     override fun onPause() {
@@ -50,7 +52,8 @@ class ShoppingFragment : Fragment() {
         }
     }
 
-    //on create
+
+    //on create view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         //getting view model
@@ -67,12 +70,26 @@ class ShoppingFragment : Fragment() {
         return root
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        println("ON ACTIVITY RESULT")
+        if(requestCode == REQUEST_CODE_SHOPPING){
+            if(resultCode == RESULT_OK){
+                val dataChanged = data?.getBooleanExtra("shoppingListChanged",false) ?: false
+                if(dataChanged){
+                    //shoppingViewModel.reloadShoppingItems(context!!)
+                }
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
         val newCheckStatus = !shoppingItem.checked
 
         viewHolder.applyCheck(newCheckStatus) //set check status in view
         shoppingItem.checked = newCheckStatus //set check status in model
-        shoppingViewModel.updateShoppingItem(context!!, shoppingItem) //update check status in database
+        shoppingViewModel.updateShoppingItem(shoppingItem) //update check status in database
     }
 
     //private functions
@@ -123,9 +140,9 @@ class ShoppingFragment : Fragment() {
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = true
 
-            shoppingViewModel.deleteAllCheckedItems(context!!) {
+            shoppingViewModel.deleteAllCheckedItems() {
                 swipeRefresh.isRefreshing = false
-                shoppingViewModel.reloadShoppingItems(context!!)
+                shoppingViewModel.reloadShoppingItems()
 
                 showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
@@ -141,7 +158,7 @@ class ShoppingFragment : Fragment() {
                 finishActionMode()
                 Intent(activity, ShoppingItemEditActivity::class.java)
                     .apply {putExtra("item", item.uid) }
-                    .also { startActivity(it) }
+                    .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
             }
 
             clickDeleteButtonHandler = { items, _ ->
@@ -156,7 +173,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .onDone {
                                 finishActionMode()
-                                shoppingViewModel.reloadShoppingItems(context)
+                                shoppingViewModel.reloadShoppingItems()
                                 dialog.dismiss()
                             }
                             .start()
@@ -184,7 +201,7 @@ class ShoppingFragment : Fragment() {
 
         btnAddShoppingItem.setOnClickListener {
             //implementing simple navigation to shopping item edit screen via intent
-            switchToActivity(ShoppingItemEditActivity::class)
+            switchToActivityForResult(REQUEST_CODE_SHOPPING,ShoppingItemEditActivity::class)
         }
     }
 

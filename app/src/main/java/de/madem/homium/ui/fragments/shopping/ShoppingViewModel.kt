@@ -22,26 +22,26 @@ class ShoppingViewModel : ViewModel() {
     }
 
     //functions
-    fun reloadShoppingItems(context: Context){
+    fun reloadShoppingItems(){
         CoroutineBackgroundTask<List<ShoppingItem>>()
-            .executeInBackground { AppDatabase.getInstance(context).itemDao().getAllShopping() }
+            .executeInBackground { AppDatabase.getInstance().itemDao().getAllShopping() }
             .onDone { shoppingItemList.value = it }
             .start()
     }
 
-    fun updateShoppingItem(context: Context, shoppingItem: ShoppingItem) {
+    fun updateShoppingItem(shoppingItem: ShoppingItem) {
         CoroutineBackgroundTask<Unit>()
             .executeInBackground {
-                AppDatabase.getInstance(context).itemDao().setShoppingItemChecked(
+                AppDatabase.getInstance().itemDao().setShoppingItemChecked(
                     shoppingItem.uid, shoppingItem.checked
                 )
             }.start()
     }
 
-    fun deleteAllCheckedItems(context: Context, callback: () -> Unit) {
+    fun deleteAllCheckedItems(callback: () -> Unit) {
         CoroutineBackgroundTask<Unit>()
             .executeInBackground {
-                AppDatabase.getInstance(context).itemDao().deleteAllCheckedShoppingItems()
+                AppDatabase.getInstance().itemDao().deleteAllCheckedShoppingItems()
             }.onDone { callback() }
             .start()
     }

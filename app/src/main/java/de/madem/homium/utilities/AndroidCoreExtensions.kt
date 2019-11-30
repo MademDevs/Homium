@@ -45,7 +45,6 @@ private fun showToast(context: Context?, duration: Int, resource: Int, vararg ar
     }
 }
 
-//settings for context
 fun <T : Any> Context.getSetting(key : String, type : KClass<T>) : T?{
     //getting shared preferences
     val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
@@ -124,6 +123,19 @@ fun <T : Any> Fragment.getSetting(key : String, type : KClass<T>) : T?{
     }
 
     return result
+}
+
+
+fun <T : Any> Fragment.switchToActivityForResult(requestCode: Int,clazz: KClass<T>) {
+    startActivityForResult(Intent(context,clazz.java),requestCode)
+}
+
+fun Activity.finishWithBooleanResult(key: String,value : Boolean, resultCode: Int){
+    val resultIntent = Intent()
+    resultIntent.putExtra(key, value)
+
+    setResult(resultCode, resultIntent)
+    finish()
 }
 
 
