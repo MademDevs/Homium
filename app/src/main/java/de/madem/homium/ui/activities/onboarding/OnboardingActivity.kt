@@ -36,6 +36,8 @@ class OnboardingActivity : AppIntro() {
                 putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),true)
             }
 
+            initAppSettings()
+
             showIntroSlides()
 
         }
@@ -101,5 +103,13 @@ class OnboardingActivity : AppIntro() {
         super.onDonePressed(currentFragment)
         putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),true)
         goToMain()
+    }
+
+    //init app settings
+    private fun initAppSettings(){
+        //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
+        CoroutineBackgroundTask<Unit>().executeInBackground {
+            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
+        }.onDone { println("SETTING INITIALIZED") }.start()
     }
 }

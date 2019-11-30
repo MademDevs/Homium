@@ -119,8 +119,11 @@ class ShoppingFragment : Fragment() {
         }
 
         adapter.longClickListener = {shoppingItem, viewHolder ->
-            //giving haptic feedback
-            vibrate()
+            //giving haptic feedback if allowed
+            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            if(vibrationAllowed){
+                vibrate()
+            }
 
             //start action mode
             actionModeHandler.startActionMode()
