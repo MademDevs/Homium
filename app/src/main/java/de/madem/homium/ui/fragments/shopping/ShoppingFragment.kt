@@ -136,17 +136,22 @@ class ShoppingFragment : Fragment() {
     private fun registerSwipeRefresh() {
         //swipe refresh layout
         val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
+
         swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = true
 
-            shoppingViewModel.deleteAllCheckedItems() {
+            shoppingViewModel.deleteAllCheckedItems {
                 swipeRefresh.isRefreshing = false
                 shoppingViewModel.reloadShoppingItems()
 
                 showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
         }
+
+        //disable swipe refresh on action mode start and enable on stop
+        actionModeHandler.onStartActionMode += { swipeRefresh.isEnabled = false }
+        actionModeHandler.onStopActionMode += { swipeRefresh.isEnabled = true }
     }
 
     private fun registerActionMode() {
