@@ -80,6 +80,7 @@
                     android:id="@+id/shopping_item_edit_numPick_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:descendantFocusability="blocksDescendants"
                     android:layout_marginLeft="64dp"
                     android:layout_marginStart="64dp">
                 </NumberPicker>
@@ -93,6 +94,7 @@
                     android:id="@+id/shopping_item_edit_numPick_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:descendantFocusability="blocksDescendants"
                     android:layout_marginRight="64dp"
                     android:layout_marginEnd="64dp">
                 </NumberPicker>
