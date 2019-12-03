@@ -27,7 +27,7 @@ interface ItemDao {
     @Query("SELECT * FROM product")
     fun getAllProduct(): List<Product>
 
-    @Query("SELECT * FROM shoppingItem")
+    @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
     fun getAllShopping(): List<ShoppingItem>
 
     @Query("SELECT * FROM inventoryItem")
