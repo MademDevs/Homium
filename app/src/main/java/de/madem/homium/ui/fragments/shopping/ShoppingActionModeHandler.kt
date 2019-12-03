@@ -31,6 +31,8 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     var clickCheckButtonHandler: (List<ShoppingItem>, List<ShoppingItemListAdapter.ShoppingItemViewHolder>) -> Unit = { _, _ ->
 
     }
+    var onStartActionMode = listOf<() -> Unit>()
+    var onStopActionMode = listOf<() -> Unit>()
 
     fun startActionMode() {
         actionMode = appCompatActivity.startSupportActionMode(this)!!.apply {
@@ -40,7 +42,6 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
 
     fun finishActionMode() {
         actionMode?.finish()
-        actionMode = null
     }
 
     fun isActionModeActive() = actionMode != null
@@ -71,6 +72,7 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        onStartActionMode.forEach { it() }
         return false
     }
 
@@ -79,6 +81,10 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
 
         selectedViewHolders.forEach { it.itemView.deselect() }
         selectedViewHolders.clear()
+
+        actionMode = null
+        onStopActionMode.forEach { it() }
+
     }
 
     fun clickItem(item: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
