@@ -1,52 +1,45 @@
 package de.madem.homium.ui.fragments.shopping
 
 import android.content.Context
-import android.graphics.Color
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import de.madem.homium.R
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
+import de.madem.homium.utilities.actionmode.ActionModeHandler
+import de.madem.homium.utilities.actionmode.ActionModeInterface
+import de.madem.homium.utilities.actionmode.ActionModeItemHolder
 
-class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
+class ShoppingActionModeHandler(
+    context: Context,
+    private val delegate: ActionModeHandler<ItemHolder> = ActionModeHandler(
+        context,
+        titleResource = R.string.screentitle_main_actionmode_shopping,
+        menuResource = R.menu.shopping_fragment_actionmode
+    )
+) : ActionModeInterface<ShoppingActionModeHandler.ItemHolder> by delegate {
 
-    private val appCompatActivity = context as AppCompatActivity
-    private var actionMode: ActionMode? = null
+    var clickEditButtonHandler: (ItemHolder) -> Unit = {}
+    var clickDeleteButtonHandler: (List<ItemHolder>) -> Unit = { _ -> }
+    var clickCheckButtonHandler: (List<ItemHolder>) -> Unit = { _ -> }
 
-    //private fields
-    private var selectedItems: MutableList<ShoppingItem> = mutableListOf()
-    private var selectedViewHolders: MutableList<ShoppingItemListAdapter.ShoppingItemViewHolder> = mutableListOf()
+    class ItemHolder(
+        val shoppingItem: ShoppingItem,
+        val adapterViewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder
+    ) : ActionModeItemHolder() {
 
-    //utility fields
-    private val menuInflater = MenuInflater(context)
-    private lateinit var menu : Menu
-
-    var clickEditButtonHandler: (ShoppingItem) -> Unit = {}
-    var clickDeleteButtonHandler: (List<ShoppingItem>, List<ShoppingItemListAdapter.ShoppingItemViewHolder>) -> Unit = { _, _ ->
-    }
-    var clickCheckButtonHandler: (List<ShoppingItem>, List<ShoppingItemListAdapter.ShoppingItemViewHolder>) -> Unit = { _, _ ->
-
-    }
-    var onStartActionMode = listOf<() -> Unit>()
-    var onStopActionMode = listOf<() -> Unit>()
-
-    fun startActionMode() {
-        actionMode = appCompatActivity.startSupportActionMode(this)!!.apply {
-            setTitle(R.string.screentitle_main_actionmode_shopping)
-        }
+        override val itemView: View
+            get() = adapterViewHolder.itemView
     }
 
-    fun finishActionMode() {
-        actionMode?.finish()
+    fun clickItem(
+        shoppingItem: ShoppingItem,
+        viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder
+    ) {
+        clickItem(ItemHolder(shoppingItem, viewHolder))
     }
 
-    fun isActionModeActive() = actionMode != null
-
-    //functions
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.shopping_item_am_btn_edit -> {
@@ -54,66 +47,22 @@ class ShoppingActionModeHandler(val context : Context) : ActionMode.Callback {
                 return true
             }
             R.id.shopping_item_am_btn_delete -> {
-                clickDeleteButtonHandler.invoke(selectedItems, selectedViewHolders)
+                clickDeleteButtonHandler.invoke(selectedItems)
                 return true
             }
             R.id.shopping_item_am_btn_check -> {
-                clickCheckButtonHandler.invoke(selectedItems, selectedViewHolders)
+                clickCheckButtonHandler.invoke(selectedItems)
                 return true
             }
         }
         return false
     }
 
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.shopping_fragment_actionmode,menu)
-        this.menu = menu
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        onStartActionMode.forEach { it() }
-        return false
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
-        selectedItems.clear()
-
-        selectedViewHolders.forEach { it.itemView.deselect() }
-        selectedViewHolders.clear()
-
-        actionMode = null
-        onStopActionMode.forEach { it() }
-
-    }
-
-    fun clickItem(item: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
-        if (selectedItems.contains(item)) {
-            selectedItems.remove(item)
-            selectedViewHolders.remove(viewHolder)
-
-            viewHolder.itemView.deselect()
-        } else {
-            selectedItems.add(item)
-            selectedViewHolders.add(viewHolder)
-
-            viewHolder.itemView.select()
-        }
+    override fun clickItem(itemHolder: ItemHolder) {
+        delegate.clickItem(itemHolder)
 
         //only visible if maximum one item is selected
-        menu.findItem(R.id.shopping_item_am_btn_edit).isVisible = selectedViewHolders.size == 1
-
-        //finish action mode if none selected
-        if (countSelected() == 0) {
-            finishActionMode()
-        }
-
+        menu.findItem(R.id.shopping_item_am_btn_edit).isVisible = selectedItems.size == 1
     }
 
-    private fun countSelected(): Int{
-        return if(selectedViewHolders.size == selectedItems.size) selectedItems.size else -1
-    }
-
-    private fun View.select() = setBackgroundColor(Color.LTGRAY)
-    private fun View.deselect() = setBackgroundColor(Color.WHITE)
 }

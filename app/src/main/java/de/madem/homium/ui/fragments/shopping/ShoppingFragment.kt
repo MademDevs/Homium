@@ -159,21 +159,21 @@ class ShoppingFragment : Fragment() {
 
         with(actionModeHandler) {
 
-            clickEditButtonHandler = { item ->
+            clickEditButtonHandler = { itemHolder ->
                 finishActionMode()
                 Intent(activity, ShoppingItemEditActivity::class.java)
-                    .apply {putExtra("item", item.uid) }
+                    .apply {putExtra("item", itemHolder.shoppingItem.uid) }
                     .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
             }
 
-            clickDeleteButtonHandler = { items, _ ->
-                AlertDialog.Builder(context)
+            clickDeleteButtonHandler = { itemHolders ->
+                AlertDialog.Builder(context!!)
                     .setMessage(R.string.shopping_list_delete_question)
                     .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                         CoroutineBackgroundTask<Unit>()
                             .executeInBackground {
-                                items.forEach {
-                                    databaseDao.deleteShoppingItemById(it.uid)
+                                itemHolders.forEach {
+                                    databaseDao.deleteShoppingItemById(it.shoppingItem.uid)
                                 }
                             }
                             .onDone {
@@ -189,10 +189,10 @@ class ShoppingFragment : Fragment() {
                     }.show()
             }
 
-            clickCheckButtonHandler = { items, viewHolders ->
-                items.forEachIndexed {index, shoppingItem ->
+            clickCheckButtonHandler = { itemHolders ->
+                itemHolders.forEachIndexed {index, itemHolder ->
                     //update check status
-                    updateShoppingItemCheckStatus(shoppingItem, viewHolders[index])
+                    updateShoppingItemCheckStatus(itemHolder.shoppingItem, itemHolder.adapterViewHolder)
                 }
             }
         }
