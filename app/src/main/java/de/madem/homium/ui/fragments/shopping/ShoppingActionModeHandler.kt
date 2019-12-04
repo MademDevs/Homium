@@ -2,7 +2,6 @@ package de.madem.homium.ui.fragments.shopping
 
 import android.content.Context
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.view.ActionMode
 import de.madem.homium.R
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
@@ -28,9 +27,7 @@ class ShoppingActionModeHandler(
         val shoppingItem: ShoppingItem,
         val adapterViewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder
     ) : ActionModeItemHolder() {
-
-        override val itemView: View
-            get() = adapterViewHolder.itemView
+        override val itemView = adapterViewHolder.itemView
     }
 
     fun clickItem(
