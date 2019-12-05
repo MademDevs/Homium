@@ -6,8 +6,10 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import de.madem.homium.utilities.showToastShort
 
 class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context, val titleResource: Int, val menuResource: Int)
     : ActionMode.Callback, ActionModeInterface<ItemHolder> {
@@ -37,6 +39,7 @@ class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context,
 
     //functions
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        context.showToastShort("old")
         return false
     }
 

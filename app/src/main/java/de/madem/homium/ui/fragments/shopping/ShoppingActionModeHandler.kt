@@ -9,9 +9,10 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.actionmode.ActionModeHandler
 import de.madem.homium.utilities.actionmode.ActionModeInterface
 import de.madem.homium.utilities.actionmode.ActionModeItemHolder
+import de.madem.homium.utilities.showToastShort
 
 class ShoppingActionModeHandler(
-    context: Context,
+    val context: Context,
     private val delegate: ActionModeHandler<ItemHolder> = ActionModeHandler(
         context,
         titleResource = R.string.screentitle_main_actionmode_shopping,
@@ -38,6 +39,7 @@ class ShoppingActionModeHandler(
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        context.showToastShort("new")
         when (item.itemId) {
             R.id.shopping_item_am_btn_edit -> {
                 clickEditButtonHandler.invoke(selectedItems.first())
