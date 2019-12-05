@@ -51,6 +51,10 @@
     <string name="btn_edit_delete">Einkaufsprodukt löschen</string>
     <string name="actionbar_edit_confirm">Bestätigen</string>
 
+    <!--recipes list texts-->
+    <string name="image_description">Bild</string>
+    <string name="txtView_recipesName">Rezeptname</string>
+
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
