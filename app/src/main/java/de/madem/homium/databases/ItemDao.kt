@@ -65,7 +65,7 @@ interface ItemDao {
 
     //return List -> iterate and adapt view -> auto-completion
     @Query("SELECT * FROM product WHERE name LIKE :getItem")
-    fun getProduct(getItem: String): List<Product>
+    fun getProductsByName(getItem: String): List<Product>
 
     @Query("SELECT COUNT(*) FROM product")
     fun productSize() : Int

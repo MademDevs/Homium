@@ -2,6 +2,7 @@ package de.madem.homium.ui.activities.shoppingitem
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
@@ -16,6 +17,7 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithBooleanResult
+import de.madem.homium.utilities.hideKeyboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -40,6 +42,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shopping_item_edit)
 
+
         //getting data from ressources
         bigUnits = resources.getStringArray(R.array.big_units)
         smallUnits = resources.getStringArray(R.array.small_units)
@@ -60,8 +63,12 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             btnDelete.isVisible = false
         }
 
+        updateSpinnerOnItemSelected()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+    }
 
     //optionsMenu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -92,26 +99,63 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 //setting unit
                 numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
 
+                    //setting amount
+                    if(editTextCount.isVisible){
+                        editTextCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
+                    }
+                    else{
+                        setValuesForNumPickerCount(numPickerUnit)
+
+                        if(numPickerCount.displayedValues.contains(it.count.toString())){
+                            numPickerCount.value = numPickerCount.displayedValues.indexOf(it.count.toString())
+                        }
+                        else{
+                            assignValueFromPickerToEditText(it.count.toString())
+                        }
+
+                    }
+                }
+                    .start()
+
+            }
+
+    //private fuctions
+    private fun setSpinnerDefaultValues(name: String) {
+        CoroutineBackgroundTask<Product>()
+            .executeInBackground { db.itemDao().getProductsByName(name)[0] }
+            .onDone {
+
+                //setting unit
+                numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+
                 //setting amount
                 if(editTextCount.isVisible){
-                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
+                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.unit)
                 }
                 else{
                     setValuesForNumPickerCount(numPickerUnit)
 
-                    if(numPickerCount.displayedValues.contains(it.count.toString())){
-                        numPickerCount.value = numPickerCount.displayedValues.indexOf(it.count.toString())
+                    if(numPickerCount.displayedValues.contains(it.amount)){
+                        numPickerCount.value = numPickerCount.displayedValues.indexOf(it.amount)
                     }
                     else{
-                        assignValueFromPickerToEditText(it.count.toString())
+                        assignValueFromPickerToEditText(it.toString())
                     }
 
                 }
             }
             .start()
+
+    }
+    private fun updateSpinnerOnItemSelected() {
+        autoCmplTxtName.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val selectedItem = parent.getItemAtPosition(position).toString()
+            setSpinnerDefaultValues(selectedItem)
+            hideKeyboard()
+        }
     }
 
-    //private fuctions
+
     private fun initGuiComponents(){
 
         //init delete button
@@ -138,12 +182,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }.show()
 
-            /*GlobalScope.launch {
-                db.itemDao().deleteShoppingItemById(itemid)
-                finish()
-            }
-
-             */
         }
 
         //init txt autocomplete
@@ -158,17 +196,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         }.start()
 
-        /*
-        val productNameList = getProducts().map { it.name }
-
-        var nameList = mutableListOf<String>()
-        for (el in productNameList) {
-            nameList.add(el.name)
-        }
-
-
-        autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
-        */
 
         //init numberpicker
         val units = Units.stringValueArray(this)
@@ -203,64 +230,10 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             numPickerUnit.setOnValueChangedListener { npUnit, i, i2 ->
                 println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
                 setValuesForNumPickerCount(npUnit)
-                /*
-                when(npUnit.value) {
-                    1, 3 -> {
-                        numPickerCount.minValue = 0
-                        numPickerCount.maxValue = bigUnits.size-1
-                        numPickerCount.displayedValues = bigUnits
-                    }
-                    else -> {
-                        numPickerCount.displayedValues = smallUnits
-                        numPickerCount.minValue = 0
-                        numPickerCount.maxValue = smallUnits.size-1
-                    }
-                }
-
-                 */
             }
         } else {
             numPickerCount.isVisible = false
         }
-        /*
-         numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            //getting data for picker
-            val bigUnits = resources.getStringArray(R.array.big_units)
-            val smallUnits = resources.getStringArray(R.array.small_units)
-
-            numPickerCount.isSaveFromParentEnabled = false
-            numPickerCount.isSaveEnabled = false
-            numPickerCount.minValue = 1
-            numPickerCount.maxValue = 20
-            numPickerCount.value = 1
-            numPickerCount.setOnLongClickListener {
-                numPickerCount.isVisible = false
-                editTextCount.isVisible = true
-                true
-            }
-
-
-
-            numPickerUnit.setOnValueChangedListener { np, i, i2 ->
-                when(np.value) {
-                    1, 3 -> {
-                        numPickerCount.minValue = 0
-                        numPickerCount.maxValue = 14
-                        numPickerCount.displayedValues = bigUnits
-                    }
-                    else -> {
-                        numPickerCount.displayedValues = smallUnits
-                        numPickerCount.minValue = 0
-                        numPickerCount.maxValue = 14
-                    }
-                }
-            }
-        } else {
-            numPickerCount.isVisible = false
-        }
-
-        */
 
         editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
             it.isVisible = false
@@ -345,18 +318,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             }.onDone {
                 finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
             }.start()
-            /*
-            GlobalScope.launch {
-                if(itemid >= 0){
-                    db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
-                }
-                else{
-                    db.itemDao().insertShopping(item)
-                }
-
-            }
-
-             */
 
         }
         else{
