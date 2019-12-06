@@ -55,6 +55,10 @@
     <string name="image_description">Bild</string>
     <string name="txtView_recipesName">Rezeptname</string>
 
+    <!--recipe edit texts-->
+    <string name="recipe_title">Rezept-Name</string>
+    <string name="recipe_description">Beschreibung</string>
+
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>

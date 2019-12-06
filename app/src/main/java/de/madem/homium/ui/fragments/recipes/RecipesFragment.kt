@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.recipes
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +13,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.managers.adapters.RecipesListAdapter
+import de.madem.homium.ui.activities.recipe.RecipeEditActivity
+import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.utilities.switchToActivity
+import de.madem.homium.utilities.switchToActivityForResult
 
 class RecipesFragment : Fragment() {
 
@@ -30,8 +37,21 @@ class RecipesFragment : Fragment() {
         root = inflater.inflate(R.layout.fragment_recipes, container, false)
 
         registerRecyclerView()
+        registerFloatingActionButton()
 
         return root
+    }
+
+    private fun registerFloatingActionButton() {
+        val btnAddRecipe = root.findViewById<FloatingActionButton>(
+            R.id.floatingActionButton_addRecipe
+        )
+
+        btnAddRecipe.setOnClickListener {
+            //implementing simple navigation to shopping item edit screen via intent
+            //switchToActivityForResult(REQUEST_CODE_SHOPPING, RecipeEditActivity::class)
+            switchToActivity(RecipeEditActivity::class)
+        }
     }
 
     private fun registerRecyclerView() {

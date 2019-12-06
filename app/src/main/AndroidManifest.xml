@@ -3,6 +3,9 @@
     package="de.madem.homium">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".application.HomiumApplication"
@@ -12,6 +15,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
         <activity
             android:name=".ui.activities.launch.LaunchActivity"
             android:theme="@style/NoActionBarTheme">
@@ -35,6 +47,9 @@
         <activity
             android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"
             android:noHistory="true"
+            android:parentActivityName=".ui.activities.main.MainActivity" />
+        <activity
+            android:name=".ui.activities.recipe.RecipeEditActivity"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity android:name=".ui.activities.test.TestActivity" />
         <activity
