@@ -1,5 +1,6 @@
 package de.madem.homium.managers.adapters
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,12 +52,23 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
         with(holder) {
             txtName.text = recipe.name
             //set Image!!
-            image.setImageResource(R.mipmap.cooking)
+            setPic(image, recipe.image)
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     shortClickListener(recipe, this)
                 }
             }
+        }
+    }
+
+    private fun setPic(imgView: ImageView, currentPhotoPath: String) {
+        // Get the dimensions of the View
+        if(currentPhotoPath.isNotEmpty()) {
+            BitmapFactory.decodeFile(currentPhotoPath)?.also { bitmap ->
+                imgView.setImageBitmap(bitmap)
+            }
+        } else {
+            imgView.setImageResource(R.drawable.empty_picture)
         }
     }
 

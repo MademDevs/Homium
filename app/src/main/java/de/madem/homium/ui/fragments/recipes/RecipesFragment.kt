@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.recipes
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -8,17 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
+import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.utilities.showToastShort
 import de.madem.homium.utilities.switchToActivity
 import de.madem.homium.utilities.switchToActivityForResult
 
@@ -26,6 +31,19 @@ class RecipesFragment : Fragment() {
 
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var root: View
+    private lateinit var db: AppDatabase
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        db = AppDatabase.getInstance()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        //reload shopping items from database
+        recipesViewModel.reloadRecipes()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,8 +56,22 @@ class RecipesFragment : Fragment() {
 
         registerRecyclerView()
         registerFloatingActionButton()
+        registerSwipeRefresh()
 
         return root
+    }
+
+    private fun registerSwipeRefresh() {
+        val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_recipes)
+        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
+        swipeRefresh.setOnRefreshListener {
+            swipeRefresh.isRefreshing = true
+            //TODO: Swipe Refresh implement something useful^
+            recipesViewModel.deleteAllRecipes {
+                swipeRefresh.isRefreshing = false
+                recipesViewModel.reloadRecipes()
+            }
+        }
     }
 
     private fun registerFloatingActionButton() {
