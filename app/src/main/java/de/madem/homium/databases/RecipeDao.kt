@@ -18,6 +18,9 @@ interface RecipeDao {
     @Query("SELECT * FROM recipe")
     fun getAllRecipe(): List<Recipe>
 
+    @Query("SELECT * FROM recipe WHERE uid = :id")
+    fun getRecipeById(id: Int): Recipe
+
     //TODO: Queries for Recipe and Ingredients!
 
 

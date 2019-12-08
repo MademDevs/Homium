@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
@@ -21,6 +22,7 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.ShoppingItem
+import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithBooleanResult
 import java.io.File
@@ -38,6 +40,7 @@ class RecipeEditActivity : AppCompatActivity() {
 
     val REQUEST_TAKE_PHOTO = 1
     var currentPhotoPath: String = ""
+    private var recipeid: Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,17 +53,40 @@ class RecipeEditActivity : AppCompatActivity() {
 
         initGuiComponents()
 
-/*
-        itemid = intent.getIntExtra("item", -1)
-        if(itemid >= 0) {
-            btnDelete.isVisible = true
-            setShoppingItemToElements(itemid)
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
+
+        recipeid = intent.getIntExtra("recipe", -1)
+        println("Recipe-ID: $recipeid")
+        if(recipeid >= 0) {
+            setRecipeToElements(recipeid)
+            supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
         } else {
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
-            btnDelete.isVisible = false
+            supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
         }
-*/
+
+    }
+
+    fun setRecipeToElements(id: Int) {
+        CoroutineBackgroundTask<Recipe>()
+            .executeInBackground { db.recipeDao().getRecipeById(id) }
+            .onDone {
+                //setting name
+               title.text = Editable.Factory.getInstance().newEditable(it.name)
+                description.text = Editable.Factory.getInstance().newEditable(it.description)
+                setPicFromDatabse(it.image)
+
+            }
+            .start()
+    }
+
+    fun setPicFromDatabse(databasePhotoPath: String) {
+        // Get the dimensions of the View
+        if(databasePhotoPath.isNotEmpty()) {
+            BitmapFactory.decodeFile(databasePhotoPath)?.also { bitmap ->
+                imgView.setImageBitmap(bitmap)
+            }
+        } else {
+            imgView.setImageResource(R.drawable.empty_picture)
+        }
     }
 
     fun addOrUpdateToDatabaseIfPossible() {

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_RECIPES
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
@@ -96,7 +97,10 @@ class RecipesFragment : Fragment() {
         val adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
-            Toast.makeText(context, "Selected ${recipe.name}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Selected ${recipe.name}, ${recipe.uid}", Toast.LENGTH_LONG).show()
+            Intent(activity, RecipeEditActivity::class.java)
+                .apply {putExtra("recipe", recipe.uid)}
+                .also { startActivityForResult(it, REQUEST_CODE_RECIPES) }
         }
     }
 

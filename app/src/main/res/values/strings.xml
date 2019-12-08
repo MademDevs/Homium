@@ -54,6 +54,8 @@
     <!--recipes list texts-->
     <string name="image_description">Bild</string>
     <string name="txtView_recipesName">Rezeptname</string>
+    <string name="recipeEdit_title_add">Rezept hinzufügen</string>
+    <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>
