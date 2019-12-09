@@ -68,6 +68,14 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putInt("unit", numPickerUnit.value)
+        outState.putInt("count", numPickerCount.value)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        numPickerCount.value = savedInstanceState.getInt("count")
+        numPickerUnit.value = savedInstanceState.getInt("unit")
     }
 
     //optionsMenu
