@@ -10,15 +10,18 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
+import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
@@ -42,6 +45,8 @@ class ShoppingFragment : Fragment() {
 
         //reload shopping items from database
         shoppingViewModel.reloadShoppingItems()
+        println("Shopping Fragment: ONRESUME")
+        println("ViewModel in Fragment: $shoppingViewModel")
     }
 
     override fun onPause() {
@@ -58,6 +63,9 @@ class ShoppingFragment : Fragment() {
 
         //getting view model
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
+        ViewRefresher.shoppingRefresher = {
+            shoppingViewModel.reloadShoppingItems()
+        }
 
         //getting root layout
         root = inflater.inflate(R.layout.fragment_shopping, container, false)
