@@ -152,6 +152,9 @@ fun Activity.finishWithBooleanResult(key: String,value : Boolean, resultCode: In
     finish()
 }
 
+fun Context.toAppCompatActivityOrNull() : AppCompatActivity?{
+    return if(this is AppCompatActivity) this as AppCompatActivity else null
+}
 
 fun Activity.vibrate() = vibrateInContext()
 fun Fragment.vibrate() = context?.vibrateInContext()
