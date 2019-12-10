@@ -14,7 +14,7 @@ interface ActionModeInterface<ItemHolder : ActionModeItemHolder> {
     fun isActionModeActive(): Boolean
     fun finishActionMode()
     fun clickItem(itemHolder: ItemHolder)
-    fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean
+    fun onActionItemClicked(item: MenuItem): Boolean
     fun startActionMode()
 
 }

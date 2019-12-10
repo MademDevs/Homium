@@ -11,18 +11,24 @@ import de.madem.homium.utilities.actionmode.ActionModeInterface
 import de.madem.homium.utilities.actionmode.ActionModeItemHolder
 import de.madem.homium.utilities.showToastShort
 
-class ShoppingActionModeHandler(
-    val context: Context,
-    private val delegate: ActionModeHandler<ItemHolder> = ActionModeHandler(
-        context,
-        titleResource = R.string.screentitle_main_actionmode_shopping,
-        menuResource = R.menu.shopping_fragment_actionmode
-    )
-) : ActionModeInterface<ShoppingActionModeHandler.ItemHolder> by delegate {
+class ShoppingActionModeHandler(val context: Context) : ActionModeInterface<ShoppingActionModeHandler.ItemHolder> {
 
     var clickEditButtonHandler: (ItemHolder) -> Unit = {}
     var clickDeleteButtonHandler: (List<ItemHolder>) -> Unit = { _ -> }
     var clickCheckButtonHandler: (List<ItemHolder>) -> Unit = { _ -> }
+
+    private var actionModeHandler: ActionModeHandler<ItemHolder> = ActionModeHandler(
+        context,
+        titleResource = R.string.screentitle_main_actionmode_shopping,
+        menuResource = R.menu.shopping_fragment_actionmode
+    )
+
+    init {
+
+    }
+
+
+
 
     class ItemHolder(
         val shoppingItem: ShoppingItem,
@@ -38,7 +44,7 @@ class ShoppingActionModeHandler(
         clickItem(ItemHolder(shoppingItem, viewHolder))
     }
 
-    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+    override fun onActionItemClicked(item: MenuItem): Boolean {
         context.showToastShort("new")
         when (item.itemId) {
             R.id.shopping_item_am_btn_edit -> {

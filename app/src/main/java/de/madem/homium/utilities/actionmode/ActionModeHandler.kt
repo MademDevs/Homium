@@ -11,36 +11,40 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import de.madem.homium.utilities.showToastShort
 
-class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context, val titleResource: Int, val menuResource: Int)
-    : ActionMode.Callback, ActionModeInterface<ItemHolder> {
+class ActionModeHandler<ItemHolder : ActionModeItemHolder>(
+    val context: Context, val titleResource: Int, val menuResource: Int
+) : ActionMode.Callback {
 
     private val appCompatActivity = context as AppCompatActivity
     private var actionMode: ActionMode? = null
 
     //utility fields
     private val menuInflater = MenuInflater(context)
-    override lateinit var menu: Menu
+    lateinit var menu: Menu
 
-    override var selectedItems: MutableList<ItemHolder> = mutableListOf()
-    override var onStartActionMode = listOf<() -> Unit>()
-    override var onStopActionMode = listOf<() -> Unit>()
+    var selectedItems: MutableList<ItemHolder> = mutableListOf()
+    var onStartActionMode = listOf<() -> Unit>()
+    var onStopActionMode = listOf<() -> Unit>()
 
-    override fun startActionMode() {
+    var onItemSelected = { item: MenuItem -> false }
+
+    fun startActionMode() {
         actionMode = appCompatActivity.startSupportActionMode(this)!!.apply {
             setTitle(titleResource)
         }
     }
 
-    override fun finishActionMode() {
+    fun finishActionMode() {
         actionMode?.finish()
     }
 
-    override fun isActionModeActive() = actionMode != null
+    fun isActionModeActive() = actionMode != null
 
     //functions
+
+
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        context.showToastShort("old")
-        return false
+        return onItemSelected()
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu): Boolean {
@@ -55,17 +59,15 @@ class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context,
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
-
         selectedItems.forEach { it.itemView.deselect() }
         selectedItems.clear()
 
         actionMode = null
         onStopActionMode.forEach { it() }
-
     }
 
 
-    override fun clickItem(itemHolder: ItemHolder) {
+    fun clickItem(itemHolder: ItemHolder) {
         if (selectedItems.contains(itemHolder)) {
             selectedItems.remove(itemHolder)
 
