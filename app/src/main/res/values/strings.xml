@@ -4,7 +4,7 @@
     <string name="answer_yes">Ja</string>
     <string name="answer_no">Nein</string>
     <string name="error">Fehler</string>
-    <string name="dummy">%s</string>
+    <string name="dummy">{0}</string>
 
     <!--settings-->
     <string name="setting_vibration">Vibration</string>
