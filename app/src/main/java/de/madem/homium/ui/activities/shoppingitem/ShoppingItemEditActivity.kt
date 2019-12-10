@@ -138,7 +138,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
                 //setting amount
                 if(editTextCount.isVisible){
-                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.unit)
+                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.amount)
                 }
                 else{
                     setValuesForNumPickerCount(numPickerUnit)
@@ -147,7 +147,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         numPickerCount.value = numPickerCount.displayedValues.indexOf(it.amount)
                     }
                     else{
-                        assignValueFromPickerToEditText(it.toString())
+                        assignValueFromPickerToEditText(it.amount)
                     }
 
                 }
