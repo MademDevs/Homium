@@ -58,7 +58,10 @@ interface ItemDao {
     fun deleteProduct(deleteItem: String)
 
     @Query("DELETE FROM shoppingItem WHERE name LIKE :deleteItem")
-    fun deleteShopping(deleteItem: String)
+    fun deleteShoppingByName(deleteItem: String)
+
+    @Query("DELETE FROM shoppingItem WHERE name LIKE :itemName AND unit LIKE :itemUnit AND count = :itemCount")
+    fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: String)
 
     @Query("DELETE FROM inventoryItem WHERE name LIKE :deleteItem")
     fun deleteInventory(deleteItem: String)

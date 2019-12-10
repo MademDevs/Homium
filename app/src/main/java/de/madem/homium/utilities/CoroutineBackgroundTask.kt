@@ -1,15 +1,26 @@
 package de.madem.homium.utilities
 
+import android.app.AlertDialog
+import android.content.Context
+import de.madem.homium.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 
-class CoroutineBackgroundTask<T> {
+open class CoroutineBackgroundTask<T> {
 
-    private lateinit var backgroundAction : CoroutineScope.() -> T
+    //fields
+    private var onPrepare : () -> Boolean = {true}
+    private lateinit var backgroundAction : suspend CoroutineScope.() -> T
     private var onDone : (T) -> Unit = {}
 
-    fun executeInBackground(function: CoroutineScope.() -> T) : CoroutineBackgroundTask<T> {
+    //functions
+    fun onPrepare(function: () -> Boolean) : CoroutineBackgroundTask<T>{
+        onPrepare = function
+        return this
+    }
+
+    fun executeInBackground(function: suspend CoroutineScope.() -> T) : CoroutineBackgroundTask<T> {
         backgroundAction = function
         return this
     }
@@ -19,14 +30,34 @@ class CoroutineBackgroundTask<T> {
         return this
     }
 
-    fun start(){
+    open fun start(){
         if(this::backgroundAction.isInitialized){
-            GlobalScope.launch(IO) {
-                val result = backgroundAction.invoke(this)
-                withContext(Main){
-                    onDone.invoke(result)
+            val allowedToStart = onPrepare.invoke()
+            if(allowedToStart){
+                GlobalScope.launch(IO) {
+                    val result = backgroundAction.invoke(this)
+                    withContext(Main){
+                        onDone.invoke(result)
+                    }
                 }
             }
+
+        }
+    }
+
+    open fun startInCoroutineScope(scope : CoroutineScope){
+        if(this::backgroundAction.isInitialized){
+            val allowedToStart = onPrepare.invoke()
+            if(allowedToStart){
+                scope.launch(IO) {
+                    val result = backgroundAction.invoke(this)
+                    withContext(Main){
+                        onDone.invoke(result)
+                    }
+                }
+            }
+
+
         }
     }
 }

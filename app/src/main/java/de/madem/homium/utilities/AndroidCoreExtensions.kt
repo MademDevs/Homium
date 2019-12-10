@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
@@ -147,6 +148,9 @@ fun Activity.finishWithBooleanResult(key: String, value: Boolean, resultCode: In
     finish()
 }
 
+fun Context.toAppCompatActivityOrNull() : AppCompatActivity?{
+    return if(this is AppCompatActivity) this as AppCompatActivity else null
+}
 
 fun Activity.vibrate() = vibrateInContext()
 fun Fragment.vibrate() = context?.vibrateInContext()
