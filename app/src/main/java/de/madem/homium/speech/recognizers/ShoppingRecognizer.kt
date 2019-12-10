@@ -92,7 +92,7 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
             }
 
             //getting products
-            val productsFromDataBase = itemDao.getProduct(words[3])
+            val productsFromDataBase = itemDao.getProductsByName(words[3])
             val result = itemResult.await()
 
             //inserting result if not null
@@ -148,7 +148,7 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
             }
 
             //getting products
-            val productsFromDataBase = itemDao.getProduct(words[3])
+            val productsFromDataBase = itemDao.getProductsByName(words[3])
             val result = itemResult.await()
 
             //inserting result if not null

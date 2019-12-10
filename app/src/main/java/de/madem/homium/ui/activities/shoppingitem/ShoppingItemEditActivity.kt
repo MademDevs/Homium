@@ -332,6 +332,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
         }
 
+        
 
     }
 }
