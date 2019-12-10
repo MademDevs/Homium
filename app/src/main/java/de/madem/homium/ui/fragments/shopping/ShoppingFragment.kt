@@ -44,9 +44,8 @@ class ShoppingFragment : Fragment() {
         super.onResume()
 
         //reload shopping items from database
-        shoppingViewModel.reloadShoppingItems()
-        println("Shopping Fragment: ONRESUME")
-        println("ViewModel in Fragment: $shoppingViewModel")
+        refreshViewModelData()
+        println("ON RESUME")
     }
 
     override fun onPause() {
@@ -64,7 +63,8 @@ class ShoppingFragment : Fragment() {
         //getting view model
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
         ViewRefresher.shoppingRefresher = {
-            shoppingViewModel.reloadShoppingItems()
+            refreshViewModelData()
+
         }
 
         //getting root layout
@@ -90,6 +90,21 @@ class ShoppingFragment : Fragment() {
         }
 
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun refreshViewModelData(){
+        val sorting = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),Int::class) ?: R.id.radio_sort_normal
+
+        if(sorting == R.id.radio_sort_reversed){
+            shoppingViewModel.reloadShoppingItems(true)
+        }
+        else{
+            shoppingViewModel.reloadShoppingItems()
+        }
+
+        println("refreshViewModelData")
+
+
     }
 
     private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
@@ -151,7 +166,7 @@ class ShoppingFragment : Fragment() {
 
             shoppingViewModel.deleteAllCheckedItems {
                 swipeRefresh.isRefreshing = false
-                shoppingViewModel.reloadShoppingItems()
+                refreshViewModelData()
 
                 showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
@@ -186,7 +201,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .onDone {
                                 finishActionMode()
-                                shoppingViewModel.reloadShoppingItems()
+                                refreshViewModelData()
                                 dialog.dismiss()
                             }
                             .start()

@@ -110,6 +110,7 @@ class OnboardingActivity : AppIntro() {
         //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
         CoroutineBackgroundTask<Unit>().executeInBackground {
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
-        }.onDone { println("SETTING INITIALIZED") }.start()
+            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
+        }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }
