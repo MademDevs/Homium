@@ -3,6 +3,7 @@
     <string name="app_name">Homium</string>
     <string name="answer_yes">Ja</string>
     <string name="answer_no">Nein</string>
+    <string name="error">Fehler</string>
     <string name="dummy">{0}</string>
 
     <!--settings-->
@@ -27,6 +28,7 @@
 
     <!--main activity menu-->
     <string name="actionbar_main_testzone">Testzone</string>
+    <string name="actionbar_main_speech_assistent">Sprachassistent</string>
     <string name="actionbar_main_actionmode_delete">Löschen</string>
     <string name="actionbar_main_actionmode_edit">Bearbeiten</string>
     <string name="actionbar_main_actionmode_check">Auswählen</string>
@@ -55,7 +57,17 @@
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
     <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
+    <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="errormsg_invalid_shoppingitem_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
+    <string name="errormsg_insert_shoppingitem_failed">Fehler: Das Einkaufselement konnte nicht hinzugefügt werden. Bitte versuche es erneut.</string>
+    <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
+
+    <!--Speech Assistent Feedback-->
+    <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
+    <string name="assistent_msg_shoppingitem_added">Ein neues Einkaufselement wurde erfolgreich zur Einkaufsliste hinzugefügt.</string>
+    <string name="assistent_msg_shoppingitem_with_param_deleted">Alle Einkaufselemente mit der Angabe # wurden gelöscht.</string>
+    <string name="assistent_question_delete_all_shopping">Soll die ganze Einkaufsliste wirklich gelöscht werden?</string>
+    <string name="assistent_question_delete_all_shopping_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
@@ -63,7 +75,7 @@
     <!--data for units-->
     <string name="data_units_item">Stück</string>
     <string name="data_units_gram">Gramm</string>
-    <string name="data_units_kilogram">Kilogram</string>
+    <string name="data_units_kilogram">Kilogramm</string>
     <string name="data_units_millilitre">Milliliter</string>
     <string name="data_units_litre">Liter</string>
     <string name="data_units_pack">Packung</string>
