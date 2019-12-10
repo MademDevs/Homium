@@ -10,14 +10,12 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
-import de.madem.homium.application.HomiumApplication
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
@@ -115,10 +113,8 @@ class ShoppingFragment : Fragment() {
         adapter.shortClickListener = {shoppingItem, viewHolder ->
 
             if (actionModeHandler.isActionModeActive()) {
-
                 //select item in action mode
                 actionModeHandler.clickItem(shoppingItem, viewHolder)
-
             } else {
 
                 //update check status

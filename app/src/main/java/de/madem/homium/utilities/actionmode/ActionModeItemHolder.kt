@@ -6,15 +6,18 @@ abstract class ActionModeItemHolder {
 
     abstract val itemView: View
 
+    abstract fun equalsImpl(other: ActionModeItemHolder): Boolean
+    abstract fun hashCodeProvider(): Int
+
     override fun equals(other: Any?): Boolean {
-        if (other is View) {
-            return other == itemView
+        if (other is ActionModeItemHolder) {
+            equalsImpl(other)
         }
         return false
     }
 
     override fun hashCode(): Int {
-        return itemView.hashCode()
+        return hashCodeProvider()
     }
 
 }
