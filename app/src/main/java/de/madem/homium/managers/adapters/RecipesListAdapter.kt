@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
+import de.madem.homium.models.Ingredients
 import de.madem.homium.models.Recipe
 
 class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>)
@@ -68,7 +69,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                 imgView.setImageBitmap(bitmap)
             }
         } else {
-            imgView.setImageResource(R.drawable.empty_picture)
+            imgView.setImageResource(R.mipmap.empty_picture)
         }
     }
 
@@ -76,4 +77,5 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
         val txtName = itemView.findViewById<TextView>(R.id.txtView_recipesName)
         val image = itemView.findViewById<ImageView>(R.id.recipes_imgView)
     }
+
 }

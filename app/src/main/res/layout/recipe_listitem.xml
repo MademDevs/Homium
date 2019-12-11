@@ -24,7 +24,7 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_description"
-                app:srcCompat="@drawable/empty_picture" />
+                app:srcCompat="@mipmap/empty_picture" />
 
             <TextView
                 android:id="@+id/txtView_recipesName"

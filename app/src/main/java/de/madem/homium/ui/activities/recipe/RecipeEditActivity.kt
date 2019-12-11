@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.room.Database
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Ingredients
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -85,7 +86,7 @@ class RecipeEditActivity : AppCompatActivity() {
                 imgView.setImageBitmap(bitmap)
             }
         } else {
-            imgView.setImageResource(R.drawable.empty_picture)
+            imgView.setImageResource(R.mipmap.empty_picture)
         }
     }
 
@@ -210,7 +211,7 @@ class RecipeEditActivity : AppCompatActivity() {
                 imgView.setImageBitmap(bitmap)
             }
         } else {
-            imgView.setImageResource(R.drawable.empty_picture)
+            imgView.setImageResource(R.mipmap.empty_picture)
         }
     }
 

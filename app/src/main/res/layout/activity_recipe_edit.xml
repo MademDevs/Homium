@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:contentDescription="recipe_image"
-            app:srcCompat="@drawable/empty_picture" />
+            app:srcCompat="@mipmap/empty_picture" />
 
         <EditText
             android:id="@+id/recipe_edit_title_editTxt"
