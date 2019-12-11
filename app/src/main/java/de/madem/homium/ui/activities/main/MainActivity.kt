@@ -1,38 +1,42 @@
 package de.madem.homium.ui.activities.main
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_SPEECH
+import de.madem.homium.exceptions.SpeechRecognitionException
+import de.madem.homium.speech.SpeechAssistent
+import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.ui.fragments.shopping.ShoppingViewModel
 import de.madem.homium.utilities.switchToActivity
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
 
+    //fields
+    private var speechAssistent : SpeechAssistent? = null
+
+    //oncreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        /*val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
-
-        if(!dataBaseInitialized){
-            //init database (should be done in onboarding later)
-            DatabaseInitializer(applicationContext) {
-                Toast.makeText(this,"Init Database",Toast.LENGTH_SHORT).show()
-                putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),true)
-            }
-
-        }
-
-         */
-
 
 
         //nav controller for bottom navigation
@@ -52,6 +56,9 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        //instanciating speech assistent
+        speechAssistent = SpeechAssistent(this)
+
 
     }
 
@@ -59,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         if( menu != null){
             menuInflater.inflate(R.menu.activity_main_actionbar_menu,menu)
         }
+
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -68,9 +76,38 @@ class MainActivity : AppCompatActivity() {
         return when(item.itemId){
             R.id.main_actionbar_testezone -> {
                 switchToActivity(TestActivity::class)
-                return false
+                false
+            }
+            R.id.main_actionbar_speech_assistent -> {
+                try {
+                    startSpeechRecognition(REQUEST_CODE_SPEECH, Locale.GERMAN)
+                }
+                catch (ex : SpeechRecognitionException){
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.errormsg_unknown_error_with_speech_assistent)
+                        .setPositiveButton(android.R.string.ok){_,_ -> }
+                        .show()
+                }
+                false
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == Activity.RESULT_OK){
+
+            if(requestCode == REQUEST_CODE_SPEECH && data != null){
+                val resultOfSpeechRecognition = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
+
+                if(resultOfSpeechRecognition.isNotEmpty()){
+                    speechAssistent?.executeCommand(command = resultOfSpeechRecognition.toLowerCase())
+                }
+            }
+
         }
     }
 

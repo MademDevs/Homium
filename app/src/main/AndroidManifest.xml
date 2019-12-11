@@ -36,7 +36,8 @@
         </activity>
         <activity
             android:name=".ui.activities.onboarding.OnboardingActivity"
-            android:theme="@style/NoActionBarTheme">
+            android:theme="@style/NoActionBarTheme"
+            android:exported="false">
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,6 +49,7 @@
         <activity
             android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"
             android:noHistory="true"
+            android:exported="false"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
             android:name=".ui.activities.recipe.RecipeEditActivity"
@@ -55,6 +57,7 @@
         <activity android:name=".ui.activities.test.TestActivity" />
         <activity
             android:name=".ui.activities.main.MainActivity"
+            android:exported="false"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

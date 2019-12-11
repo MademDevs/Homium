@@ -10,15 +10,18 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
+import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
@@ -41,7 +44,8 @@ class ShoppingFragment : Fragment() {
         super.onResume()
 
         //reload shopping items from database
-        shoppingViewModel.reloadShoppingItems()
+        refreshViewModelData()
+        println("ON RESUME")
     }
 
     override fun onPause() {
@@ -58,6 +62,10 @@ class ShoppingFragment : Fragment() {
 
         //getting view model
         shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
+        ViewRefresher.shoppingRefresher = {
+            refreshViewModelData()
+
+        }
 
         //getting root layout
         root = inflater.inflate(R.layout.fragment_shopping, container, false)
@@ -82,6 +90,21 @@ class ShoppingFragment : Fragment() {
         }
 
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun refreshViewModelData(){
+        val sorting = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),Int::class) ?: R.id.radio_sort_normal
+
+        if(sorting == R.id.radio_sort_reversed){
+            shoppingViewModel.reloadShoppingItems(true)
+        }
+        else{
+            shoppingViewModel.reloadShoppingItems()
+        }
+
+        println("refreshViewModelData")
+
+
     }
 
     private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
@@ -143,7 +166,7 @@ class ShoppingFragment : Fragment() {
 
             shoppingViewModel.deleteAllCheckedItems {
                 swipeRefresh.isRefreshing = false
-                shoppingViewModel.reloadShoppingItems()
+                refreshViewModelData()
 
                 showToastShort(R.string.notification_remove_bought_shoppingitems)
             }
@@ -178,7 +201,7 @@ class ShoppingFragment : Fragment() {
                             }
                             .onDone {
                                 finishActionMode()
-                                shoppingViewModel.reloadShoppingItems()
+                                refreshViewModelData()
                                 dialog.dismiss()
                             }
                             .start()

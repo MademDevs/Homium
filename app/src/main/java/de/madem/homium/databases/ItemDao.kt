@@ -27,8 +27,11 @@ interface ItemDao {
     @Query("SELECT * FROM product")
     fun getAllProduct(): List<Product>
 
-    @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
+    @Query("SELECT * FROM shoppingItem")
     fun getAllShopping(): List<ShoppingItem>
+
+    @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
+    fun getAllShoppingReversedOrder(): List<ShoppingItem>
 
     @Query("SELECT * FROM inventoryItem")
     fun getAllInventory(): List<InventoryItem>
@@ -58,7 +61,10 @@ interface ItemDao {
     fun deleteProduct(deleteItem: String)
 
     @Query("DELETE FROM shoppingItem WHERE name LIKE :deleteItem")
-    fun deleteShopping(deleteItem: String)
+    fun deleteShoppingByName(deleteItem: String)
+
+    @Query("DELETE FROM shoppingItem WHERE name LIKE :itemName AND unit LIKE :itemUnit AND count = :itemCount")
+    fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: String)
 
     @Query("DELETE FROM inventoryItem WHERE name LIKE :deleteItem")
     fun deleteInventory(deleteItem: String)
