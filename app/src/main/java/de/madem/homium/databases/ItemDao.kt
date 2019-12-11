@@ -71,7 +71,10 @@ interface ItemDao {
 
     //return List -> iterate and adapt view -> auto-completion
     @Query("SELECT * FROM product WHERE name LIKE :getItem")
-    fun getProduct(getItem: String): List<Product>
+    fun getProductsByName(getItem: String): List<Product>
+
+    @Query("SELECT * FROM product WHERE name LIKE :name OR pluralName LIKE :name")
+    fun getProductsByNameOrPlural(name: String) : List<Product>
 
     @Query("SELECT COUNT(*) FROM product")
     fun productSize() : Int
@@ -84,6 +87,9 @@ interface ItemDao {
 
     @Query("DELETE FROM shoppingItem WHERE uid = :id")
     fun deleteShoppingItemById(id: Int)
+
+    @Query("DELETE FROM shoppingItem WHERE name = :name AND count = :count")
+    fun deleteShoppingItemByNameCount(name : String,count: Int)
 
     @Query("UPDATE shoppingItem SET checked = :checked WHERE uid = :id")
     fun setShoppingItemChecked(id: Int, checked: Boolean = true)

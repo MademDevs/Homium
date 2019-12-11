@@ -30,18 +30,9 @@ class DatabaseInitializer(private val context: Context, private val doneCallback
         var line = fileReader.readLine()
         while(line != null) {
             val splitted = line.split(";")
-            dao.insertProduct(Product(splitted[0], splitted[1], splitted[2]))
+            dao.insertProduct(Product(splitted[0],splitted[1], splitted[2], splitted[3]))
             line = fileReader.readLine()
         }
         println("PRODUCTSIZE: ${dao.productSize()}")
-    }
-
-    private fun loadDummyProducts() {
-        dao.insertProduct(
-            Product("Apfel", "kg", "2"),
-            Product("Ananas", "Stück", "1"),
-            Product("Brötchen", "Stück", "5"),
-            Product("Hackfleisch", "g", "500")
-        )
     }
 }
