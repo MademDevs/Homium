@@ -8,9 +8,7 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.actionmode.ActionModeHandler
 import de.madem.homium.utilities.actionmode.ActionModeItemHolder
 
-class ShoppingActionModeHandler(
-    context: Context
-) : ActionModeHandler<ShoppingActionModeHandler.ItemHolder>(context) {
+class ShoppingActionModeHandler(context: Context) : ActionModeHandler<ShoppingActionModeHandler.ItemHolder>(context) {
 
     //protected properties
     override val actionModeSettings: ActionModeSettings
@@ -46,6 +44,12 @@ class ShoppingActionModeHandler(
         return false
     }
 
+    override fun clickItem(itemHolder: ItemHolder) {
+        super.clickItem(itemHolder)
+
+        //only visible if maximum one item is selected
+        menu?.findItem(R.id.shopping_item_am_btn_edit)?.isVisible = selectedItems.size == 1
+    }
 
     //api methods
     fun clickItem(
@@ -53,11 +57,7 @@ class ShoppingActionModeHandler(
         adapterViewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder
     ) {
         val itemHolder = ItemHolder.of(shoppingItem, adapterViewHolder)
-
         clickItem(itemHolder)
-
-        //only visible if maximum one item is selected
-        menu?.findItem(R.id.shopping_item_am_btn_edit)?.isVisible = selectedItems.size == 1
     }
 
 

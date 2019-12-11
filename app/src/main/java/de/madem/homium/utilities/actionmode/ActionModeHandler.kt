@@ -51,7 +51,7 @@ abstract class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context:
 
     fun isActionModeActive() = actionMode != null
 
-    fun clickItem(itemHolder: ItemHolder) {
+    open fun clickItem(itemHolder: ItemHolder) {
         println(itemHolder.hashCode())
 
         val hashCode = itemHolder.hashCode()
