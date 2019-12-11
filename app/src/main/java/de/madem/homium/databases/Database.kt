@@ -17,6 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     //userDao for accessing database content
     abstract fun itemDao(): ItemDao
     abstract fun recipeDao(): RecipeDao
+    abstract fun inventoryDao(): InventoryDao
 
     //Singleton
     companion object{

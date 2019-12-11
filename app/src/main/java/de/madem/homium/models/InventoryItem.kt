@@ -7,8 +7,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "inventoryItem")
 data class InventoryItem(
-    @PrimaryKey val uid: Int,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "count") val count: Int,
-    @ColumnInfo(name = "unit") val unit: String
+    @ColumnInfo(name = "unit") val unit: String,
+    @ColumnInfo(name = "location") val location: String,
+    @PrimaryKey(autoGenerate = true) val uid: Int = -1
 )

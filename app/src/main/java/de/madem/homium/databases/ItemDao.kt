@@ -3,7 +3,6 @@ package de.madem.homium.databases
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 
@@ -33,26 +32,17 @@ interface ItemDao {
     @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
     fun getAllShoppingReversedOrder(): List<ShoppingItem>
 
-    @Query("SELECT * FROM inventoryItem")
-    fun getAllInventory(): List<InventoryItem>
-
     @Insert
     fun insertProduct(vararg item: Product)
 
     @Insert
     fun insertShopping(vararg item: ShoppingItem)
 
-    @Insert
-    fun insertInventory(vararg item: InventoryItem)
-
     @Query("DELETE FROM product")
     fun deleteAllProduct()
 
     @Query("DELETE FROM shoppingItem")
     fun deleteAllShopping()
-
-    @Query("DELETE FROM inventoryItem")
-    fun deleteAllInventory()
 
 
     //Search for Items -> if partial String (not full name), has to be %String%
@@ -65,9 +55,6 @@ interface ItemDao {
 
     @Query("DELETE FROM shoppingItem WHERE name LIKE :itemName AND unit LIKE :itemUnit AND count = :itemCount")
     fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: String)
-
-    @Query("DELETE FROM inventoryItem WHERE name LIKE :deleteItem")
-    fun deleteInventory(deleteItem: String)
 
     //return List -> iterate and adapt view -> auto-completion
     @Query("SELECT * FROM product WHERE name LIKE :getItem")
