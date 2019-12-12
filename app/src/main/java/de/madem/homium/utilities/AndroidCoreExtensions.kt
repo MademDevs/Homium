@@ -36,11 +36,6 @@ fun AppCompatActivity.hideKeyboard() {
 fun Fragment.showToastShort(string: String) = context.showToastShort(string)
 fun Fragment.showToastLong(string: String) = context.showToastLong(string)
 
-
-fun Fragment.showToastShort(string: String) {
-    showToast(context, Toast.LENGTH_SHORT, R.string.dummy, string)
-}
-
 fun Fragment.showToastShort(resource: Int, vararg arguments: Any) =
     context.showToast(Toast.LENGTH_SHORT, resource, arguments)
 
