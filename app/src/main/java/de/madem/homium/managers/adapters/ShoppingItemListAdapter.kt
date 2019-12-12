@@ -25,6 +25,7 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
         liveData.observe(owner, Observer { list ->
             data = list
             notifyDataSetChanged()
+            println("OBSERVER TRIGGERED")
         })
     }
 

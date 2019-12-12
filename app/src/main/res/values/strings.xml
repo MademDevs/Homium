@@ -8,6 +8,9 @@
 
     <!--settings-->
     <string name="setting_vibration">Vibration</string>
+    <string name="setting_shopping_sort">Sortierung der Einkaufsliste</string>
+    <string name="setting_shopping_sort_normal">Neuste unten anfügen</string>
+    <string name="setting_shopping_sort_reversed">Neuste oben anfügen</string>
 
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
@@ -53,6 +56,16 @@
     <string name="btn_edit_delete">Einkaufsprodukt löschen</string>
     <string name="actionbar_edit_confirm">Bestätigen</string>
 
+    <!--recipes list texts-->
+    <string name="image_description">Bild</string>
+    <string name="txtView_recipesName">Rezeptname</string>
+    <string name="recipeEdit_title_add">Rezept hinzufügen</string>
+    <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
+
+    <!--recipe edit texts-->
+    <string name="recipe_title">Rezept-Name</string>
+    <string name="recipe_description">Beschreibung</string>
+
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
@@ -68,6 +81,8 @@
     <string name="assistent_msg_shoppingitem_with_param_deleted">Alle Einkaufselemente mit der Angabe # wurden gelöscht.</string>
     <string name="assistent_question_delete_all_shopping">Soll die ganze Einkaufsliste wirklich gelöscht werden?</string>
     <string name="assistent_question_delete_all_shopping_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
+    <string name="assistent_question_delete_all_shopping_with_name_and_plural">Sollen wirklich alle Einkaufselemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
+    <string name="assistent_msg_delete_failed">Leider konnte die Löschaktion aufgrund ungültiger Eingaben nicht durchgeführt werden. Bitte versuche es erneut!</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
@@ -124,4 +139,5 @@
     <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
     <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
     <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
+    <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
 </resources>

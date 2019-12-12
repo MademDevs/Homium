@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
@@ -20,9 +22,24 @@ fun <T : Any> Activity.switchToActivity(clazz: KClass<T>) {
     startActivity(Intent(this, clazz.java))
 }
 
-//fragment toast
+fun AppCompatActivity.hideKeyboard() {
+    val view = this.currentFocus
+    if (view != null) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+    // else {
+    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+    // }
+}
+
 fun Fragment.showToastShort(string: String) = context.showToastShort(string)
 fun Fragment.showToastLong(string: String) = context.showToastLong(string)
+
+
+fun Fragment.showToastShort(string: String) {
+    showToast(context, Toast.LENGTH_SHORT, R.string.dummy, string)
+}
 
 fun Fragment.showToastShort(resource: Int, vararg arguments: Any) =
     context.showToast(Toast.LENGTH_SHORT, resource, arguments)

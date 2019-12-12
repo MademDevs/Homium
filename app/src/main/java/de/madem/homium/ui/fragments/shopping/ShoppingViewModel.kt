@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import kotlinx.coroutines.CoroutineScope
@@ -21,11 +22,21 @@ class ShoppingViewModel : ViewModel() {
         value = listOf()
     }
 
+
     //functions
-    fun reloadShoppingItems(){
+    fun reloadShoppingItems(reversed: Boolean = false){
         CoroutineBackgroundTask<List<ShoppingItem>>()
-            .executeInBackground { AppDatabase.getInstance().itemDao().getAllShopping() }
-            .onDone { shoppingItemList.value = it }
+            .executeInBackground {
+
+                if(reversed){
+                    AppDatabase.getInstance().itemDao().getAllShoppingReversedOrder()
+                }
+                else{
+                    AppDatabase.getInstance().itemDao().getAllShopping()
+                }
+
+            }
+            .onDone { shoppingItemList.value = it; println("VIEWMODEL: Shoppinglist updated")}
             .start()
     }
 
