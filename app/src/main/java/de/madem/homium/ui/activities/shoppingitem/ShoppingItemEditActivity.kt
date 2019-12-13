@@ -255,7 +255,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 it.isVisible = true
             }
         }
-
     }
 
     private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker){

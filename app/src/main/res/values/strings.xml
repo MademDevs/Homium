@@ -66,6 +66,12 @@
     <string name="recipe_title">Rezept-Name</string>
     <string name="recipe_description">Beschreibung</string>
 
+    <!-- inventory edit -->
+    <string name="inventory_edit_title_name">Was möchtest du verwalten?</string>
+    <string name="inventory_edit_button_delete_text">Inventarelement löschen</string>
+
+
+
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>

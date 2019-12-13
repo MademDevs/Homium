@@ -11,5 +11,5 @@ data class InventoryItem(
     @ColumnInfo(name = "count") val count: Int,
     @ColumnInfo(name = "unit") val unit: String,
     @ColumnInfo(name = "location") val location: String,
-    @PrimaryKey(autoGenerate = true) val uid: Int = -1
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0
 )

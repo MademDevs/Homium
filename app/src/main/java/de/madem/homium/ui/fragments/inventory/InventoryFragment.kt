@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
+import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
+import de.madem.homium.utilities.switchToActivity
 
 class InventoryFragment : Fragment() {
 
@@ -30,9 +32,19 @@ class InventoryFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_inventory)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        inventoryViewModel.reloadInventoryItems()
+        val inventoryAdapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
 
-        recyclerView.adapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
+        inventoryAdapter.shortClickListener = { item, holder ->
+            switchToActivity(InventoryItemEditActivity::class)
+        }
+
+        recyclerView.adapter = inventoryAdapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        inventoryViewModel.reloadInventoryItems()
     }
 
 
