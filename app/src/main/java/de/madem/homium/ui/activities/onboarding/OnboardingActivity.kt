@@ -22,12 +22,9 @@ import de.madem.homium.utilities.switchToActivity
 
 class OnboardingActivity : AppIntro() {
 
-    //private lateinit var manager : PreferencesManager
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //manager = PreferencesManager(this)
+
         //not initialized database = app runs for the first time
         val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
         val onBoardingCompleted : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),Boolean::class) ?: false
@@ -38,6 +35,8 @@ class OnboardingActivity : AppIntro() {
                 println("INFO FOR DEVELOPPERS: DATABASE INITIALIZED!")
                 putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),true)
             }
+
+            initAppSettings()
 
             showIntroSlides()
 
@@ -56,7 +55,6 @@ class OnboardingActivity : AppIntro() {
     }
 
     private fun showIntroSlides() {
-        //manager.setFirstRun()
 
         val pageOne = SliderPagerBuilder()
             .title("Willkommen zu Homium")
@@ -105,5 +103,13 @@ class OnboardingActivity : AppIntro() {
         super.onDonePressed(currentFragment)
         putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),true)
         goToMain()
+    }
+
+    //init app settings
+    private fun initAppSettings(){
+        //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
+        CoroutineBackgroundTask<Unit>().executeInBackground {
+            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
+        }.onDone { println("SETTING INITIALIZED") }.start()
     }
 }
