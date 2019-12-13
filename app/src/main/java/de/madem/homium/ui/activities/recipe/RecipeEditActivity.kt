@@ -9,11 +9,10 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
@@ -26,6 +25,7 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithBooleanResult
+import kotlinx.android.synthetic.main.recipe_list_ingredient_row.view.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -36,6 +36,7 @@ class RecipeEditActivity : AppCompatActivity() {
     private lateinit var imgView: ImageView
     private lateinit var title: EditText
     private lateinit var description: EditText
+    private lateinit var addIngredientBtn: ImageButton
 
     private val db = AppDatabase.getInstance()
 
@@ -129,7 +130,19 @@ class RecipeEditActivity : AppCompatActivity() {
         imgView = findViewById(R.id.recipe_edit_imgView)
         title = findViewById(R.id.recipe_edit_title_editTxt)
         description = findViewById(R.id.recipe_edit_description_editTxt)
+        addIngredientBtn = findViewById(R.id.recipe_edit_addIngredient_btn)
         imgView.setOnClickListener { dispatchTakePictureIntent() }
+        addIngredientBtn.setOnClickListener { addIngredient() }
+    }
+
+    private fun addIngredient() {
+        //TODO: Start AddIngredients-Activity and insert selected values in textfields
+        val recipeLayout = findViewById<LinearLayout>(R.id.recipe_edit_linlayout)
+        val view = layoutInflater.inflate(R.layout.recipe_list_ingredient_row, null)
+        view.findViewById<TextView>(R.id.ingredien_amount_txt).text = "1"
+        view.findViewById<TextView>(R.id.ingredient_unit_txt).text = "Stück"
+        view.findViewById<TextView>(R.id.ingredient_name_txt).text = "Butter"
+        recipeLayout.addView(view, 0)
     }
 
     private fun dispatchTakePictureIntent() {

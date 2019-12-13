@@ -65,6 +65,7 @@
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>
     <string name="recipe_description">Beschreibung</string>
+    <string name="recipe_ingredients">Zutaten</string>
 
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>

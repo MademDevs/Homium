@@ -8,6 +8,7 @@ import de.madem.homium.models.Recipe
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import kotlinx.coroutines.Job
+import java.io.File
 
 class RecipesViewModel : ViewModel() {
 
@@ -36,6 +37,14 @@ class RecipesViewModel : ViewModel() {
             .executeInBackground { db.recipeDao().deleteAllRecipe() }
             .onDone { callback() }
             .start()
+        deleteImages()
+    }
+
+    fun deleteImages() {
+        recipeList.value?.forEach {
+            val file = File(it.image)
+            file.delete()
+        }
     }
 
 }
