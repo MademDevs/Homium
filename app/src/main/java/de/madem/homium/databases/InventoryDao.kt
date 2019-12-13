@@ -9,15 +9,15 @@ import de.madem.homium.models.InventoryItem
 interface InventoryDao {
 
     @Query("SELECT * FROM inventoryItem")
-    fun getAllInventory(): List<InventoryItem>
+    fun fetchAllInventoryItems(): List<InventoryItem>
 
     @Query("DELETE FROM inventoryItem")
-    fun deleteAllInventory()
+    fun clearInventory()
 
     @Query("DELETE FROM inventoryItem WHERE name LIKE :deleteItem")
-    fun deleteInventory(deleteItem: String)
+    fun deleteInventoryItem(deleteItem: String)
 
     @Insert
-    fun insertInventory(vararg item: InventoryItem)
+    fun insertInventoryItems(vararg item: InventoryItem)
 
 }

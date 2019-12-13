@@ -30,9 +30,10 @@ class InventoryFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_inventory)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        inventoryViewModel.setDummyData()
+        inventoryViewModel.reloadInventoryItems()
 
         recyclerView.adapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
     }
+
 
 }
