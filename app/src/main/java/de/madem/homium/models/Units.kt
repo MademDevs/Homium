@@ -2,6 +2,7 @@ package de.madem.homium.models
 
 import android.content.Context
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 
 enum class Units(val ressourceId : Int, val shortCut : String) {
 
@@ -16,7 +17,7 @@ enum class Units(val ressourceId : Int, val shortCut : String) {
     //companion
     companion object{
 
-        fun stringValueArray(context: Context) : Array<String>{
+        fun stringValueArray(context: Context = HomiumApplication.appContext!!) : Array<String>{
             return values().map { it.getString(context) }.toTypedArray()
         }
 
@@ -39,10 +40,9 @@ enum class Units(val ressourceId : Int, val shortCut : String) {
     }
 
     //functions
-    fun getString(context: Context) : String {
+    fun getString(context: Context = HomiumApplication.appContext!!) : String {
         return context.resources.getString(ressourceId)
     }
-
 
 
 }

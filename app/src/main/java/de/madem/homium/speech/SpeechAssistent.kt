@@ -22,8 +22,11 @@ class SpeechAssistent(val context: Context) {
 
     //public function
     fun executeCommand(command : String){
+
+        val formattedCommand = replaceNumberWords(command.toLowerCase())
+
         CoroutineBackgroundTask<CoroutineBackgroundTask<Boolean>?>().executeInBackground {
-            shoppingRecognizer.matchingTask(command)
+            shoppingRecognizer.matchingTask(formattedCommand)
         }.onDone {task ->
             task?.start() ?: saySorry()
 
@@ -37,7 +40,20 @@ class SpeechAssistent(val context: Context) {
         return context.resources.getString(id)
     }
 
-
+    private fun replaceNumberWords(str : String) : String{
+        return str.replace(Regex(" ein(e)*(n)* ")," 1 ")
+            .replace(" zwei "," 2 ")
+            .replace(" drei "," 3 ")
+            .replace(" vier "," 4 ")
+            .replace(" fünf "," 5 ")
+            .replace(" sechs "," 6 ")
+            .replace(" sieben "," 7 ")
+            .replace(" acht "," 8 ")
+            .replace(" neun "," 9 ")
+            .replace(" zehn "," 10 ")
+            .replace(" elf "," 11 ")
+            .replace(" zwölf "," 12 ")
+    }
 
 
 

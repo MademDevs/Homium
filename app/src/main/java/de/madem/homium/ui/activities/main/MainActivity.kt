@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                 val resultOfSpeechRecognition = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
 
                 if(resultOfSpeechRecognition.isNotEmpty()){
-                    speechAssistent?.executeCommand(command = resultOfSpeechRecognition.toLowerCase())
+                    speechAssistent?.executeCommand(command = resultOfSpeechRecognition)
                 }
             }
 
