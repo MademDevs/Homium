@@ -25,6 +25,8 @@
     <string name="screentitle_edit_shopppingitem_add">Produkt hinzufügen</string>
     <string name="screentitle_edit_shoppingitem_edit">Produkt bearbeiten</string>
     <string name="screentitle_main_actionmode_shopping">Optionen</string>
+    <string name="screentitle_edit_ingredient_add">Zutat hinzufügen</string>
+    <string name="screentitle_edit_ingredient_edit">Zutat bearbeiten</string>
 
     <!--normal headlines-->
     <string name="head_general_settings">Allgemeine Einstellungen</string>
@@ -47,14 +49,23 @@
     <string name="shopping_list_delete_question">Sollen die ausgewählten Listenelemente wirklich gelöscht löschen?</string>
     <string name="shopping_item_delete_question">Sollen das ausgewählte Einkaufselement wirklich gelöscht löschen?</string>
 
-    <!--edit screen texts-->
-    <string name="title_edit_name">Was möchtest du einkaufen?</string>
+    <!--shopping edit screen texts-->
+    <string name="shopping_title_edit_name">Was möchtest du einkaufen?</string>
+
+    <string name="shopping_hint_edit_name">Name des gewünschten Produktes</string>
+    <string name="shopping_hint_edit_quantity">Menge des Produktes</string>
+    <string name="shopping_btn_edit_delete">Einkaufsprodukt löschen</string>
+
+    <!--ingredient edit screen texts-->
+    <string name="ingredient_title_edit_name">Um welche Zutat handelt es sich?</string>
+    <string name="ingredient_hint_edit_name">Name der Zutat</string>
+    <string name="ingredient_hint_edit_quantity">Menge der Zutat</string>
+    <string name="ingredient_btn_edit_delete">Zutat löschen</string>
+
+    <!--general edit screen texts-->
+    <string name="actionbar_edit_confirm">Bestätigen</string>
     <string name="title_edit_quantity">Wie viel?</string>
     <string name="title_edit_unit">Welche Einheit?</string>
-    <string name="hint_edit_name">Name des gewünschten Produktes</string>
-    <string name="hint_edit_quantity">Menge des Produktes</string>
-    <string name="btn_edit_delete">Einkaufsprodukt löschen</string>
-    <string name="actionbar_edit_confirm">Bestätigen</string>
 
     <!--recipes list texts-->
     <string name="image_description">Bild</string>
@@ -72,7 +83,7 @@
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
     <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
-    <string name="errormsg_invalid_shoppingitem_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
+    <string name="errormsg_invalid_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
     <string name="errormsg_insert_shoppingitem_failed">Fehler: Das Einkaufselement konnte nicht hinzugefügt werden. Bitte versuche es erneut.</string>
     <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
 
@@ -87,6 +98,10 @@
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
+    <string name="data_transfer_intent_edit_ingredient_name">ingredientname</string>
+    <string name="data_transfer_intent_edit_ingredient_unit">ingredientunit</string>
+    <string name="data_transfer_intent_edit_ingredient_count">ingredientcount</string>
+    <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
 
     <!--data for units-->
     <string name="data_units_item">Stück</string>

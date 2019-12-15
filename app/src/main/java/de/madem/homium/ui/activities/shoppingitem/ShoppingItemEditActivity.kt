@@ -2,7 +2,6 @@ package de.madem.homium.ui.activities.shoppingitem
 
 import android.app.Activity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
@@ -329,7 +328,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         }
         else{
-            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
+            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_parameters),Toast.LENGTH_LONG).show()
         }
 
         
