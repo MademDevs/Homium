@@ -3,6 +3,7 @@ package de.madem.homium.speech.recognizers
 import android.content.Context
 import android.widget.Toast
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
@@ -22,26 +23,43 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
     private val commandParser = CommandParser(context)
 
     companion object{
-        val ADD_SHOPPING_ITEM = Regex("s[ei]tze ([(a-z)(0-9)]+) ([a-zA-ZäöüÄÖÜ]+) ([a-zA-ZäöüÄÖÜ]+) auf die einkaufsliste")
-        val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("s[ei]tze ([(a-z)(0-9)]+) ([a-zA-ZäöüÄÖÜ]+) auf die einkaufsliste")
-        val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("s[ei]tze ([a-zA-ZäöüÄÖÜ]+) auf die einkaufsliste")
-        val CLEAR_SHOPPING_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* einkaufsliste")
-        val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ]+) (aus|von){1} der einkaufsliste( heraus)?")
-        val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} ([(a-z)(0-9)]+) ([a-zA-ZäöüÄÖÜ]+) ([a-zA-ZäöüÄÖÜ]+) (aus|von){1} der einkaufsliste( heraus)?")
-        val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} ([(a-z)(0-9)]+) ([a-zA-ZäöüÄÖÜ]+) (aus|von){1} der einkaufsliste( heraus)?")
+        private val unitsAsRecognitionPattern = Units.values().map {
+            val str = it.getString()
+            val shortcutExists = it.shortCut.isNotEmpty()
+
+            //creating regex string via string operation
+            //goal is to achieve like e.g. ([mM]{1}illiliter)(ml)
+            if(it == Units.PACK){
+                "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}")}(en)?${if(shortcutExists) "|"+it.shortCut else ""}"
+            }
+            else if(it == Units.KILOGRAM){
+                "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}").removeSuffix("gramm")}(gramm)?${if(shortcutExists) "|"+it.shortCut else ""}"
+            }
+            else{
+                "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}")}${if(shortcutExists) "|"+it.shortCut else ""}"
+            }
+        }.joinToString("|").also { println(it) }
+
+        val ADD_SHOPPING_ITEM = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("[sS]{1}[ei]tze ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        val CLEAR_SHOPPING_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [eE]{1}inkaufsliste")
+        val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
     }
 
     //functions
     override fun matchingTask(command: String): CoroutineBackgroundTask<Boolean>? {
-
+        println(command.matches(Regex("[sS]{1}[ei]tze ([(a-z)(0-9)]+) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")))
         return when{
             command.matches(ADD_SHOPPING_ITEM) -> matchAddShopping(command)
             command.matches(ADD_SHOPPING_ITEM_WITHOUT_UNIT) -> matchAddShoppingWithoutUnit(command)
             command.matches(ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY) -> matchAddShoppingWithoutUnitWithoutQuantity(command)
-            command.matches(CLEAR_SHOPPING_LIST) -> matchClearShoppingList(command)
-            command.matches(DELETE_SHOPPING_WITH_NAME) -> matchDeleteShoppingWithName(command)
+            command.matches(CLEAR_SHOPPING_LIST) -> matchClearShoppingList()
             command.matches(DELETE_SHOPPING_WITH_ALL_PARAMS) -> matchDeleteShoppingWithAllParams(command)
             command.matches(DELETE_SHOPPING_WITH_NAME_QUANTITY) -> matchDeleteShoppingWithNameQuantity(command)
+            command.matches(DELETE_SHOPPING_WITH_NAME) -> matchDeleteShoppingWithName(command)
             else -> null
         }
     }
@@ -50,7 +68,17 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
     //functions for recognition
     private fun matchAddShopping(command : String) : CoroutineBackgroundTask<Boolean>{
         return CoroutineBackgroundTask<Boolean>().executeInBackground{
-            val result = commandParser.parseShoppingItem(command.split(" ").toList().slice(1..3))
+
+            val params : List<String> = ADD_SHOPPING_ITEM
+                .find(command)?.groupValues?.filter { it.isNotBlank() && it.isNotEmpty() }?.toMutableList()
+                ?.apply {
+                    remove(command)
+                    removeAll {this[1] != it && this[1].contains(it)}
+                }
+                .takeIf { it != null && it.size == 3 } ?:
+                command.split(" ").toList().slice(1..3)
+
+            val result = commandParser.parseShoppingItem(params)
 
             if(result != null){
                 itemDao.insertShopping(result)
@@ -78,49 +106,26 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
 
     private fun matchAddShoppingWithoutUnit(command : String) : CoroutineBackgroundTask<Boolean> {
         return CoroutineBackgroundTask<Boolean>().executeInBackground {
-            //getting words and adding "stück" as unit
-            val words = command.split(Regex(" ")).toMutableList().apply {
-                add(2, Units.ITEM.getString(context))
+            //getting words
 
-            }
+            val words = ADD_SHOPPING_ITEM_WITHOUT_UNIT.find(command)?.groupValues
+                ?.filter { it.isNotBlank() && it.isNotEmpty() }?.toMutableList()
+                ?.apply { remove(command) }.takeIf { it != null && it.size == 2 } ?:
+                command.split(Regex(" ")).toMutableList().slice(1..2)
 
             //parsing shopping item
-            val itemResult = async<ShoppingItem?> {
-                commandParser.parseShoppingItem(words.slice(1..3))
+            val parsedItem : ShoppingItem? = commandParser.parseShoppingItemWithoutUnit(words)
+
+            //insert if not null
+            var sucess = false
+
+            parsedItem.notNull {
+                itemDao.insertShopping(it)
+                sucess = true
             }
 
-            //getting products
-            var productsFromDataBase = itemDao.getProductsByNameOrPlural(words[3])
-            val result = itemResult.await()
+            return@executeInBackground sucess
 
-            //inserting result if not null
-            if (result != null){
-                //editing unit if there is a preset for unit in products
-                if(!(productsFromDataBase.isNullOrEmpty())){
-                    val productNameIndex = productsFromDataBase.map { it.name }.indexOf(result.name)
-                    val productPluralNameIndex = productsFromDataBase.map { it.plural }.indexOf(result.name)
-                    if(productNameIndex >= 0 || productPluralNameIndex >= 0) {
-                        val newUnit = if(productPluralNameIndex < 0) productsFromDataBase[productNameIndex].unit else productsFromDataBase[productPluralNameIndex].unit
-                        itemDao.insertShopping(ShoppingItem(result.name,result.count,newUnit))
-                    }
-                    else{
-                        itemDao.insertShopping(result)
-                    }
-                }
-                else{
-                    itemDao.insertShopping(result)
-                }
-
-                withContext(Dispatchers.Main){
-                    Toast.makeText(context,getStringRessource(R.string.assistent_msg_shoppingitem_added),
-                        Toast.LENGTH_SHORT).show()
-                }
-
-                true
-            }
-            else{
-                false
-            }
         }.onDone { sucess ->
             if(!sucess) {
                 Toast.makeText(context,
@@ -136,57 +141,24 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
 
     private fun matchAddShoppingWithoutUnitWithoutQuantity(command : String) : CoroutineBackgroundTask<Boolean>{
         return CoroutineBackgroundTask<Boolean>().executeInBackground {
-            val words = command.split(Regex(" ")).toMutableList().apply {
-                add(1, Units.ITEM.getString(context))
-                add(1,1.toString())
-            }
+
+            val name : String = ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY.find(command)?.groupValues
+                ?.filter { it.isNotBlank() && it.isNotEmpty() }?.toMutableList()
+                ?.apply { remove(command) }.takeIf { it != null && it.size == 1}
+                ?.get(0)  ?: command.split(" ")[1]
 
             //parsing shopping item
-            val itemResult = async<ShoppingItem?> {
-                commandParser.parseShoppingItem(words.slice(1..3))
+            val parsedItem = commandParser.parseShoppingItemWithoutUnitWithoutAmount(name)
+
+            var sucess = false
+
+            parsedItem.notNull {
+                itemDao.insertShopping(it)
+                sucess = true
             }
 
-            //getting products
-            val productsFromDataBase = itemDao.getProductsByNameOrPlural(words[3])
-            val result = itemResult.await()
+            return@executeInBackground sucess
 
-            //inserting result if not null
-            if (result != null){
-                //editing unit if there is a preset for unit in products
-                if(!(productsFromDataBase.isNullOrEmpty())){
-                    val productNameIndex = productsFromDataBase.map { it.name }.indexOf(result.name)
-                    val productPluralIndex = productsFromDataBase.map { it.plural }.indexOf(result.name)
-                    when {
-                        productNameIndex >= 0 -> {
-                            val newUnit = productsFromDataBase[productNameIndex].unit
-                            val newQuantity = productsFromDataBase[productNameIndex].amount.toIntOrNull() ?: 1
-                            itemDao.insertShopping(ShoppingItem(result.name,newQuantity,newUnit))
-                        }
-                        productPluralIndex >= 0 -> {
-                            val newUnit = productsFromDataBase[productPluralIndex].unit
-                            val newQuantity = productsFromDataBase[productPluralIndex].amount.toIntOrNull() ?: 2
-                            itemDao.insertShopping(ShoppingItem(result.name,newQuantity,newUnit))
-
-                        }
-                        else -> {
-                            itemDao.insertShopping(result)
-                        }
-                    }
-                }
-                else{
-                    itemDao.insertShopping(result)
-                }
-
-                withContext(Dispatchers.Main){
-                    Toast.makeText(context,getStringRessource(R.string.assistent_msg_shoppingitem_added),
-                        Toast.LENGTH_SHORT).show()
-                }
-
-                true
-            }
-            else{
-                false
-            }
         }.onDone {sucess ->
             if(!sucess) {
                 Toast.makeText(context,
@@ -200,7 +172,7 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
         }
     }
 
-    private fun matchClearShoppingList(command: String) : CoroutineBackgroundTask<Boolean> {
+    private fun matchClearShoppingList() : CoroutineBackgroundTask<Boolean> {
         return UserRequestedCoroutineBackgroundTask<Boolean>(context,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
             itemDao.deleteAllShopping()
             true
@@ -213,9 +185,23 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
     }
 
     private fun matchDeleteShoppingWithName(command : String) : CoroutineBackgroundTask<Boolean>{
-        val words = command.split(Regex(" "))
+        val words = DELETE_SHOPPING_WITH_NAME.find(command)?.groupValues
+            ?.filter{it.isNotBlank() && it.isNotEmpty()}?.map{it.trim()}?.toMutableList()
+            ?.apply{
+                remove(command)
+                remove("e")
+                removeAll{it.matches(Regex("(aus|von){1}"))}
+            }?.takeIf { it.size == 2 || it.size == 1 } ?: command.split(Regex(" "))
+
         val allShouldBeDeleted = words.contains("alle")
-        val name = if(allShouldBeDeleted) words[2] else words[1]
+        var name = if(words.size > 2){
+            if(allShouldBeDeleted) words[2] else words[1]
+        }
+        else{
+            words[words.lastIndex]
+        }
+
+        name = name.split(" ").map { it.capitalize() }.joinToString (" ")
 
         val msg = if(allShouldBeDeleted){
             getStringRessource(R.string.assistent_question_delete_all_shopping_with_name_and_plural).replace("#","\"${name.capitalize()}\"")
@@ -253,9 +239,15 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
     }
 
     private fun matchDeleteShoppingWithAllParams(command: String) : CoroutineBackgroundTask<Boolean>{
-        val params = command.split(" ").slice(1..3)
+        val params =  DELETE_SHOPPING_WITH_ALL_PARAMS.find(command)?.groupValues?.filter{it.isNotBlank() && it.isNotEmpty()}?.map{it.trim()}?.toMutableList()?.apply{
+            remove(command)
+            removeAll{it.matches(Regex("e(n)?"))}
+            removeAll{it.matches(Regex("lösch(e)*(n)*"))}
+            removeAll{it.matches(Regex("(aus|von){1}"))}
+        }?.takeIf { it.size == 3  } ?: command.split(" ").slice(1..3)
         val itemStr : String = params.map { it.capitalize() }.joinToString(" ")
         println(itemStr.toUpperCase())
+
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(context, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
             .executeInBackground{
@@ -285,21 +277,30 @@ class ShoppingRecognizer(val context: Context) : PatternRecognizer {
     }
 
     private fun matchDeleteShoppingWithNameQuantity(command: String) : CoroutineBackgroundTask<Boolean>{
-        val pseudoOut = command.split(" ").slice(1..2).joinToString(" ") { it.capitalize() }
-        val params = command.split(" ").slice(1..2).toMutableList().apply { this.add(1,Units.ITEM.getString(context)) }
-        val itemStr : String = params.map { it.capitalize() }.joinToString(" ")
+        val params = DELETE_SHOPPING_WITH_NAME_QUANTITY.find(command)?.groupValues?.filter{it.isNotBlank() && it.isNotEmpty()}?.map{it.trim()}?.toMutableList()?.apply{
+            remove(command)
+            removeAll{it.matches(Regex("e(n)?"))}
+            removeAll{it.matches(Regex("lösch(e)*(n)*"))}
+            removeAll{it.matches(Regex("(aus|von){1}"))}
+        }?.takeIf { it.size == 2 } ?: command.split(" ").slice(1..2).toMutableList()
+        val pseudoOut : String = params.map { it.split(" ").map { it.capitalize() }.joinToString(" ") }.joinToString(" ")
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(context,context.getString(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"${pseudoOut}\""))
             .executeInBackground {
-                val resultItem = commandParser.parseShoppingItem(params)
+                val searchCount = params.first().trim().toIntOrNull()
+                val searchName = params.last().trim()
+                    .split(" ").map { it.capitalize() }.joinToString(" ")
 
-                if(resultItem != null){
-                    itemDao.deleteShoppingItemByNameCount(resultItem.name,resultItem.count)
+                if(searchCount != null){
+                    itemDao.deleteShoppingItemByNameCount(searchName,searchCount)
                     true
                 }
                 else{
                     false
                 }
+
+
+
              }
             .onDone {sucess ->
                 if(sucess){
