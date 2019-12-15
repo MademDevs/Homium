@@ -91,6 +91,5 @@
             android:contentDescription="addIngredientsButton"
             android:background="@color/colorPrimary"
             app:srcCompat="@drawable/ic_add_white" />
-
     </LinearLayout>
 </ScrollView>

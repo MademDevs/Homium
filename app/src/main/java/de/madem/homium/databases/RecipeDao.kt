@@ -3,6 +3,7 @@ package de.madem.homium.databases
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import de.madem.homium.models.Ingredients
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.ShoppingItem
 
@@ -22,6 +23,12 @@ interface RecipeDao {
     fun getRecipeById(id: Int): Recipe
 
     //TODO: Queries for Recipe and Ingredients!
+
+    @Insert
+    fun insertIngredient(vararg item: Ingredients)
+
+    @Query("SELECT * FROM ingredients WHERE uuid = :id")
+    fun getIngredientById(id: Int) : Ingredients?
 
 
 }

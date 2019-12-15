@@ -147,6 +147,14 @@ fun <T : Any> Fragment.getSetting(key: String, type: KClass<T>): T? {
     return result
 }
 
+fun <T : Any> Activity.switchToActivityForResult(requestCode: Int, clazz: KClass<T>)
+        = switchToActivityForResult(requestCode,clazz){}
+
+fun <T : Any> Activity.switchToActivityForResult(requestCode: Int,clazz: KClass<T>,modifyIntent: (Intent)->Unit){
+    val intent = Intent(this,clazz.java)
+    modifyIntent.invoke(intent)
+    startActivityForResult(intent, requestCode)
+}
 
 fun <T : Any> Fragment.switchToActivityForResult(requestCode: Int, clazz: KClass<T>) {
     startActivityForResult(Intent(context, clazz.java), requestCode)
@@ -156,6 +164,14 @@ fun Activity.finishWithBooleanResult(key: String, value: Boolean, resultCode: In
     val resultIntent = Intent()
     resultIntent.putExtra(key, value)
 
+    setResult(resultCode, resultIntent)
+    finish()
+}
+
+fun Activity.finishWithResultData(resultCode: Int,modifyIntent : (Intent)->Unit){
+    val resultIntent = Intent()
+
+    modifyIntent.invoke(resultIntent)
     setResult(resultCode, resultIntent)
     finish()
 }
