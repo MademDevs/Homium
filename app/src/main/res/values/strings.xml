@@ -27,6 +27,8 @@
     <string name="screentitle_main_actionmode_shopping">Optionen</string>
     <string name="screentitle_edit_ingredient_add">Zutat hinzufügen</string>
     <string name="screentitle_edit_ingredient_edit">Zutat bearbeiten</string>
+    <string name="screentitle_edit_inventoryitem_add">Produkt hinzufügen</string>
+    <string name="screentitle_edit_inventoryitem_edit">Produkt bearbeiten</string>
 
     <!--normal headlines-->
     <string name="head_general_settings">Allgemeine Einstellungen</string>
@@ -89,6 +91,7 @@
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
+    <string name="notification_delete_inventoryitem_sucess">Produkt erfolgreich gelöscht</string>
     <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="errormsg_invalid_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>

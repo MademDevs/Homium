@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".ui.activities.shoppingitem.ShoppingItemEditActivity">
+    tools:context=".ui.activities.inventoryedit.InventoryItemEditActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/shopping_item_edit_txtView_name"
+            android:id="@+id/inventory_item_tv_what"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -29,15 +29,15 @@
         </TextView>
 
         <AutoCompleteTextView
-            android:id="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:id="@+id/inventory_item_edit_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_txtView_name"
+            android:layout_below="@+id/inventory_item_tv_what"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:autofillHints="@string/hint_edit_name"
+            android:autofillHints="@string/inventory_edit_input_name_hint"
             android:completionThreshold="1"
             android:hint="@string/inventory_edit_input_name_hint"
             android:inputType="text"
@@ -49,12 +49,12 @@
             android:id="@+id/inventory_item_edit_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_below="@+id/inventory_item_edit_name"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:autofillHints="@string/hint_edit_name"
+            android:autofillHints="@string/inventory_edit_input_location_hint"
             android:completionThreshold="1"
             android:hint="@string/inventory_edit_input_location_hint"
             android:inputType="text"
@@ -63,7 +63,7 @@
         </AutoCompleteTextView>
 
         <TextView
-            android:id="@+id/shopping_item_edit_txtView_amount"
+            android:id="@+id/inventory_item_tv_howmuch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/inventory_item_edit_location"
@@ -81,7 +81,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_txtView_amount"
+            android:layout_below="@id/inventory_item_tv_howmuch"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="0dp"
             android:orientation="vertical">
@@ -94,7 +94,7 @@
                 android:orientation="horizontal">
 
                 <NumberPicker
-                    android:id="@+id/shopping_item_edit_numPick_count"
+                    android:id="@+id/inventory_item_picker_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:descendantFocusability="blocksDescendants"
@@ -108,7 +108,7 @@
                     android:layout_weight="1" />
 
                 <NumberPicker
-                    android:id="@+id/shopping_item_edit_numPick_unit"
+                    android:id="@+id/inventory_item_picker_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:descendantFocusability="blocksDescendants"
@@ -125,7 +125,7 @@
                 android:layout_marginTop="16dp">
 
                 <Button
-                    android:id="@+id/shopping_item_edit_btn_delete"
+                    android:id="@+id/inventory_item_button_delete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
@@ -141,10 +141,10 @@
         </LinearLayout>
 
         <EditText
-            android:id="@+id/shopping_item_edit_editTxt_count"
+            android:id="@+id/inventory_item_input_count"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_below="@+id/shopping_item_edit_txtView_amount"
+            android:layout_below="@+id/inventory_item_tv_howmuch"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_marginStart="64dp"

@@ -6,6 +6,12 @@ fun <T> T?.notNull(function: (T) -> Unit){
     }
 }
 
+fun <T> withNotNull(element: T?, function: T.() -> Unit) {
+    if(element != null) {
+        function(element)
+    }
+}
+
 fun <T> T?.applyNotNull(function: T.() -> Unit): T {
     if (this != null){
         function(this)

@@ -13,18 +13,15 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
-import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.finishWithBooleanResult
-import de.madem.homium.utilities.hideKeyboard
+import de.madem.homium.utilities.*
 
 class InventoryItemEditActivity : AppCompatActivity() {
 
     //GUI Components
-    private lateinit var btnDelete : Button
-    private lateinit var autoCmplTxtName : AutoCompleteTextView
-    private lateinit var autoCmplTxtLocation : AutoCompleteTextView
+    private lateinit var btnDelete: Button
+    private lateinit var autoCmplTxtName: AutoCompleteTextView
+    private lateinit var autoCmplTxtLocation: AutoCompleteTextView
     private lateinit var numPickerCount: NumberPicker
     private lateinit var numPickerUnit: NumberPicker
     private lateinit var editTextCount: EditText
@@ -32,8 +29,8 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
     //fields
     private val db = AppDatabase.getInstance()
-    private lateinit var bigUnits : Array<String>
-    private lateinit var smallUnits : Array<String>
+    private lateinit var bigUnits: Array<String>
+    private lateinit var smallUnits: Array<String>
     private var itemid: Int = -1
 
     //ON CREATE
@@ -41,29 +38,33 @@ class InventoryItemEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inventory_item_edit)
 
-
         //getting data from ressources
         bigUnits = resources.getStringArray(R.array.big_units)
         smallUnits = resources.getStringArray(R.array.small_units)
 
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-
+        //init action bar
+        initActionbar()
 
         initGuiComponents()
         itemid = intent.getIntExtra("item", -1)
 
-        if(itemid >= 0) {
+        if (itemid >= 0) {
             btnDelete.isVisible = true
             setInventoryItemToView(itemid)
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
         } else {
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
             btnDelete.isVisible = false
         }
 
         updateSpinnerOnItemSelected()
+    }
+
+    private fun initActionbar() = withNotNull(supportActionBar) {
+        setDisplayHomeAsUpEnabled(true)
+        setHomeButtonEnabled(true)
+        setTitle(
+            if (itemid >= 0) R.string.screentitle_edit_inventoryitem_edit
+            else R.string.screentitle_edit_inventoryitem_add
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -81,17 +82,17 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
     //optionsMenu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if(menu != null){
-            menuInflater.inflate(R.menu.shoppingitem_edit_actionbar_menu,menu)
+        if (menu != null) {
+            menuInflater.inflate(R.menu.inventoryitem_edit_actionbar_menu, menu)
         }
 
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.shopping_item_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
+        when (item.itemId) {
+            R.id.inventory_item_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
+            android.R.id.home -> finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
         }
 
         return super.onOptionsItemSelected(item)
@@ -111,16 +112,16 @@ class InventoryItemEditActivity : AppCompatActivity() {
                 numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
 
                 //setting amount
-                if(editTextCount.isVisible){
-                    editTextCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
-                }
-                else{
+                if (editTextCount.isVisible) {
+                    editTextCount.text =
+                        Editable.Factory.getInstance().newEditable(it.count.toString())
+                } else {
                     setValuesForNumPickerCount(numPickerUnit)
 
-                    if(numPickerCount.displayedValues.contains(it.count.toString())){
-                        numPickerCount.value = numPickerCount.displayedValues.indexOf(it.count.toString())
-                    }
-                    else{
+                    if (numPickerCount.displayedValues.contains(it.count.toString())) {
+                        numPickerCount.value =
+                            numPickerCount.displayedValues.indexOf(it.count.toString())
+                    } else {
                         assignValueFromPickerToEditText(it.count.toString())
                     }
 
@@ -140,16 +141,14 @@ class InventoryItemEditActivity : AppCompatActivity() {
                 numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
 
                 //setting amount
-                if(editTextCount.isVisible){
+                if (editTextCount.isVisible) {
                     editTextCount.text = Editable.Factory.getInstance().newEditable(it.amount)
-                }
-                else{
+                } else {
                     setValuesForNumPickerCount(numPickerUnit)
 
-                    if(numPickerCount.displayedValues.contains(it.amount)){
+                    if (numPickerCount.displayedValues.contains(it.amount)) {
                         numPickerCount.value = numPickerCount.displayedValues.indexOf(it.amount)
-                    }
-                    else{
+                    } else {
                         assignValueFromPickerToEditText(it.amount)
                     }
 
@@ -158,34 +157,35 @@ class InventoryItemEditActivity : AppCompatActivity() {
             .start()
 
     }
+
     private fun updateSpinnerOnItemSelected() {
-        autoCmplTxtName.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            val selectedItem = parent.getItemAtPosition(position).toString()
-            setSpinnerDefaultValues(selectedItem)
-            hideKeyboard()
-        }
+        autoCmplTxtName.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val selectedItem = parent.getItemAtPosition(position).toString()
+                setSpinnerDefaultValues(selectedItem)
+                hideKeyboard()
+            }
     }
 
 
-    private fun initGuiComponents(){
-
+    private fun initGuiComponents() {
         //init delete button
-        btnDelete = findViewById(R.id.shopping_item_edit_btn_delete)
-        btnDelete.setOnClickListener{
+        btnDelete = findViewById(R.id.inventory_item_button_delete)
+        btnDelete.setOnClickListener {
 
             AlertDialog.Builder(this)
                 .setMessage(R.string.inventory_edit_button_delete_question)
                 .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
-                            if(itemid >= 0) {
+                            if (itemid >= 0) {
                                 db.inventoryDao().deleteInventoryItemById(itemid)
                             }
                         }
                         .onDone {
-                            Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+                            showToastShort(R.string.notification_delete_inventoryitem_sucess)
                             dialog.dismiss()
-                            finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+                            finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
                         }
                         .start()
                 }
@@ -196,14 +196,20 @@ class InventoryItemEditActivity : AppCompatActivity() {
         }
 
         //init txt autocomplete
-        autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
+        autoCmplTxtName = findViewById(R.id.inventory_item_edit_name)
 
         CoroutineBackgroundTask<List<Product>>().executeInBackground {
             val result = db.itemDao().getAllProduct()
             return@executeInBackground result
-        }.onDone {result ->
+        }.onDone { result ->
             val productNameList = result.map { it.name }
-            autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
+            autoCmplTxtName.setAdapter(
+                ArrayAdapter<String>(
+                    this,
+                    android.R.layout.simple_dropdown_item_1line,
+                    productNameList
+                )
+            )
 
         }.start()
 
@@ -214,31 +220,32 @@ class InventoryItemEditActivity : AppCompatActivity() {
         autoCmplTxtLocation.setAdapter(
             ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, locations)
         )
-        autoCmplTxtLocation.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            hideKeyboard()
-        }
+        autoCmplTxtLocation.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                hideKeyboard()
+            }
 
         //init numberpicker
         val units = Units.stringValueArray(this)
-        numPickerUnit = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_unit).also {
+        numPickerUnit = findViewById<NumberPicker>(R.id.inventory_item_picker_unit).also {
             it.isSaveFromParentEnabled = false
             it.isSaveEnabled = false
             it.minValue = 0
-            it.maxValue = units.size-1
+            it.maxValue = units.size - 1
             it.displayedValues = units
             it.value = 0
         }
 
 
-        numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        numPickerCount = findViewById<NumberPicker>(R.id.inventory_item_picker_count)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             //getting data for picker
 
 
             numPickerCount.isSaveFromParentEnabled = false
             numPickerCount.isSaveEnabled = false
             numPickerCount.minValue = 0
-            numPickerCount.maxValue = smallUnits.size-1
+            numPickerCount.maxValue = smallUnits.size - 1
             numPickerCount.value = 0
             numPickerCount.displayedValues = smallUnits
             numPickerCount.setOnLongClickListener {
@@ -256,9 +263,9 @@ class InventoryItemEditActivity : AppCompatActivity() {
             numPickerCount.isVisible = false
         }
 
-        editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
+        editTextCount = findViewById<EditText>(R.id.inventory_item_input_count).also {
             it.isVisible = false
-            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 it.setOnLongClickListener {
                     editTextCount.isVisible = false
                     numPickerCount.isVisible = true
@@ -270,22 +277,22 @@ class InventoryItemEditActivity : AppCompatActivity() {
         }
     }
 
-    private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker){
-        when(numberPickerUnit.value) {
+    private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker) {
+        when (numberPickerUnit.value) {
             1, 3 -> {
                 numPickerCount.minValue = 0
-                numPickerCount.maxValue = bigUnits.size-1
+                numPickerCount.maxValue = bigUnits.size - 1
                 numPickerCount.displayedValues = bigUnits
             }
             else -> {
                 numPickerCount.displayedValues = smallUnits
                 numPickerCount.minValue = 0
-                numPickerCount.maxValue = smallUnits.size-1
+                numPickerCount.maxValue = smallUnits.size - 1
             }
         }
     }
 
-    private fun assignValueFromPickerToEditText(value : String) : Boolean{
+    private fun assignValueFromPickerToEditText(value: String): Boolean {
         numPickerCount.isVisible = false
         editTextCount.isVisible = true
         editTextCount.text = Editable.Factory.getInstance().newEditable(value)
@@ -293,7 +300,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
     }
 
     private fun getAmount(): Int? {
-        if(numPickerCount.isVisible) {
+        if (numPickerCount.isVisible) {
             return numPickerCount.displayedValues[numPickerCount.value].toIntOrNull()
         } else {
             return editTextCount.text.toString().toIntOrNull()
@@ -320,24 +327,22 @@ class InventoryItemEditActivity : AppCompatActivity() {
         val unit = getUnit()
         val location = getLocation()
 
-        if(title.isNotBlank() && title.isNotEmpty() && amount != null){
+        if (title.isNotBlank() && title.isNotEmpty() && amount != null) {
             //all input components are valid -> creating object and put it into database via coroutine
             val item = InventoryItem(title, amount, unit, location)
 
             CoroutineBackgroundTask<Unit>().executeInBackground {
-                if(itemid >= 0){
+                if (itemid >= 0) {
                     db.inventoryDao().updateInventoryItem(itemid, title, amount, unit, location)
-                }
-                else{
+                } else {
                     db.inventoryDao().insertInventoryItems(item)
                 }
             }.onDone {
-                finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+                finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }.start()
 
-        }
-        else{
-            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
+        } else {
+            showToastLong(R.string.errormsg_invalid_parameters)
         }
     }
 
