@@ -39,7 +39,24 @@
             android:layout_marginBottom="8dp"
             android:autofillHints="@string/hint_edit_name"
             android:completionThreshold="1"
-            android:hint="@string/hint_edit_name"
+            android:hint="@string/inventory_edit_input_name_hint"
+            android:inputType="text"
+            android:imeOptions="flagNoExtractUi">
+
+        </AutoCompleteTextView>
+
+        <AutoCompleteTextView
+            android:id="@+id/inventory_item_edit_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:autofillHints="@string/hint_edit_name"
+            android:completionThreshold="1"
+            android:hint="@string/inventory_edit_input_location_hint"
             android:inputType="text"
             android:imeOptions="flagNoExtractUi">
 
@@ -49,7 +66,7 @@
             android:id="@+id/shopping_item_edit_txtView_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
+            android:layout_below="@+id/inventory_item_edit_location"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
@@ -115,7 +132,7 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginBottom="8dp"
                     android:background="@android:color/holo_red_dark"
-                    android:text="@string/btn_edit_delete"
+                    android:text="@string/inventory_edit_button_delete_text"
                     android:textColor="@android:color/background_light"
                     android:layout_gravity="bottom">
                 </Button>

@@ -69,6 +69,8 @@
     <!-- inventory edit -->
     <string name="inventory_edit_title_name">Was möchtest du verwalten?</string>
     <string name="inventory_edit_button_delete_text">Inventarelement löschen</string>
+    <string name="inventory_edit_input_name_hint">Name des Produkts</string>
+    <string name="inventory_edit_input_location_hint">Lagerort des Produkts</string>
 
 
 
