@@ -71,7 +71,7 @@
     <string name="inventory_edit_button_delete_text">Inventarelement löschen</string>
     <string name="inventory_edit_input_name_hint">Name des Produkts</string>
     <string name="inventory_edit_input_location_hint">Lagerort des Produkts</string>
-
+    <string name="inventory_edit_button_delete_question">Soll das ausgewählte Produkt wirklich aus dem Inventar gelöscht werden?</string>
 
 
     <!--Notifications for user-->

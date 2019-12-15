@@ -18,11 +18,8 @@ import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithBooleanResult
 import de.madem.homium.utilities.hideKeyboard
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class InventoryItemEditActivity : AppCompatActivity() {
-
 
     //GUI Components
     private lateinit var btnDelete : Button
@@ -56,9 +53,10 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
         initGuiComponents()
         itemid = intent.getIntExtra("item", -1)
+
         if(itemid >= 0) {
             btnDelete.isVisible = true
-            setShoppingItemToElements(itemid)
+            setInventoryItemToView(itemid)
             supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
         } else {
             supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
@@ -76,6 +74,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+
         numPickerCount.value = savedInstanceState.getInt("count")
         numPickerUnit.value = savedInstanceState.getInt("unit")
     }
@@ -96,15 +95,17 @@ class InventoryItemEditActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
-
     }
 
-    private fun setShoppingItemToElements(id: Int) {
-        CoroutineBackgroundTask<ShoppingItem>()
-            .executeInBackground { db.itemDao().getShoppingItemById(id) }
+    private fun setInventoryItemToView(id: Int) {
+        CoroutineBackgroundTask<InventoryItem>()
+            .executeInBackground { db.inventoryDao().fetchInventoryItemById(id) }
             .onDone {
                 //setting name
                 autoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name)
+
+                //set location
+                autoCmplTxtLocation.text = Editable.Factory.getInstance().newEditable(it.location)
 
                 //setting unit
                 numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
@@ -173,12 +174,12 @@ class InventoryItemEditActivity : AppCompatActivity() {
         btnDelete.setOnClickListener{
 
             AlertDialog.Builder(this)
-                .setMessage(R.string.shopping_item_delete_question)
+                .setMessage(R.string.inventory_edit_button_delete_question)
                 .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
                             if(itemid >= 0) {
-                                db.itemDao().deleteShoppingItemById(itemid)
+                                db.inventoryDao().deleteInventoryItemById(itemid)
                             }
                         }
                         .onDone {
@@ -325,7 +326,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
             CoroutineBackgroundTask<Unit>().executeInBackground {
                 if(itemid >= 0){
-                    //db.inventoryDao().updateShoppingItemById(itemid, title, amount, unit)
+                    db.inventoryDao().updateInventoryItem(itemid, title, amount, unit, location)
                 }
                 else{
                     db.inventoryDao().insertInventoryItems(item)
@@ -338,9 +339,6 @@ class InventoryItemEditActivity : AppCompatActivity() {
         else{
             Toast.makeText(this, resources.getString(R.string.errormsg_invalid_shoppingitem_parameters),Toast.LENGTH_LONG).show()
         }
-
-
-
     }
 
 }

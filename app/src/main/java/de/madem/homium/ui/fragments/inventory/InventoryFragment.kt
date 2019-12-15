@@ -1,5 +1,6 @@
 package de.madem.homium.ui.fragments.inventory
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_INVENTORY
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
@@ -52,7 +54,11 @@ class InventoryFragment : Fragment() {
         val inventoryAdapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
 
         inventoryAdapter.shortClickListener = { item, holder ->
-            switchToActivity(InventoryItemEditActivity::class)
+
+            Intent(activity, InventoryItemEditActivity::class.java)
+                .apply { putExtra("item", item.uid) }
+                .also { startActivityForResult(it, REQUEST_CODE_INVENTORY) }
+
         }
 
         recyclerView.adapter = inventoryAdapter
