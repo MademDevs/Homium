@@ -33,70 +33,78 @@ fun AppCompatActivity.hideKeyboard() {
     // }
 }
 
-fun Fragment.showToastShort(string: String) {
-    showToast(context, Toast.LENGTH_SHORT, R.string.dummy, string)
+fun Fragment.showToastShort(string: String) = context.showToastShort(string)
+fun Fragment.showToastLong(string: String) = context.showToastLong(string)
+
+fun Fragment.showToastShort(resource: Int, vararg arguments: Any) =
+    context.showToast(Toast.LENGTH_SHORT, resource, arguments)
+
+fun Fragment.showToastLong(resource: Int, vararg arguments: Any) =
+    context.showToast(Toast.LENGTH_LONG, resource, arguments)
+
+//activity/conext toast
+fun Context?.showToastShort(resource: Int, vararg arguments: Any) =
+    showToast(Toast.LENGTH_SHORT, resource, arguments)
+
+fun Context?.showToastLong(resource: Int, vararg arguments: Any) =
+    showToast(Toast.LENGTH_LONG, resource, arguments)
+
+fun Context?.showToastShort(string: String) {
+    showToast(Toast.LENGTH_SHORT, R.string.dummy, string)
 }
 
-fun Fragment.showToastLong(string: String) {
-    showToast(context, Toast.LENGTH_LONG, R.string.dummy, string)
+fun Context?.showToastLong(string: String) {
+    showToast(Toast.LENGTH_LONG, R.string.dummy, string)
 }
 
-fun Fragment.showToastShort(resource: Int, vararg arguments: Any)
-        = showToast(context, Toast.LENGTH_SHORT, resource, arguments)
-
-fun Fragment.showToastLong(resource: Int, vararg arguments: Any)
-        = showToast(context, Toast.LENGTH_LONG, resource, arguments)
-
-fun Activity.showToastShort(resource: Int, vararg arguments: Any)
-        = showToast(this, Toast.LENGTH_SHORT, resource, arguments)
-
-fun Activity.showToastLong(resource: Int, vararg arguments: Any)
-        = showToast(this, Toast.LENGTH_LONG, resource, arguments)
-
-private fun showToast(context: Context?, duration: Int, resource: Int, vararg arguments: Any) {
-    context.notNull {
-        Toast.makeText(it, it.getString(resource, arguments), duration).show()
-    }
+private fun Context?.showToast(duration: Int, resource: Int, vararg arguments: Any) = notNull {
+    Toast.makeText(it, it.getString(resource, arguments), duration).show()
 }
 
-fun <T : Any> Context.getSetting(key : String, type : KClass<T>) : T?{
+fun <T : Any> Context.getSetting(key: String, type: KClass<T>): T? {
     //getting shared preferences
-    val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
+    val prefs = this.getSharedPreferences(
+        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        Context.MODE_PRIVATE
+    )
 
     //getting setting depending on type
-    return when(type){
-        Int::class -> prefs.getInt(key,0) as T
-        Boolean::class -> prefs.getBoolean(key,false) as T
-        Float::class -> prefs.getFloat(key,0f) as T
-        Double::class -> prefs.getFloat(key,0f).toDouble() as T
-        Long::class -> prefs.getLong(key,0) as T
-        String::class -> prefs.getString(key,"") as T
+    return when (type) {
+        Int::class -> prefs.getInt(key, 0) as T
+        Boolean::class -> prefs.getBoolean(key, false) as T
+        Float::class -> prefs.getFloat(key, 0f) as T
+        Double::class -> prefs.getFloat(key, 0f).toDouble() as T
+        Long::class -> prefs.getLong(key, 0) as T
+        String::class -> prefs.getString(key, "") as T
         else -> null
     }
 }
 
-fun <T : Any> Context.putSetting(key : String, value : T) : Boolean{
+fun <T : Any> Context.putSetting(key: String, value: T): Boolean {
     //getting shared preferences
-    val prefs = this.getSharedPreferences(resources.getString(R.string.sharedprefernce_namespacekey_settings),Context.MODE_PRIVATE)
+    val prefs = this.getSharedPreferences(
+        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        Context.MODE_PRIVATE
+    )
 
     var result = false
 
-    prefs.edit(false){
-         result = when(value){
+    prefs.edit(false) {
+        result = when (value) {
             is String -> {
                 putString(key, value)
                 commit()
             }
             is Boolean -> {
-                putBoolean(key,value)
+                putBoolean(key, value)
                 commit()
             }
             is Int -> {
-                putInt(key,value)
+                putInt(key, value)
                 commit()
             }
             is Float -> {
-                putFloat(key,value)
+                putFloat(key, value)
                 commit()
             }
             is Double -> {
@@ -117,7 +125,7 @@ fun <T : Any> Context.putSetting(key : String, value : T) : Boolean{
 }
 
 //settings for fragment
-fun <T : Any> Fragment.putSetting(key : String, value : T) : Boolean{
+fun <T : Any> Fragment.putSetting(key: String, value: T): Boolean {
     var result = false
 
     this.context.notNull {
@@ -128,26 +136,42 @@ fun <T : Any> Fragment.putSetting(key : String, value : T) : Boolean{
     return result
 }
 
-fun <T : Any> Fragment.getSetting(key : String, type : KClass<T>) : T?{
+fun <T : Any> Fragment.getSetting(key: String, type: KClass<T>): T? {
 
-    var result : T? = null
+    var result: T? = null
 
     this.context.notNull {
-        result = it.getSetting(key,type)
+        result = it.getSetting(key, type)
     }
 
     return result
 }
 
+fun <T : Any> Activity.switchToActivityForResult(requestCode: Int, clazz: KClass<T>)
+        = switchToActivityForResult(requestCode,clazz){}
 
-fun <T : Any> Fragment.switchToActivityForResult(requestCode: Int,clazz: KClass<T>) {
-    startActivityForResult(Intent(context,clazz.java),requestCode)
+fun <T : Any> Activity.switchToActivityForResult(requestCode: Int,clazz: KClass<T>,modifyIntent: (Intent)->Unit){
+    val intent = Intent(this,clazz.java)
+    modifyIntent.invoke(intent)
+    startActivityForResult(intent, requestCode)
 }
 
-fun Activity.finishWithBooleanResult(key: String,value : Boolean, resultCode: Int){
+fun <T : Any> Fragment.switchToActivityForResult(requestCode: Int, clazz: KClass<T>) {
+    startActivityForResult(Intent(context, clazz.java), requestCode)
+}
+
+fun Activity.finishWithBooleanResult(key: String, value: Boolean, resultCode: Int) {
     val resultIntent = Intent()
     resultIntent.putExtra(key, value)
 
+    setResult(resultCode, resultIntent)
+    finish()
+}
+
+fun Activity.finishWithResultData(resultCode: Int,modifyIntent : (Intent)->Unit){
+    val resultIntent = Intent()
+
+    modifyIntent.invoke(resultIntent)
     setResult(resultCode, resultIntent)
     finish()
 }
@@ -161,10 +185,9 @@ fun Fragment.vibrate() = context?.vibrateInContext()
 
 private fun Context.vibrateInContext() {
     val vib = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
+    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
         vib?.vibrate(30)
-    }
-    else{
-        vib?.vibrate(VibrationEffect.createOneShot(30,10))
+    } else {
+        vib?.vibrate(VibrationEffect.createOneShot(30, 10))
     }
 }

@@ -1,20 +1,27 @@
 package de.madem.homium.speech
 
 import android.content.Context
-import androidx.core.text.isDigitsOnly
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
-import java.util.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class CommandParser(val context: Context) {
 
     fun parseShoppingItem(splittedWords : List<String>) : ShoppingItem?{
+
+        if(splittedWords.size < 3){
+            return null
+        }
+
         //name
-        val name = splittedWords[2].capitalize()
+        val name = splittedWords[2].trim().split(" ").map { it.capitalize() }.joinToString(" ")
         println("NAME = $name")
         //unit
-        var unit : String = splittedWords[1].capitalize()
+        var unit : String = splittedWords[1].trim().capitalize()
         println("UNIT = $unit")
 
         if(unit == "Kilo"){
@@ -29,33 +36,90 @@ class CommandParser(val context: Context) {
         }
 
         //quantity
-        val quantity = replaceNumberWords(splittedWords[0]).toIntOrNull() ?: return null
+        val quantity = splittedWords[0].trim().toIntOrNull() ?: return null //replaceNumberWords(splittedWords[0]).toIntOrNull() ?: return null
         println("QUANTITY = $quantity")
         return ShoppingItem(name,quantity,Units.shortCutToLongValue(unit,context))
 
     }
 
+    suspend fun parseShoppingItemWithoutUnit(splittedWords : List<String>) : ShoppingItem? = coroutineScope{
 
-    private fun replaceNumberWords(str : String) : String {
+        if(splittedWords.size < 2){
+            return@coroutineScope null
+        }
 
-        return if(str.isDigitsOnly()){
-            str
+        //name
+        val name = splittedWords[1].trim().split(Regex(" ")).map { it.capitalize() }.joinToString(" ")
+
+        val matchingProductsDeffered = async<List<Product>> {
+            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+        }
+
+
+        //quantity
+        val amount = splittedWords[0].trim().toIntOrNull()
+
+
+        if(name.isNotEmpty() && name.isNotBlank() && amount != null){
+
+            val productResult = matchingProductsDeffered.await()
+
+            if(productResult.isEmpty()){
+                return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString(context))
+            }
+            else{
+                val productNameIndex = productResult.map { it.name }.indexOf(name)
+                val productPluralNameIndex = productResult.map { it.plural }.indexOf(name)
+                if(productNameIndex >= 0 || productPluralNameIndex >= 0) {
+                    val newUnit = if(productPluralNameIndex < 0) productResult[productNameIndex].unit else productResult[productPluralNameIndex].unit
+                    return@coroutineScope ShoppingItem(name,amount,newUnit)
+                }
+                else{
+                    return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString(context))
+                }
+            }
         }
         else{
-            str.replace(Regex("ein(e)*"),"1")
-                .replace("zwei","2")
-                .replace("drei","3")
-                .replace("vier","4")
-                .replace("fünf","5")
-                .replace("sechs","6")
-                .replace("sieben","7")
-                .replace("acht","8")
-                .replace("neun","9")
-                .replace("zehn","10")
-                .replace("elf","11")
-                .replace("zwölf","12")
+            return@coroutineScope null
+        }
+    }
 
+    suspend fun parseShoppingItemWithoutUnitWithoutAmount(nameIn : String) : ShoppingItem? = coroutineScope{
+
+        val productsDeffered = async<List<Product>> {
+            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(nameIn.capitalize())
         }
 
+        if(nameIn.isNotBlank() && nameIn.isNotEmpty()){
+
+            val name = nameIn.trim().split(Regex(" ")).map { it.capitalize() }.joinToString(" ")
+
+            val productResult = productsDeffered.await()
+
+            val productNameIndex = productResult.map { it.name }.indexOf(name)
+            val productPluralIndex = productResult.map { it.plural }.indexOf(name)
+            return@coroutineScope when {
+                productNameIndex >= 0 -> {
+                    val newUnit = productResult[productNameIndex].unit
+                    val newQuantity = productResult[productNameIndex].amount.toIntOrNull() ?: 1
+                    ShoppingItem(name,newQuantity,newUnit)
+                }
+                productPluralIndex >= 0 -> {
+                    val newUnit = productResult[productPluralIndex].unit
+                    val newQuantity = productResult[productPluralIndex].amount.toIntOrNull()?.takeIf { it > 1 } ?: 2
+                    ShoppingItem(name,newQuantity,newUnit)
+
+                }
+                else -> {
+                    ShoppingItem(name,1,Units.ITEM.getString(context))
+                }
+            }
+
+
+        }
+        else{
+            return@coroutineScope null
+        }
     }
+
 }

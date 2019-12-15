@@ -3,8 +3,11 @@
     package="de.madem.homium">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -15,6 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".ui.activities.ingredient.IngredientEditActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.activities.recipe.RecipeEditActivity"
+            android:noHistory="true"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.android.fileprovider"
@@ -22,9 +30,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-            </meta-data>
+                android:resource="@xml/file_paths"></meta-data>
         </provider>
+
         <activity
             android:name=".ui.activities.launch.LaunchActivity"
             android:theme="@style/NoActionBarTheme">
@@ -36,8 +44,9 @@
         </activity>
         <activity
             android:name=".ui.activities.onboarding.OnboardingActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/NoActionBarTheme">
+
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,8 +57,8 @@
         </activity>
         <activity
             android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"
-            android:noHistory="true"
             android:exported="false"
+            android:noHistory="true"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
             android:name=".ui.activities.recipe.RecipeEditActivity"
