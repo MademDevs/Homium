@@ -1,12 +1,7 @@
 package de.madem.homium.ui.activities.onboarding
 
 
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
@@ -15,6 +10,9 @@ import com.github.paolorotolo.appintro.model.SliderPagerBuilder
 import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
+import de.madem.homium.ui.fragments.onboarding.OnboardingSlideComingSoon
+import de.madem.homium.ui.fragments.onboarding.OnboardingSlideShopping
+import de.madem.homium.ui.fragments.onboarding.OnboardingSlideWelcome
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.getSetting
 import de.madem.homium.utilities.putSetting
@@ -24,6 +22,8 @@ class OnboardingActivity : AppIntro() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //val textSlide11 = findViewById<TextView>(R.id.text_slide1) as TextView
+        //textSlide11.movementMethod = ScrollingMovementMethod()
 
         //not initialized database = app runs for the first time
         val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
@@ -56,6 +56,7 @@ class OnboardingActivity : AppIntro() {
 
     private fun showIntroSlides() {
 
+        /*
         val pageOne = SliderPagerBuilder()
             .title("Willkommen zu Homium")
             .description(getString(R.string.onboarding_welcome))
@@ -77,6 +78,8 @@ class OnboardingActivity : AppIntro() {
             .bgColor(ContextCompat.getColor(this,R.color.colorPrimary))
             .build()
 
+         */
+
 //Können uns hier noch die Übergangsanimation aussuchen ;)
         setFadeAnimation()
         //setZoomAnimation()
@@ -84,9 +87,13 @@ class OnboardingActivity : AppIntro() {
         //setSlideOverAnimation()
         //setDepthAnimation()
 
-        addSlide(AppIntro2Fragment.newInstance(pageOne))
-        addSlide(AppIntro2Fragment.newInstance(pageTwo))
-        addSlide(AppIntro2Fragment.newInstance(pageThree))
+        addSlide(OnboardingSlideWelcome())
+        addSlide(OnboardingSlideShopping())
+        addSlide(OnboardingSlideComingSoon())
+
+        //addSlide(AppIntro2Fragment.newInstance(pageOne))
+        //addSlide(AppIntro2Fragment.newInstance(pageTwo))
+        //addSlide(AppIntro2Fragment.newInstance(pageThree))
     }
 
     private fun goToMain() {
