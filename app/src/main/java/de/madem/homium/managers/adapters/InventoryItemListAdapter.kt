@@ -1,5 +1,6 @@
 package de.madem.homium.managers.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.models.InventoryItem
+import de.madem.homium.models.Units
 
-class InventoryItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<InventoryItem>>)
+class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: MutableLiveData<List<InventoryItem>>)
     : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>() {
 
     companion object {
@@ -58,6 +61,26 @@ class InventoryItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<
                 .replace("unit",inventoryItem.unit)
             txtLocation.text = inventoryItem.location
 
+
+            val unit = Units.getUnitForText(HomiumApplication.appContext!!, inventoryItem.unit)
+
+            if (unit != null) {
+                val min = unit.bounds.first
+                val max = unit.bounds.second
+
+                when {
+                    inventoryItem.count < min -> {
+                        viewStock.setBackgroundColor(Color.RED)
+                    }
+                    inventoryItem.count < max -> {
+                        viewStock.setBackgroundColor(Color.YELLOW)
+                    }
+                    else -> {
+                        viewStock.setBackgroundColor(Color.GREEN)
+                    }
+                }
+            }
+
             //set click handler
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
@@ -84,6 +107,7 @@ class InventoryItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<
         val txtTitle : TextView = itemView.findViewById(R.id.tv_name)
         val txtQuantityUnit : TextView = itemView.findViewById(R.id.tv_quantityunit)
         val txtLocation : TextView = itemView.findViewById(R.id.tv_location)
+        val viewStock: View = itemView.findViewById(R.id.view_stock)
 
     }
 }
