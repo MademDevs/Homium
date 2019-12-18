@@ -7,11 +7,7 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -23,8 +19,10 @@ import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
-import de.madem.homium.ui.fragments.shopping.ShoppingViewModel
+import de.madem.homium.utilities.showToastLong
+import de.madem.homium.utilities.showToastShort
 import de.madem.homium.utilities.switchToActivity
+import java.lang.Exception
 import java.util.*
 
 
@@ -88,6 +86,9 @@ class MainActivity : AppCompatActivity() {
                         .setMessage(R.string.errormsg_unknown_error_with_speech_assistent)
                         .setPositiveButton(android.R.string.ok){_,_ -> }
                         .show()
+                }
+                catch(ex : Exception){
+                    showToastLong(R.string.errormsg_unknown_error_with_speech_assistent)
                 }
                 false
             }

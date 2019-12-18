@@ -96,7 +96,7 @@
     <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="errormsg_invalid_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
     <string name="errormsg_insert_shoppingitem_failed">Fehler: Das Einkaufselement konnte nicht hinzugefügt werden. Bitte versuche es erneut.</string>
-    <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
+    <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte versuche es erneut oder überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
 
     <!--Speech Assistent Feedback-->
     <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
