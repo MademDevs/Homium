@@ -8,6 +8,7 @@ import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 import de.madem.homium.speech.commandparser.InventoryCommandParser
 import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.UserRequestedCoroutineBackgroundTask
 import de.madem.homium.utilities.notNull
 import de.madem.homium.utilities.showToastShort
 import java.lang.ref.WeakReference
@@ -22,7 +23,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         val ADD_INVENTORY_ITEM_WITHOUT_LOCATION = Regex("([sS]{1}[ei]tze|[nN]{1}ehme){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]{1}nventar(liste)?( auf)?")
         val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT = Regex("([sS]{1}[ei]tze|[nN]{1}ehme){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]{1}nventar(liste)?( auf)?")
         val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT = Regex("([sS]{1}[ei]tze|[nN]{1}ehme){1} ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]{1}nventar(liste)?( auf)?")
-        //val CLEAR_INVENTORY_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [iI]{1}nventar(liste)?")
+        val CLEAR_INVENTORY_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [iI]{1}nventar(liste)?")
         //val DELETE_INVENTORY_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
         //val DELETE_INVENTORY_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
         //val DELETE_INVENTORY_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
@@ -33,6 +34,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             command.matches(ADD_INVENTORY_ITEM_WITHOUT_LOCATION) -> matchAddInventoryWithoutLocation(command)
             command.matches(ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT) -> matchAddInventoryWithoutLocationUnit(command)
             command.matches(ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT) -> matchAddInventoryWithoutLocationUnitCount(command)
+            command.matches(CLEAR_INVENTORY_LIST) -> matchClearInventory()
             else -> null
         }
 
@@ -70,14 +72,18 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             val parsedItem = parser.parseInventoryWithoutLocation(params) ?: return@executeInBackground false
 
             dao.insertInventoryItems(parsedItem)
-            ViewRefresher.inventoryRefresher.invoke()
+
 
             return@executeInBackground true
 
 
 
-        }.onDone {
-            makeUserFeedbackAboutAdd(it)
+        }.onDone {success ->
+            if(success){
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+
+            makeUserFeedbackAboutAdd(success)
         }
     }
 
@@ -107,14 +113,17 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             //inserting item
             dao.insertInventoryItems(resultItem)
 
-            //view refresh
-            ViewRefresher.inventoryRefresher.invoke()
-
             //return
             true
 
-        }.onDone {
-            makeUserFeedbackAboutAdd(it)
+        }.onDone {success ->
+
+            if(success){
+                //view refresh
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+
+            makeUserFeedbackAboutAdd(success)
         }
     }
 
@@ -144,15 +153,54 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             //insert into db
             dao.insertInventoryItems(resultItem)
 
-            //view refresh
-            ViewRefresher.inventoryRefresher.invoke()
+
 
             //return
             true
 
 
-        }.onDone {
-            makeUserFeedbackAboutAdd(it)
+        }.onDone {sucess ->
+
+            if(sucess){
+                //view refresh
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+
+            makeUserFeedbackAboutAdd(sucess)
+
+
+        }
+    }
+
+    private fun matchClearInventory() : CoroutineBackgroundTask<Boolean>{
+
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,R.string.assistent_question_delete_all_inventory).executeInBackground {
+
+            if(dao.inventorySize() != 0){
+                dao.clearInventory()
+
+                true
+            }
+            else{
+                false
+            }
+
+        }.onDone {sucess ->
+
+            if(sucess){
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+
+            contextRef.get().notNull {cntxt ->
+                if(sucess){
+                    cntxt.showToastShort(R.string.notification_remove_all_inventoryitems)
+                }
+                else{
+                    cntxt.showToastShort(R.string.errormsg_delete_inventory_failed)
+                }
+            }
+
+
         }
     }
 

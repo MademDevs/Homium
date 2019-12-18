@@ -84,4 +84,6 @@ interface ItemDao {
     @Query("DELETE FROM shoppingItem WHERE checked = 1")
     fun deleteAllCheckedShoppingItems()
 
+    @Query("SELECT COUNT(uid) FROM shoppingItem;")
+    fun shoppingListSize() : Int
 }

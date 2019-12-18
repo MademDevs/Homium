@@ -12,6 +12,7 @@ import de.madem.homium.speech.commandparser.ShoppingCommandParser
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.UserRequestedCoroutineBackgroundTask
 import de.madem.homium.utilities.notNull
+import de.madem.homium.utilities.showToastShort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
@@ -189,17 +190,36 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     }
 
     private fun matchClearShoppingList() : CoroutineBackgroundTask<Boolean> {
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef.get() ?: HomiumApplication.appContext!!,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
-            itemDao.deleteAllShopping()
-            true
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
+            if(itemDao.shoppingListSize() != 0){
+                itemDao.deleteAllShopping()
+                true
+            }
+            else{
+                false
+            }
+
+
+
         }.onDone {sucess ->
-            if(sucess) {
-                contextRef.get().notNull {
-                    Toast.makeText(it, R.string.notification_remove_all_shoppingitems, Toast.LENGTH_SHORT).show()
+
+            contextRef.get().notNull {cntxt ->
+                if(sucess) {
+                    Toast.makeText(cntxt, R.string.notification_remove_all_shoppingitems, Toast.LENGTH_SHORT).show()
                 }
+                else{
+                    cntxt.showToastShort(R.string.errormsg_delete_shopping_failed)
+                }
+
+            }
+
+            if(sucess){
                 ViewRefresher.shoppingRefresher.invoke()
             }
+
         }
+
+
     }
 
     private fun matchDeleteShoppingWithName(command : String) : CoroutineBackgroundTask<Boolean>{
@@ -228,7 +248,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"${name.capitalize()}\"")
         }
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef.get() ?: HomiumApplication.appContext!!,msg).executeInBackground {
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
             if(allShouldBeDeleted){
                 val products = itemDao.getProductsByNameOrPlural(name)
 
@@ -271,7 +291,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         println(itemStr.toUpperCase())
 
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef.get() ?: HomiumApplication.appContext!!, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
             .executeInBackground{
 
                 val item : ShoppingItem?= commandParser.parseShoppingItem(params)
@@ -309,9 +329,8 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }?.takeIf { it.size == 2 } ?: command.split(" ").slice(1..2).toMutableList()
         val pseudoOut : String = params.map { it.split(" ").map { it.capitalize() }.joinToString(" ") }.joinToString(" ")
 
-        val cntxt = contextRef.get() ?: return null
-
-        return UserRequestedCoroutineBackgroundTask<Boolean>(cntxt,cntxt.getString(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"${pseudoOut}\""))
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
+            ?.replace("#","\"${pseudoOut}\"") ?: "")
             .executeInBackground {
                 val searchCount = params.first().trim().toIntOrNull()
                 val searchName = params.last().trim()
