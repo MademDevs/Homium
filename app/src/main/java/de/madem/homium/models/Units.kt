@@ -4,15 +4,15 @@ import android.content.Context
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 
-enum class Units(val ressourceId : Int, val shortCut : String) {
+enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<Int,Int>) {
 
     //values
-    ITEM(R.string.data_units_item,""),
-    GRAM(R.string.data_units_gram,"g"),
-    KILOGRAM(R.string.data_units_kilogram,"kg"),
-    MILLILITRE(R.string.data_units_millilitre,"ml"),
-    LITRE(R.string.data_units_litre,"l"),
-    PACK(R.string.data_units_pack,"");
+    ITEM(R.string.data_units_item,"",Pair(10,30)),
+    GRAM(R.string.data_units_gram,"g",Pair(100,1000)),
+    KILOGRAM(R.string.data_units_kilogram,"kg",Pair(2,5)),
+    MILLILITRE(R.string.data_units_millilitre,"ml",Pair(100,1000)),
+    LITRE(R.string.data_units_litre,"l",Pair(2,4)),
+    PACK(R.string.data_units_pack,"",Pair(4,10));
 
     //companion
     companion object{
@@ -41,7 +41,7 @@ enum class Units(val ressourceId : Int, val shortCut : String) {
 
     //functions
     fun getString(context: Context = HomiumApplication.appContext!!) : String {
-        return context.resources.getString(ressourceId)
+        return context.resources.getString(resourceId)
     }
 
 
