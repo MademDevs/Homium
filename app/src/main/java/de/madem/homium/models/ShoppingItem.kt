@@ -12,4 +12,10 @@ data class ShoppingItem(
     @ColumnInfo(name = "unit") val unit: String = "",
     @ColumnInfo(name = "checked") var checked: Boolean = false,
     @PrimaryKey(autoGenerate = true) val uid: Int = 0
-)
+) {
+
+    fun contentEquals(other: ShoppingItem): Boolean {
+        return name == other.name && count == other.count && unit == other.unit
+    }
+
+}
