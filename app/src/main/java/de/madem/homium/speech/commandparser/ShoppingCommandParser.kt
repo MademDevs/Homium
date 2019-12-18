@@ -1,4 +1,4 @@
-package de.madem.homium.speech
+package de.madem.homium.speech.commandparser
 
 import android.content.Context
 import de.madem.homium.R
@@ -8,8 +8,9 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.lang.ref.WeakReference
 
-class CommandParser(val context: Context) {
+class ShoppingCommandParser(private val contextRef: WeakReference<Context>) {
 
     fun parseShoppingItem(splittedWords : List<String>) : ShoppingItem?{
 
@@ -25,20 +26,21 @@ class CommandParser(val context: Context) {
         println("UNIT = $unit")
 
         if(unit == "Kilo"){
-            unit = context.resources.getString(R.string.data_units_kilogram)
+
+            unit = contextRef.get()?.resources?.getString(R.string.data_units_kilogram) ?: "Kilogramm"
         }
 
-        if(unit.contains(Units.PACK.getString(context))){
+        if(unit.contains(Units.PACK.getString())){
             unit = unit.replace("en","")
         }
-        else if (!(Units.stringShortcuts().contains(unit.toLowerCase()) || Units.stringValueArray(context).contains(unit))){
+        else if (!(Units.stringShortcuts().contains(unit.toLowerCase()) || Units.stringValueArray().contains(unit))){
             return null
         }
 
         //quantity
         val quantity = splittedWords[0].trim().toIntOrNull() ?: return null //replaceNumberWords(splittedWords[0]).toIntOrNull() ?: return null
         println("QUANTITY = $quantity")
-        return ShoppingItem(name,quantity,Units.shortCutToLongValue(unit,context))
+        return ShoppingItem(name,quantity,Units.shortCutToLongValue(unit))
 
     }
 
@@ -65,7 +67,7 @@ class CommandParser(val context: Context) {
             val productResult = matchingProductsDeffered.await()
 
             if(productResult.isEmpty()){
-                return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString(context))
+                return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString())
             }
             else{
                 val productNameIndex = productResult.map { it.name }.indexOf(name)
@@ -75,7 +77,7 @@ class CommandParser(val context: Context) {
                     return@coroutineScope ShoppingItem(name,amount,newUnit)
                 }
                 else{
-                    return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString(context))
+                    return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString())
                 }
             }
         }
@@ -111,7 +113,7 @@ class CommandParser(val context: Context) {
 
                 }
                 else -> {
-                    ShoppingItem(name,1,Units.ITEM.getString(context))
+                    ShoppingItem(name,1,Units.ITEM.getString())
                 }
             }
 

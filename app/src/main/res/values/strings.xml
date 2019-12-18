@@ -106,6 +106,9 @@
     <string name="assistent_question_delete_all_shopping_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_question_delete_all_shopping_with_name_and_plural">Sollen wirklich alle Einkaufselemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
     <string name="assistent_msg_delete_failed">Leider konnte die Löschaktion aufgrund ungültiger Eingaben nicht durchgeführt werden. Bitte versuche es erneut!</string>
+    <string name="assistent_msg_inventory_added">Inventar wurde erfolgreich erweitert!</string>
+    <string name="assistent_const_inventory_default_location">Kühlschrank</string>
+
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
