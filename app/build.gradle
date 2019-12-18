@@ -25,9 +25,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    /*viewBinding { //Erst, wenn AndroidStudio 3.6
-        enabled = true
-    }*/
 }
 
 dependencies {
