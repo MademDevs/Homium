@@ -15,21 +15,24 @@ abstract class AppDatabase : RoomDatabase() {
 
     //userDao for accessing database content
     abstract fun itemDao(): ItemDao
+
     abstract fun recipeDao(): RecipeDao
 
     //Singleton
     companion object{
-        private var INSTANCE: AppDatabase? = null
-        fun getInstance(): AppDatabase{
-            if (INSTANCE == null){
-                INSTANCE = Room.databaseBuilder(
-                    HomiumApplication.appContext!!,
+        private lateinit var instance: AppDatabase
+
+        fun getInstance(context: Context = HomiumApplication.appContext!!): AppDatabase{
+            if (!::instance.isInitialized) {
+                instance = Room.databaseBuilder(
+                    context,
                     AppDatabase::class.java,
                     "database")
                     .build()
             }
 
-            return INSTANCE as AppDatabase
+            return instance
         }
+
     }
 }
