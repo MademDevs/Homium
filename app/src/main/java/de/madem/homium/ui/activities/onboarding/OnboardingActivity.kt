@@ -2,17 +2,12 @@ package de.madem.homium.ui.activities.onboarding
 
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
-import com.github.paolorotolo.appintro.AppIntro2Fragment
-import com.github.paolorotolo.appintro.model.SliderPagerBuilder
 import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
-import de.madem.homium.ui.fragments.onboarding.OnboardingSlideComingSoon
-import de.madem.homium.ui.fragments.onboarding.OnboardingSlideShopping
-import de.madem.homium.ui.fragments.onboarding.OnboardingSlideWelcome
+import de.madem.homium.ui.fragments.onboarding.*
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.getSetting
 import de.madem.homium.utilities.putSetting
@@ -89,6 +84,8 @@ class OnboardingActivity : AppIntro() {
 
         addSlide(OnboardingSlideWelcome())
         addSlide(OnboardingSlideShopping())
+        addSlide(OnboardingSlideRecipe())
+        addSlide(OnboardingSlideSpeachAssistant())
         addSlide(OnboardingSlideComingSoon())
 
         //addSlide(AppIntro2Fragment.newInstance(pageOne))

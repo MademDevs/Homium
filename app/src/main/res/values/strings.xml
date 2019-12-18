@@ -8,6 +8,13 @@
     <!--settings-->
     <string name="setting_vibration">Vibration</string>
 
+    <!--Onboarding Headlines-->
+    <string name="onboarding_welcome_headline">Willkommen zu Homium!</string>
+    <string name="onboarding_shopping_headline">So verwendest du die Einkaufsliste</string>
+    <string name="onboarding_comingSoon_headline">Coming Soon ;)</string>
+    <string name="onboarding_recipe_headline">Erstelle eigene Rezepte</string>
+    <string name="onboarding_speachAssistant_headline">Der Sprachassistent zur leichteren Bedienung</string>
+
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
     Es folgt eine kleine Erklärung zur Bedienung der App</string>
@@ -16,6 +23,12 @@
         die eingekauften Elemente per Swipe von der Liste. Ein Bearbeiten ist ganz einfach per langem Tippen möglich. </string>
 
     <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
+
+    <string name="onboarding_speachAssistant">Für eine intuitivere Bedienung ist der Homium-Sprachassistent eine Möglichkeit zum Steuern der App. Der Sprachassistenz selbst ruft nur Kommandos
+        ab, wenn er aufgerufen wird und sendet somit keine Daten ungewollt an Dritte weiter.</string>
+
+    <string name="onboarding_recipe">Verwalte deine Rezepte mit den entsprechenden Zutaten und erstelle Notizen zur Zubereitung. Verknüpfe die Rezeptverwaltung mit dem Inventar
+        und erhalte einen Überblick, was du mit den vorhandenen Lebensmitteln kochen kannst.</string>
 
     <!--screen headlines-->
     <string name="screentitle_edit_shopppingitem_add">Produkt hinzufügen</string>
@@ -112,4 +125,5 @@
     <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
     <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
     <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
+
 </resources>

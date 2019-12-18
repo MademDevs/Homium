@@ -36,7 +36,7 @@
                     android:layout_marginBottom="15pt"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
-                    android:text="@string/onboarding_welcome_headline"
+                    android:text="@string/onboarding_recipe_headline"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                     android:textColor="#FFFFFF"
                     android:textSize="30sp" />
@@ -46,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
-                    android:src="@drawable/onboarding_logo" />
+                    android:src="@drawable/onboarding_recipe" />
 
                 <TextView
                     android:id="@+id/text_slide1"
@@ -60,7 +60,7 @@
                     android:gravity="center"
                     android:isScrollContainer="false"
                     android:scrollbars="vertical"
-                    android:text="@string/onboarding_welcome"
+                    android:text="@string/onboarding_recipe"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp" />
