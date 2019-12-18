@@ -1,22 +1,18 @@
 package de.madem.homium.ui.activities.test
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognizerIntent
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import de.madem.homium.R
-import de.madem.homium.constants.REQUEST_CODE_SPEECH
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.managers.DatabaseInitializer
-import de.madem.homium.models.ShoppingItem
+import de.madem.homium.models.InventoryItem
+import de.madem.homium.models.Units
 import de.madem.homium.speech.SpeechAssistent
-import de.madem.homium.speech.startSpeechRecognition
-import de.madem.homium.utilities.showToastShort
 import kotlinx.android.synthetic.main.activity_test.*
-import kotlinx.coroutines.*
-import java.util.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class TestActivity : AppCompatActivity() {
 
@@ -31,6 +27,30 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+
+
+        btn_clear.setOnClickListener {
+            GlobalScope.launch(IO) {
+                AppDatabase.getInstance().inventoryDao().clearInventory()
+            }
+        }
+
+        btn_dummy.setOnClickListener {
+            GlobalScope.launch(IO) {
+                val list = mutableListOf<InventoryItem>().apply {
+                    add(InventoryItem("Apfel", 1, Units.ITEM.getString(this@TestActivity), "Kühlschrank"))
+                    add(InventoryItem("Milch", 1, Units.LITRE.getString(this@TestActivity), "Kühlschrank"))
+                }
+
+                for (item in list) {
+                    AppDatabase.getInstance().inventoryDao().insertInventoryItems(item)
+                }
+            }
+        }
+
+
+
+        /*
         speechAssistent = SpeechAssistent(this)
 
         findViewById<Button>(R.id.btn_TestSpeechAssistent).apply {
@@ -40,10 +60,12 @@ class TestActivity : AppCompatActivity() {
         }
 
         txtTextSpeechAssistent = findViewById(R.id.txt_TestSpeechAssistent)
+
+         */
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(resultCode == Activity.RESULT_OK){
@@ -58,7 +80,7 @@ class TestActivity : AppCompatActivity() {
             }
 
         }
-    }
+    }*/
 
 
 

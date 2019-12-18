@@ -37,6 +37,10 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return ""
         }
 
+        fun getUnitForText(context: Context, text: String): Units? {
+            return values().firstOrNull { context.getString(it.resourceId) == text }
+        }
+
     }
 
     //functions
