@@ -248,7 +248,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             true
         }.onDone {sucess ->
             if(sucess){
-                val sucessMsg = getStringRessource(R.string.assistent_msg_inventoryitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
+                val sucessMsg = getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
                 contextRef.get().notNull {
                     Toast.makeText(it,sucessMsg, Toast.LENGTH_SHORT).show()
                 }
@@ -272,15 +272,21 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             removeAll{it.matches(Regex("e(n)?"))}
             removeAll{it.matches(Regex("lösch(e)*(n)*"))}
             removeAll{it.matches(Regex("(aus|von){1}"))}
+
+
+            if(get(1).toLowerCase() == Units.KILOGRAM.getString().toLowerCase()){
+                remove("gramm")
+            }
+
         }?.takeIf { it.size == 3  } ?: command.split(" ").slice(1..3)
-        val itemStr : String = params.map { it.capitalize() }.joinToString(" ")
+        val itemStr : String = params.map { it.capitalizeEachWord() }.joinToString(" ")
         println(itemStr.toUpperCase())
 
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
             .executeInBackground{
 
-                if(!(itemDao.getAllShoppingNames().contains(params[2].capitalize()))){
+                if(!(itemDao.getAllShoppingNames().contains(params[2].capitalizeEachWord()))){
                     return@executeInBackground false
                 }
 

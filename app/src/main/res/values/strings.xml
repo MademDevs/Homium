@@ -114,7 +114,7 @@
     <string name="assistent_question_delete_all_inventory">Soll wirklich das gesamte Inventar gelöscht werden?</string>
     <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_msg_inventoryitem_with_param_deleted">Alle Inventarelemente mit der Angabe # wurden gelöscht.</string>
-
+    <string name="assistent_question_delete_all_inventory_with_name_and_plural">Sollen wirklich alle Inventarelemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>

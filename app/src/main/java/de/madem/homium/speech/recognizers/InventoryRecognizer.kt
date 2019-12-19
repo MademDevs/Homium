@@ -25,7 +25,8 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         val CLEAR_INVENTORY_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [iI]{1}nventar(liste)?")
         val DELETE_INVENTORY_ITEM_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} [derm]* [iI]{1}nventar(liste)?( heraus)?")
         val DELETE_INVENTORY_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} [derm]* [iI]{1}nventar(liste)?( heraus)?")
-        //val DELETE_INVENTORY_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        val DELETE_INVENTORY_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} [derm]* [iI]{1}nventar(liste)?( heraus)?")
+
         //val DELETE_INVENTORY_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
     }
 
@@ -37,6 +38,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             command.matches(CLEAR_INVENTORY_LIST) -> matchClearInventory()
             command.matches(DELETE_INVENTORY_ITEM_WITH_NAME) -> matchDeleteItemWithName(command)
             command.matches(DELETE_INVENTORY_WITH_ALL_PARAMS) -> matchDeleteItemWithAllParams(command)
+            command.matches(DELETE_INVENTORY_WITH_NAME_QUANTITY) -> matchDeleteItemWithNameQuantity(command)
             else -> null
         }
 
@@ -300,14 +302,19 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                         && it != "alle"
                         && it != "heraus"
             }
-            ?.toList()?.takeIf { it.size == 3 } ?: return null
+            ?.toMutableList()
+            ?.apply {
+                if(get(1).toLowerCase() == Units.KILOGRAM.getString().toLowerCase()){
+                    remove("gramm")
+                }
+            }?.takeIf { it.size == 3 } ?: return null
 
         val itemStr = params.map { it.capitalizeEachWord() }.joinToString(" ")
         val msg = deleteIndication(replacement = itemStr,withQutationMarks = true)
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
 
-            if(!(inventoryDao.getAllInventoryItemNames().contains(params[2].capitalize()))){
+            if(!(inventoryDao.getAllInventoryItemNames().contains(params[2].capitalizeEachWord()))){
                 return@executeInBackground false
             }
 
@@ -334,6 +341,81 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                 }
             }
         }
+    }
+
+    private fun matchDeleteItemWithNameQuantity(command : String) : CoroutineBackgroundTask<Boolean>?{
+        val params = DELETE_INVENTORY_WITH_NAME_QUANTITY.find(command)?.groupValues
+            ?.asSequence()
+            ?.map{it.trim().toLowerCase()}
+            ?.filter{it.isNotBlank() && it.isNotEmpty()}
+            ?.filter{!(it.matches(DELETE_INVENTORY_WITH_NAME_QUANTITY))}
+            ?.filter{!(it.matches(Regex("e(n)?")))}
+            ?.filter{!(it.matches(Regex("(lösch(e)*|welche){1}")))}
+            ?.filter{!(it.matches(Regex("(aus|von){1}")))}
+            ?.filter{
+                it != "der"
+                        && it != "die"
+                        && it != "das"
+                        && it != "dem"
+                        && it != "auf"
+                        && it != "in"
+                        && it != "liste"
+                        && it != "alle"
+                        && it != "heraus"
+            }
+            ?.toList()?.takeIf { it.size == 2 } ?: return null
+
+
+        val allShouldBeDeleted = command.contains("alle")
+        val name = params[1].trim().capitalizeEachWord()
+
+        val msg = if(allShouldBeDeleted){
+            getStringRessource(R.string.assistent_question_delete_all_inventory_with_name_and_plural).replace("#","\"${name.capitalize()}\"")
+        }
+        else {
+            getStringRessource(R.string.assistent_question_delete_all_inventory_with_name).replace("#","\"${name.capitalize()}\"")
+        }
+
+        val itemStr = params.map { it.capitalizeEachWord() }.joinToString(" ")
+
+
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,deleteIndication(replacement = itemStr,withQutationMarks = true))
+            .executeInBackground {
+
+                val searchCount = params.first().trim().toIntOrNull()
+                val searchName = params.last().trim().capitalizeEachWord()
+
+                if(!(inventoryDao.getAllInventoryItemNames().contains(searchName))){
+                    return@executeInBackground false
+                }
+
+                if(searchCount != null){
+                    inventoryDao.deleteInventoryByNameCount(searchName,searchCount)
+                    true
+                }
+                else{
+                    false
+                }
+
+
+
+            }
+            .onDone {sucess ->
+                if(sucess){
+                    contextRef.get().notNull {
+                        Toast.makeText(it,getStringRessource(R.string.assistent_msg_inventoryitem_with_param_deleted).replace("#","\"$itemStr\""),
+                            Toast.LENGTH_SHORT).show();
+                    }
+                    ViewRefresher.inventoryRefresher.invoke()
+                }
+                else{
+                    contextRef.get().notNull {
+                        it.showToastShort(R.string.errormsg_delete_inventory_failed)
+                    }
+                }
+            }
+
+
     }
 
     //help functions

@@ -42,4 +42,7 @@ interface InventoryDao {
     @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count AND unit LIKE :unit")
     fun deleteInventoryByNameCountUnit(name: String, count: Int, unit : String)
 
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count")
+    fun deleteInventoryByNameCount(name: String, count: Int)
+
 }
