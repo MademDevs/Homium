@@ -32,6 +32,9 @@ interface ItemDao {
     @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
     fun getAllShoppingReversedOrder(): List<ShoppingItem>
 
+    @Query("SELECT name FROM shoppingitem;")
+    fun getAllShoppingNames(): List<String>
+
     @Insert
     fun insertProduct(vararg item: Product)
 

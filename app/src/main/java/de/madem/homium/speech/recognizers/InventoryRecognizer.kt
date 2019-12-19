@@ -1,22 +1,21 @@
 package de.madem.homium.speech.recognizers
 
 import android.content.Context
+import android.widget.Toast
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 import de.madem.homium.speech.commandparser.InventoryCommandParser
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.UserRequestedCoroutineBackgroundTask
-import de.madem.homium.utilities.notNull
-import de.madem.homium.utilities.showToastShort
+import de.madem.homium.utilities.*
 import java.lang.ref.WeakReference
 
 class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternRecognizer{
 
     private val parser = InventoryCommandParser(contextRef)
-    private val dao = AppDatabase.getInstance().inventoryDao()
+    private val inventoryDao = AppDatabase.getInstance().inventoryDao()
 
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern()
@@ -24,6 +23,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT = Regex("([sS]{1}[ei]tze|[nN]{1}ehme){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]{1}nventar(liste)?( auf)?")
         val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT = Regex("([sS]{1}[ei]tze|[nN]{1}ehme){1} ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]{1}nventar(liste)?( auf)?")
         val CLEAR_INVENTORY_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [iI]{1}nventar(liste)?")
+        val DELETE_INVENTORY_ITEM_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} [derm]* [iI]{1}nventar(liste)?( heraus)?")
         //val DELETE_INVENTORY_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
         //val DELETE_INVENTORY_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
         //val DELETE_INVENTORY_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
@@ -35,6 +35,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             command.matches(ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT) -> matchAddInventoryWithoutLocationUnit(command)
             command.matches(ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT) -> matchAddInventoryWithoutLocationUnitCount(command)
             command.matches(CLEAR_INVENTORY_LIST) -> matchClearInventory()
+            command.matches(DELETE_INVENTORY_ITEM_WITH_NAME) -> matchDeleteItemWithName(command)
             else -> null
         }
 
@@ -71,7 +72,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
 
             val parsedItem = parser.parseInventoryWithoutLocation(params) ?: return@executeInBackground false
 
-            dao.insertInventoryItems(parsedItem)
+            inventoryDao.insertInventoryItems(parsedItem)
 
 
             return@executeInBackground true
@@ -111,7 +112,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             val resultItem = parser.parseInventoryWithoutLocationUnit(params) ?: return@executeInBackground false
 
             //inserting item
-            dao.insertInventoryItems(resultItem)
+            inventoryDao.insertInventoryItems(resultItem)
 
             //return
             true
@@ -151,7 +152,7 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                 ?: return@executeInBackground false
 
             //insert into db
-            dao.insertInventoryItems(resultItem)
+            inventoryDao.insertInventoryItems(resultItem)
 
 
 
@@ -176,8 +177,8 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,R.string.assistent_question_delete_all_inventory).executeInBackground {
 
-            if(dao.inventorySize() != 0){
-                dao.clearInventory()
+            if(inventoryDao.inventorySize() != 0){
+                inventoryDao.clearInventory()
 
                 true
             }
@@ -204,6 +205,80 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         }
     }
 
+    private fun matchDeleteItemWithName(command : String) : CoroutineBackgroundTask<Boolean>?{
+        val params = DELETE_INVENTORY_ITEM_WITH_NAME.find(command)?.groupValues
+            ?.asSequence()
+            ?.map{it.trim().toLowerCase()}
+            ?.filter{it.isNotBlank() && it.isNotEmpty()}
+            ?.filter{!(it.matches(DELETE_INVENTORY_ITEM_WITH_NAME))}
+            ?.filter{!(it.matches(Regex("(e)*")))}
+            ?.filter{!(it.matches(Regex("(aus|von){1}")))}
+            ?.filter{
+                it != "der"
+                        && it != "die"
+                        && it != "das"
+                        && it != "dem"
+                        && it != "auf"
+                        && it != "in"
+                        && it != "liste"
+                        && it != "alle"
+                        && it != "heraus"
+            }
+            ?.toList()?.takeIf { it.size == 1 } ?: return null
+
+        val name = params[0].capitalizeEachWord()
+
+        val allShouldBeDeleted = command.contains("alle")
+
+
+        val msg = if(allShouldBeDeleted){
+
+            deleteIndication(name,R.string.assistent_question_delete_all_shopping_with_name_and_plural,true)
+        }
+        else {
+            deleteIndication(name,withQutationMarks = true)
+        }
+
+
+        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
+            .executeInBackground {
+
+                if(!(inventoryDao.getAllInventoryItemNames().contains(name))){
+                    return@executeInBackground false
+                }
+
+                if(allShouldBeDeleted){
+                    val products = AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+
+                    if(products.isNotEmpty()){
+                        inventoryDao.deleteInventoryItemByName(products[0].plural)
+                        inventoryDao.deleteInventoryItemByName(products[0].name)
+                    }
+                }
+
+                inventoryDao.deleteInventoryItemByName(name)
+
+                true
+
+            }.onDone {success ->
+
+                if(success){
+                    val sucessMsg = getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
+                    contextRef.get().notNull {
+                        Toast.makeText(it,sucessMsg, Toast.LENGTH_SHORT).show()
+                    }
+                    ViewRefresher.inventoryRefresher.invoke()
+                }
+                else{
+                    val failMsg = getStringRessource(R.string.assistent_msg_delete_failed)
+                    contextRef.get().notNull {
+                        Toast.makeText(it,failMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            }
+    }
+
     //help functions
     private fun makeUserFeedbackAboutAdd(sucess: Boolean){
         contextRef.get().notNull {cntxt ->
@@ -214,5 +289,19 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                 cntxt.showToastShort(R.string.assistent_msg_sorry)
             }
         }
+    }
+
+    private fun deleteIndication(replacement : String, baseID : Int = R.string.assistent_question_delete_all_inventory_with_name,withQutationMarks : Boolean = false) : String{
+        val base =contextRef.get()?.resources?.getString(baseID)
+            ?: HomiumApplication.appContext?.getString(baseID)
+            ?: "Elemente mit der Angabe # löschen?"
+
+        return base.replace("#",if(withQutationMarks) "\"${replacement}\"" else replacement)
+    }
+
+    private fun getStringRessource(id : Int) : String{
+        val cntxt = contextRef.get() ?: HomiumApplication.appContext ?: return ""
+
+        return cntxt.resources.getString(id)
     }
 }
