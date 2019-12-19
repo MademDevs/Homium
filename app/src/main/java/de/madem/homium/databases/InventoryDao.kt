@@ -20,6 +20,9 @@ interface InventoryDao {
     @Query("DELETE FROM inventoryItem WHERE uid LIKE :id")
     fun deleteInventoryItemById(id: Int)
 
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name")
+    fun deleteInventoryItemByName(name: String)
+
     @Insert
     fun insertInventoryItems(vararg item: InventoryItem)
 
@@ -29,5 +32,17 @@ interface InventoryDao {
         WHERE uid = :id
         """)
     fun updateInventoryItem(id: Int, name: String, count: Int, unit: String, location: String)
+
+    @Query("SELECT COUNT(uid) FROM inventoryItem;")
+    fun inventorySize() : Int
+
+    @Query("SELECT name FROM inventoryItem;")
+    fun getAllInventoryItemNames(): List<String>
+
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count AND unit LIKE :unit")
+    fun deleteInventoryByNameCountUnit(name: String, count: Int, unit : String)
+
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count")
+    fun deleteInventoryByNameCount(name: String, count: Int)
 
 }

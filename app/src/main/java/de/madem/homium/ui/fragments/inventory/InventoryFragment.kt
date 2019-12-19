@@ -13,6 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_INVENTORY
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
+import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
@@ -45,6 +46,7 @@ class InventoryFragment : Fragment() {
         super.onResume()
 
         inventoryViewModel.reloadInventoryItems()
+        ViewRefresher.inventoryRefresher = inventoryViewModel::reloadInventoryItems
     }
 
     private fun registerRecyclerView() {

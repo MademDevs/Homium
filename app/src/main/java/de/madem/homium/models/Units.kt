@@ -21,11 +21,30 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return values().map { it.getString(context) }.toTypedArray()
         }
 
+        fun asSpeechRecognitionPattern() : String{
+            return values().map {
+                val str = it.getString()
+                val shortcutExists = it.shortCut.isNotEmpty()
+
+                //creating regex string via string operation
+                //goal is to achieve like e.g. ([mM]{1}illiliter)(ml)
+                if(it == PACK){
+                    "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}")}(en)?${if(shortcutExists) "|"+it.shortCut else ""}"
+                }
+                else if(it == KILOGRAM){
+                    "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}").removeSuffix("gramm")}(gramm)?${if(shortcutExists) "|"+it.shortCut else ""}"
+                }
+                else{
+                    "${str.replaceFirst(str.first().toString(),"[${str.first().toLowerCase()}${str.first().toUpperCase()}]{1}")}${if(shortcutExists) "|"+it.shortCut else ""}"
+                }
+            }.joinToString("|")
+        }
+
         fun stringShortcuts(): List<String>{
             return values().map { it.shortCut }
         }
 
-        fun shortCutToLongValue(shortcut : String, context: Context) : String{
+        fun shortCutToLongValue(shortcut : String, context: Context = HomiumApplication.appContext!!) : String{
             values().forEach {
                 val longVersion = it.getString(context)
 
@@ -47,6 +66,7 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
     fun getString(context: Context = HomiumApplication.appContext!!) : String {
         return context.resources.getString(resourceId)
     }
+
 
 
 }
