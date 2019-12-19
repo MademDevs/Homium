@@ -280,7 +280,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
             .executeInBackground{
 
-                if(!(itemDao.getAllShoppingNames().contains(params[2]))){
+                if(!(itemDao.getAllShoppingNames().contains(params[2].capitalize()))){
                     return@executeInBackground false
                 }
 
@@ -318,7 +318,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             removeAll{it.matches(Regex("lösch(e)*(n)*"))}
             removeAll{it.matches(Regex("(aus|von){1}"))}
         }?.takeIf { it.size == 2 } ?: command.split(" ").slice(1..2).toMutableList()
-        val pseudoOut : String = params.map { it.split(" ").map { it.capitalize() }.joinToString(" ") }.joinToString(" ")
+        val pseudoOut : String = params.map { it.capitalizeEachWord() }.joinToString(" ")
 
         return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
             ?.replace("#","\"${pseudoOut}\"") ?: "")
