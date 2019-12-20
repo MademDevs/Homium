@@ -3,10 +3,12 @@ package de.madem.homium.utilities
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
@@ -31,6 +33,16 @@ fun AppCompatActivity.hideKeyboard() {
     // else {
     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
     // }
+}
+
+fun ImageView.setPictureFromPath(path: String) {
+    if(path.isNotEmpty()) {
+        BitmapFactory.decodeFile(path)?.also { bitmap ->
+            this.setImageBitmap(bitmap)
+        }
+    } else {
+        this.setImageResource(R.mipmap.empty_picture)
+    }
 }
 
 fun Fragment.showToastShort(string: String) = context.showToastShort(string)

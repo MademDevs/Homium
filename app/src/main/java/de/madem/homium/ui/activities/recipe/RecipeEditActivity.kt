@@ -2,30 +2,23 @@ package de.madem.homium.ui.activities.recipe
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.view.isVisible
-import androidx.room.Database
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.models.Ingredients
 import de.madem.homium.models.Recipe
-import de.madem.homium.models.ShoppingItem
-import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithBooleanResult
-import kotlinx.android.synthetic.main.recipe_list_ingredient_row.view.*
+import de.madem.homium.utilities.setPictureFromPath
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -44,7 +37,6 @@ class RecipeEditActivity : AppCompatActivity() {
     var currentPhotoPath: String = ""
     private var recipeid: Int = -1
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_edit)
@@ -52,9 +44,7 @@ class RecipeEditActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-
         initGuiComponents()
-
 
         recipeid = intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
@@ -72,23 +62,12 @@ class RecipeEditActivity : AppCompatActivity() {
             .executeInBackground { db.recipeDao().getRecipeById(id) }
             .onDone {
                 //setting name
-               title.text = Editable.Factory.getInstance().newEditable(it.name)
+                title.text = Editable.Factory.getInstance().newEditable(it.name)
                 description.text = Editable.Factory.getInstance().newEditable(it.description)
-                setPicFromDatabse(it.image)
+                imgView.setPictureFromPath(it.image)
 
             }
             .start()
-    }
-
-    fun setPicFromDatabse(databasePhotoPath: String) {
-        // Get the dimensions of the View
-        if(databasePhotoPath.isNotEmpty()) {
-            BitmapFactory.decodeFile(databasePhotoPath)?.also { bitmap ->
-                imgView.setImageBitmap(bitmap)
-            }
-        } else {
-            imgView.setImageResource(R.mipmap.empty_picture)
-        }
     }
 
     fun addOrUpdateToDatabaseIfPossible() {
@@ -113,7 +92,7 @@ class RecipeEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.recipe_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
+            android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -185,8 +164,6 @@ class RecipeEditActivity : AppCompatActivity() {
             currentPhotoPath = absolutePath
         }
     }
-
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

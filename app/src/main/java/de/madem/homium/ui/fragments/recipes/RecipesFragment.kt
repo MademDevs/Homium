@@ -99,12 +99,9 @@ class RecipesFragment : Fragment() {
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             Toast.makeText(context, "Selected ${recipe.name}, ${recipe.uid}", Toast.LENGTH_LONG).show()
-            switchToActivity(RecipePresentation::class)
-            /*
-            Intent(activity, RecipeEditActivity::class.java)
-                .apply {putExtra("recipe", recipe.uid)}
-                .also { startActivityForResult(it, REQUEST_CODE_RECIPES) }
-             */
+            Intent(activity, RecipePresentation::class.java)
+                .apply { putExtra("recipe", recipe.uid) }
+                .also { startActivity(it)}
         }
     }
 

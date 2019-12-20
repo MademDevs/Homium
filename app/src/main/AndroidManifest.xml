@@ -59,6 +59,7 @@
         android:theme="@style/NoActionBarTheme"/>
 
         <activity android:name=".ui.activities.test.TestActivity" />
+        <activity android:name=".ui.activities.recipe.PresentationMode"/>
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:exported="false"
