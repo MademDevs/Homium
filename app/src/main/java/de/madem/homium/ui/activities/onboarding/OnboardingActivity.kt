@@ -115,6 +115,7 @@ class OnboardingActivity : AppIntro() {
         CoroutineBackgroundTask<Unit>().executeInBackground {
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
+            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),true)
         }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }

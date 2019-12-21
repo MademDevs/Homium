@@ -11,6 +11,7 @@
     <string name="setting_shopping_sort">Sortierung der Einkaufsliste</string>
     <string name="setting_shopping_sort_normal">Neuste unten anfügen</string>
     <string name="setting_shopping_sort_reversed">Neuste oben anfügen</string>
+    <string name="setting_speech_assistent_delete_question">Sicherheitsfrage vor Löschaktionen</string>
 
     <!--Onboarding Headlines-->
     <string name="onboarding_welcome_headline">Willkommen zu Homium!</string>
@@ -59,6 +60,7 @@
     <string name="title_recipes">Rezepte</string>
     <string name="title_money">Bilanz</string>
     <string name="title_settings">Einstellungen</string>
+    <string name="title_speech_assistent">Sprachassistent</string>
 
     <!-- shopping list texts-->
     <string name="shopping_list_delete_question">Sollen die ausgewählten Listenelemente wirklich gelöscht löschen?</string>
@@ -189,4 +191,5 @@
     <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
     <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
+    <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
 </resources>
