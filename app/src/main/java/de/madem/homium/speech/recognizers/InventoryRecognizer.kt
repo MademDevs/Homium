@@ -178,8 +178,8 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
 
     private fun matchClearInventory() : CoroutineBackgroundTask<Boolean>{
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,R.string.assistent_question_delete_all_inventory).executeInBackground {
-
+        //creating functions
+        val backgroundFunc : () -> Boolean = {
             if(inventoryDao.inventorySize() != 0){
                 inventoryDao.clearInventory()
 
@@ -188,15 +188,15 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             else{
                 false
             }
+        }
 
-        }.onDone {sucess ->
-
-            if(sucess){
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
                 ViewRefresher.inventoryRefresher.invoke()
             }
 
             contextRef.get().notNull {cntxt ->
-                if(sucess){
+                if(success){
                     cntxt.showToastShort(R.string.notification_remove_all_inventoryitems)
                 }
                 else{
@@ -204,7 +204,23 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                 }
             }
 
+        }
 
+
+        //returning task
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,R.string.assistent_question_delete_all_inventory).executeInBackground {
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>().executeInBackground {
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
         }
     }
 
@@ -242,44 +258,59 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
             deleteIndication(name,withQutationMarks = true)
         }
 
-
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
-            .executeInBackground {
-
-                if(!(inventoryDao.getAllInventoryItemNames().contains(name))){
-                    return@executeInBackground false
-                }
-
-                if(allShouldBeDeleted){
-                    val products = AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
-
-                    if(products.isNotEmpty()){
-                        inventoryDao.deleteInventoryItemByName(products[0].plural)
-                        inventoryDao.deleteInventoryItemByName(products[0].name)
-                    }
-                }
-
-                inventoryDao.deleteInventoryItemByName(name)
-
-                true
-
-            }.onDone {success ->
-
-                if(success){
-                    val sucessMsg = getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
-                    contextRef.get().notNull {
-                        Toast.makeText(it,sucessMsg, Toast.LENGTH_SHORT).show()
-                    }
-                    ViewRefresher.inventoryRefresher.invoke()
-                }
-                else{
-                    val failMsg = getStringRessource(R.string.assistent_msg_delete_failed)
-                    contextRef.get().notNull {
-                        Toast.makeText(it,failMsg, Toast.LENGTH_SHORT).show()
-                    }
-                }
-
+        //creating functions
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
+            if(!(inventoryDao.getAllInventoryItemNames().contains(name))){
+                return@backgroundFunc false
             }
+
+            if(allShouldBeDeleted){
+                val products = AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+
+                if(products.isNotEmpty()){
+                    inventoryDao.deleteInventoryItemByName(products[0].plural)
+                    inventoryDao.deleteInventoryItemByName(products[0].name)
+                }
+            }
+
+            inventoryDao.deleteInventoryItemByName(name)
+
+            return@backgroundFunc true
+        }
+
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
+                val sucessMsg = getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
+                contextRef.get().notNull {
+                    Toast.makeText(it,sucessMsg, Toast.LENGTH_SHORT).show()
+                }
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+            else{
+                val failMsg = getStringRessource(R.string.assistent_msg_delete_failed)
+                contextRef.get().notNull {
+                    Toast.makeText(it,failMsg, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        //returning right task
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
+                .executeInBackground {
+                    backgroundFunc.invoke()
+                }.onDone {success ->
+                    onDoneFunc(success)
+                }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
+                    backgroundFunc.invoke()
+                }.onDone {success ->
+                    onDoneFunc(success)
+                }
+        }
     }
 
     private fun matchDeleteItemWithAllParams(command : String) : CoroutineBackgroundTask<Boolean>?{
@@ -312,23 +343,25 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         val itemStr = params.map { it.capitalizeEachWord() }.joinToString(" ")
         val msg = deleteIndication(replacement = itemStr,withQutationMarks = true)
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
-
+        //creating functions
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
             if(!(inventoryDao.getAllInventoryItemNames().contains(params[2].capitalizeEachWord()))){
-                return@executeInBackground false
+                return@backgroundFunc false
             }
 
             val item : InventoryItem?= parser.parseInventoryWithoutLocation(params)
 
-            if(item != null){
+            return@backgroundFunc if(item != null){
                 inventoryDao.deleteInventoryByNameCountUnit(item.name,item.count,item.unit)
                 true
             }
             else{
                 false
             }
-        }.onDone { sucess ->
-            if(sucess){
+        }
+
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
                 contextRef.get().notNull {
                     Toast.makeText(it,getStringRessource(R.string.assistent_msg_inventoryitem_with_param_deleted).replace("#","\"$itemStr\""),
                         Toast.LENGTH_SHORT).show();
@@ -339,6 +372,21 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
                 contextRef.get().notNull {
                     it.showToastShort(R.string.errormsg_delete_inventory_failed)
                 }
+            }
+        }
+
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
+                backgroundFunc()
+            }.onDone { success ->
+                onDoneFunc(success)
+            }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>().executeInBackground {
+                backgroundFunc()
+            }.onDone { success ->
+                onDoneFunc(success)
             }
         }
     }
@@ -378,42 +426,59 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
 
         val itemStr = params.map { it.capitalizeEachWord() }.joinToString(" ")
 
+        //creating functions
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
+            val searchCount = params.first().trim().toIntOrNull()
+            val searchName = params.last().trim().capitalizeEachWord()
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,deleteIndication(replacement = itemStr,withQutationMarks = true))
-            .executeInBackground {
-
-                val searchCount = params.first().trim().toIntOrNull()
-                val searchName = params.last().trim().capitalizeEachWord()
-
-                if(!(inventoryDao.getAllInventoryItemNames().contains(searchName))){
-                    return@executeInBackground false
-                }
-
-                if(searchCount != null){
-                    inventoryDao.deleteInventoryByNameCount(searchName,searchCount)
-                    true
-                }
-                else{
-                    false
-                }
-
-
-
+            if(!(inventoryDao.getAllInventoryItemNames().contains(searchName))){
+                return@backgroundFunc false
             }
-            .onDone {sucess ->
-                if(sucess){
-                    contextRef.get().notNull {
-                        Toast.makeText(it,getStringRessource(R.string.assistent_msg_inventoryitem_with_param_deleted).replace("#","\"$itemStr\""),
-                            Toast.LENGTH_SHORT).show();
-                    }
-                    ViewRefresher.inventoryRefresher.invoke()
+
+            return@backgroundFunc if(searchCount != null){
+                inventoryDao.deleteInventoryByNameCount(searchName,searchCount)
+                true
+            }
+            else{
+                false
+            }
+
+        }
+
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
+                contextRef.get().notNull {
+                    Toast.makeText(it,getStringRessource(R.string.assistent_msg_inventoryitem_with_param_deleted).replace("#","\"$itemStr\""),
+                        Toast.LENGTH_SHORT).show();
                 }
-                else{
-                    contextRef.get().notNull {
-                        it.showToastShort(R.string.errormsg_delete_inventory_failed)
-                    }
+                ViewRefresher.inventoryRefresher.invoke()
+            }
+            else{
+                contextRef.get().notNull {
+                    it.showToastShort(R.string.errormsg_delete_inventory_failed)
                 }
             }
+        }
+
+        //returning right task
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,deleteIndication(replacement = itemStr,withQutationMarks = true))
+                .executeInBackground {
+                    backgroundFunc()
+                }
+                .onDone {success ->
+                    onDoneFunc(success)
+                }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
+                    backgroundFunc()
+                }
+                .onDone {success ->
+                    onDoneFunc(success)
+                }
+        }
 
 
     }
@@ -430,6 +495,10 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
         }
     }
 
+    private fun shouldAskDeleteQuestion() : Boolean{
+        return contextRef.get()?.getSetting(getStringRessource(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),Boolean::class) ?: true
+    }
+
     private fun deleteIndication(replacement : String, baseID : Int = R.string.assistent_question_delete_all_inventory_with_name,withQutationMarks : Boolean = false) : String{
         val base =contextRef.get()?.resources?.getString(baseID)
             ?: HomiumApplication.appContext?.getString(baseID)
@@ -443,4 +512,6 @@ class InventoryRecognizer(val contextRef : WeakReference<Context>) : PatternReco
 
         return cntxt.resources.getString(id)
     }
+
+
 }
