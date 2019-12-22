@@ -24,19 +24,15 @@ class RecipePresentation: AppCompatActivity() {
 
     private lateinit var dao: RecipeDao
     private lateinit var imgView: ImageView
-    private lateinit var txtView: TextView
     private lateinit var recipe: Recipe
     private lateinit var coltoolbar: CollapsingToolbarLayout
     private lateinit var toolbar: Toolbar
-    private lateinit var startBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_presentation)
-        txtView = findViewById(R.id.presentation_txtView)
         imgView = findViewById(R.id.presentation_imgView)
         coltoolbar = findViewById(R.id.collapsingToolbar)
-        startBtn = findViewById(R.id.presentation_start_btn)
         toolbar = findViewById(R.id.toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
         toolbar.setNavigationOnClickListener {
@@ -55,12 +51,10 @@ class RecipePresentation: AppCompatActivity() {
                 .onDone { recipe = it; setRecipeToView(it)}
                 .start()
         }
-        startBtn.setOnClickListener { startActivity(Intent(this, PresentationMode::class.java).putExtra("recipeId", recipe.uid)) }
     }
 
     private fun setRecipeToView(recipe: Recipe) {
         coltoolbar.title = recipe.name
-        txtView.text = recipe.description
         imgView.setPictureFromPath(recipe.image)
         toolbar.title = recipe.uid.toString()
     }

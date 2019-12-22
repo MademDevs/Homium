@@ -98,7 +98,7 @@ class RecipesFragment : Fragment() {
         val adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
-            Toast.makeText(context, "Selected ${recipe.name}, ${recipe.uid}", Toast.LENGTH_LONG).show()
+            println(recipe.uid)
             Intent(activity, RecipePresentation::class.java)
                 .apply { putExtra("recipe", recipe.uid) }
                 .also { startActivity(it)}
