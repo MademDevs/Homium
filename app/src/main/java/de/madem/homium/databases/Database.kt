@@ -9,7 +9,7 @@ import de.madem.homium.models.*
 
 
 @Database(
-    entities = [Product::class, ShoppingItem::class, InventoryItem::class, Recipe::class, Ingredients::class],
+    entities = [Product::class, ShoppingItem::class, InventoryItem::class, Recipe::class, RecipeIngredient::class, RecipeDescription::class],
     version = 1, exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

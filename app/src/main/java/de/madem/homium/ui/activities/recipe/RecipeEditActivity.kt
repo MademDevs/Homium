@@ -41,8 +41,6 @@ class RecipeEditActivity : AppCompatActivity() {
     var currentPhotoPath: String = ""
     private var recipeid: Int = -1
 
-
-    //lifecycle functions
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_edit)
@@ -50,9 +48,7 @@ class RecipeEditActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-
         initGuiComponents()
-
 
         recipeid = intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
@@ -120,26 +116,15 @@ class RecipeEditActivity : AppCompatActivity() {
             .executeInBackground { db.recipeDao().getRecipeById(id) }
             .onDone {
                 //setting name
-               title.text = Editable.Factory.getInstance().newEditable(it.name)
+                title.text = Editable.Factory.getInstance().newEditable(it.name)
                 description.text = Editable.Factory.getInstance().newEditable(it.description)
-                setPicFromDatabase(it.image)
+                imgView.setPictureFromPath(it.image)
 
             }
             .start()
     }
 
-    private fun setPicFromDatabase(databasePhotoPath: String) {
-        // Get the dimensions of the View
-        if(databasePhotoPath.isNotEmpty()) {
-            BitmapFactory.decodeFile(databasePhotoPath)?.also { bitmap ->
-                imgView.setImageBitmap(bitmap)
-            }
-        } else {
-            imgView.setImageResource(R.mipmap.empty_picture)
-        }
-    }
-
-    private fun addOrUpdateToDatabaseIfPossible() {
+    fun addOrUpdateToDatabaseIfPossible() {
         val name: String = title.text.toString()
         val details: String = description.text.toString()
 
@@ -158,6 +143,13 @@ class RecipeEditActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.recipe_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
 
     private fun initGuiComponents() {
@@ -219,6 +211,17 @@ class RecipeEditActivity : AppCompatActivity() {
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            /*
+            val imageBitmap = data?.extras?.get("data") as Bitmap
+            imgView.setImageBitmap(imageBitmap)
+             */
+            setPic()
         }
     }
 

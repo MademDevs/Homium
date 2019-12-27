@@ -1,19 +1,17 @@
 package de.madem.homium.managers.adapters
 
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
-import de.madem.homium.models.Ingredients
 import de.madem.homium.models.Recipe
+import de.madem.homium.utilities.setPictureFromPath
 
 class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>)
     : RecyclerView.Adapter<RecipesListAdapter.RecipesViewHolder>() {
@@ -53,7 +51,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
         with(holder) {
             txtName.text = recipe.name
             //set Image!!
-            setPic(image, recipe.image)
+            image.setPictureFromPath(recipe.image)
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     shortClickListener(recipe, this)
@@ -62,16 +60,6 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
         }
     }
 
-    private fun setPic(imgView: ImageView, currentPhotoPath: String) {
-        // Get the dimensions of the View
-        if(currentPhotoPath.isNotEmpty()) {
-            BitmapFactory.decodeFile(currentPhotoPath)?.also { bitmap ->
-                imgView.setImageBitmap(bitmap)
-            }
-        } else {
-            imgView.setImageResource(R.mipmap.empty_picture)
-        }
-    }
 
     class RecipesViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val txtName = itemView.findViewById<TextView>(R.id.txtView_recipesName)

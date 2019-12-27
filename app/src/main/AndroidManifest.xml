@@ -63,7 +63,12 @@
         <activity
             android:name=".ui.activities.recipe.RecipeEditActivity"
             android:parentActivityName=".ui.activities.main.MainActivity" />
+        <activity
+            android:name=".ui.activities.recipe.RecipePresentation"
+        android:theme="@style/NoActionBarTheme"/>
+
         <activity android:name=".ui.activities.test.TestActivity" />
+        <activity android:name=".ui.activities.recipe.PresentationMode"/>
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:exported="false"

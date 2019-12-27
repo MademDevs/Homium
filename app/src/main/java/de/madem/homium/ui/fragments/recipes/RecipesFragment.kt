@@ -23,6 +23,7 @@ import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
+import de.madem.homium.ui.activities.recipe.RecipePresentation
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.showToastShort
 import de.madem.homium.utilities.switchToActivity
@@ -97,10 +98,10 @@ class RecipesFragment : Fragment() {
         val adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
-            Toast.makeText(context, "Selected ${recipe.name}, ${recipe.uid}", Toast.LENGTH_LONG).show()
-            Intent(activity, RecipeEditActivity::class.java)
-                .apply {putExtra("recipe", recipe.uid)}
-                .also { startActivityForResult(it, REQUEST_CODE_RECIPES) }
+            println(recipe.uid)
+            Intent(activity, RecipePresentation::class.java)
+                .apply { putExtra("recipe", recipe.uid) }
+                .also { startActivity(it)}
         }
     }
 
