@@ -13,7 +13,7 @@ import android.widget.NumberPicker
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.models.Ingredients
+import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.finishWithResultData
@@ -23,7 +23,7 @@ import de.madem.homium.utilities.showToastShort
 class IngredientEditActivity : AppCompatActivity() {
 
     //fields
-    private var ingredient : Ingredients? = null
+    private var ingredient : RecipeIngredient? = null
 
     private lateinit var valuesForCountPicker : List<String>
     private lateinit var valuesForUnitPicker : List<String>
@@ -265,7 +265,7 @@ class IngredientEditActivity : AppCompatActivity() {
     private fun getIngredientFromDatabase(id : Int){
 
         if(id >= 0){
-           CoroutineBackgroundTask<Ingredients?>().executeInBackground{
+           CoroutineBackgroundTask<RecipeIngredient>().executeInBackground{
                 dao.getIngredientById(id)
            }.onDone { result ->
                 result.notNull {

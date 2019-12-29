@@ -57,6 +57,13 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                     shortClickListener(recipe, this)
                 }
             }
+            itemView.setOnLongClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    longClickListener(recipe, this)
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -64,6 +71,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
     class RecipesViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val txtName = itemView.findViewById<TextView>(R.id.txtView_recipesName)
         val image = itemView.findViewById<ImageView>(R.id.recipes_imgView)
+
     }
 
 }
