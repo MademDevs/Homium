@@ -2,23 +2,20 @@ package de.madem.homium.speech
 
 import android.content.Context
 import android.widget.Toast
-import androidx.core.text.isDigitsOnly
-import androidx.fragment.app.FragmentActivity
 import de.madem.homium.R
-import de.madem.homium.databases.AppDatabase
-import de.madem.homium.models.ShoppingItem
-import de.madem.homium.models.Units
+import de.madem.homium.speech.recognizers.InventoryRecognizer
+import de.madem.homium.speech.recognizers.PatternRecognizer
 import de.madem.homium.speech.recognizers.ShoppingRecognizer
 import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.UserRequestedCoroutineBackgroundTask
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import java.lang.ref.WeakReference
 
 class SpeechAssistent(val context: Context) {
 
     //fields
-    val shoppingRecognizer = ShoppingRecognizer(context)
+
+    private val recognizers = listOf<PatternRecognizer>(
+        ShoppingRecognizer(WeakReference<Context>(context)),
+        InventoryRecognizer(WeakReference<Context>(context)))
 
     //public function
     fun executeCommand(command : String){
@@ -26,7 +23,19 @@ class SpeechAssistent(val context: Context) {
         val formattedCommand = replaceNumberWords(command.toLowerCase())
 
         CoroutineBackgroundTask<CoroutineBackgroundTask<Boolean>?>().executeInBackground {
-            shoppingRecognizer.matchingTask(formattedCommand)
+            var resultTask : CoroutineBackgroundTask<Boolean>? = null
+
+            for(rec in recognizers){
+                val result = rec.matchingTask(formattedCommand)
+                if(result != null){
+                    resultTask = result
+                    break
+                }
+
+            }
+
+            return@executeInBackground resultTask
+
         }.onDone {task ->
             task?.start() ?: saySorry()
 

@@ -12,6 +12,13 @@
     <string name="setting_shopping_sort_normal">Neuste unten anfügen</string>
     <string name="setting_shopping_sort_reversed">Neuste oben anfügen</string>
 
+    <!--Onboarding Headlines-->
+    <string name="onboarding_welcome_headline">Willkommen zu Homium!</string>
+    <string name="onboarding_shopping_headline">So verwendest du die Einkaufsliste</string>
+    <string name="onboarding_comingSoon_headline">Coming Soon ;)</string>
+    <string name="onboarding_recipe_headline">Erstelle eigene Rezepte</string>
+    <string name="onboarding_speachAssistant_headline">Der Sprachassistent zur leichteren Bedienung</string>
+
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
     Es folgt eine kleine Erklärung zur Bedienung der App</string>
@@ -20,6 +27,12 @@
         die eingekauften Elemente per Swipe von der Liste. Ein Bearbeiten ist ganz einfach per langem Tippen möglich. </string>
 
     <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
+
+    <string name="onboarding_speachAssistant">Für eine intuitivere Bedienung ist der Homium-Sprachassistent eine Möglichkeit zum Steuern der App. Der Sprachassistenz selbst ruft nur Kommandos
+        ab, wenn er aufgerufen wird und sendet somit keine Daten ungewollt an Dritte weiter.</string>
+
+    <string name="onboarding_recipe">Verwalte deine Rezepte mit den entsprechenden Zutaten und erstelle Notizen zur Zubereitung. Verknüpfe die Rezeptverwaltung mit dem Inventar
+        und erhalte einen Überblick, was du mit den vorhandenen Lebensmitteln kochen kannst.</string>
 
     <!--screen headlines-->
     <string name="screentitle_edit_shopppingitem_add">Produkt hinzufügen</string>
@@ -91,21 +104,30 @@
     <!--Notifications for user-->
     <string name="notification_edited_shoppingitem_sucess">Produkt erfolgreich aktualisiert</string>
     <string name="notification_delete_shoppingitem_sucess">Produkt erfolgreich gelöscht</string>
-    <string name="notification_delete_inventoryitem_sucess">Produkt erfolgreich gelöscht</string>
+    <string name="notification_delete_inventoryitem_sucess">Inventarelement erfolgreich gelöscht</string>
     <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
+    <string name="notification_remove_all_inventoryitems">Das gesamte Inventar wurde erfolgreich gelöscht.</string>
     <string name="errormsg_invalid_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
     <string name="errormsg_insert_shoppingitem_failed">Fehler: Das Einkaufselement konnte nicht hinzugefügt werden. Bitte versuche es erneut.</string>
-    <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
+    <string name="errormsg_delete_shopping_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Einkaufsliste etwas schiefgegangen.</string>
+    <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte versuche es erneut oder überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
+    <string name="errormsg_delete_inventory_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Inventarliste etwas schiefgegangen.</string>
 
     <!--Speech Assistent Feedback-->
     <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
     <string name="assistent_msg_shoppingitem_added">Ein neues Einkaufselement wurde erfolgreich zur Einkaufsliste hinzugefügt.</string>
     <string name="assistent_msg_shoppingitem_with_param_deleted">Alle Einkaufselemente mit der Angabe # wurden gelöscht.</string>
-    <string name="assistent_question_delete_all_shopping">Soll die ganze Einkaufsliste wirklich gelöscht werden?</string>
+    <string name="assistent_question_delete_all_shopping">Soll wirklich die ganze Einkaufsliste gelöscht werden?</string>
     <string name="assistent_question_delete_all_shopping_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_question_delete_all_shopping_with_name_and_plural">Sollen wirklich alle Einkaufselemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
     <string name="assistent_msg_delete_failed">Leider konnte die Löschaktion aufgrund ungültiger Eingaben nicht durchgeführt werden. Bitte versuche es erneut!</string>
+    <string name="assistent_msg_inventory_added">Inventar wurde erfolgreich erweitert!</string>
+    <string name="assistent_const_inventory_default_location">Kühlschrank</string>
+    <string name="assistent_question_delete_all_inventory">Soll wirklich das gesamte Inventar gelöscht werden?</string>
+    <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
+    <string name="assistent_msg_inventoryitem_with_param_deleted">Alle Inventarelemente mit der Angabe # wurden gelöscht.</string>
+    <string name="assistent_question_delete_all_inventory_with_name_and_plural">Sollen wirklich alle Inventarelemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>

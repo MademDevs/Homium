@@ -19,3 +19,7 @@ fun <T> T?.applyNotNull(function: T.() -> Unit): T {
     }
     throw RuntimeException("Function parameter is null!")
 }
+
+fun String.capitalizeEachWord() : String{
+    return this.split(Regex(" ")).joinToString(" ") { it.capitalize() }
+}
