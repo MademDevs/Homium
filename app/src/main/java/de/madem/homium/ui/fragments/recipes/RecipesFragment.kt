@@ -7,27 +7,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
-import de.madem.homium.constants.REQUEST_CODE_RECIPES
-import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentation
-import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
-import de.madem.homium.utilities.showToastShort
 import de.madem.homium.utilities.switchToActivity
-import de.madem.homium.utilities.switchToActivityForResult
 
 class RecipesFragment : Fragment() {
 
@@ -102,6 +94,12 @@ class RecipesFragment : Fragment() {
             Intent(activity, RecipePresentation::class.java)
                 .apply { putExtra("recipe", recipe.uid) }
                 .also { startActivity(it)}
+        }
+        adapter.longClickListener = {recipe, viewHolder ->
+            Intent(activity, RecipeEditActivity::class.java)
+                .apply { putExtra("recipe", recipe.uid) }
+                .also { startActivity(it) }
+            false
         }
     }
 

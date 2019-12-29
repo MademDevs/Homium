@@ -13,16 +13,16 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.view.children
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
 import de.madem.homium.constants.REQUEST_TAKE_PHOTO
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
+import de.madem.homium.models.RecipeDescription
+import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.finishWithBooleanResult
-import de.madem.homium.utilities.notNull
-import de.madem.homium.utilities.switchToActivityForResult
+import de.madem.homium.utilities.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -33,13 +33,24 @@ class RecipeEditActivity : AppCompatActivity() {
     //fields
     private lateinit var imgView: ImageView
     private lateinit var title: EditText
-    private lateinit var description: EditText
     private lateinit var addIngredientBtn: ImageButton
+    private lateinit var ingrName: String
+    private lateinit var ingrUnit: String
+    private var ingrCount: Int = 0
+    private lateinit var recipe: Recipe
+    private var ingredients: MutableList<Ingredient> = mutableListOf()
+    private lateinit var addDescrBtn: ImageButton
+    private lateinit var description: EditText
+    private lateinit var descriptionList: List<RecipeDescription>
+    private lateinit var ingredientsList: List<RecipeIngredient>
 
     private val db = AppDatabase.getInstance()
 
     var currentPhotoPath: String = ""
     private var recipeid: Int = -1
+    private var descrCounter: Int = 0
+
+    data class Ingredient(val count: Int, val unit: String, val name: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,20 +72,21 @@ class RecipeEditActivity : AppCompatActivity() {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.recipe_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if(menu != null){
             menuInflater.inflate(R.menu.recipe_edit_actionbar_menu,menu)
         }
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun addDescription() {
+        descrCounter++
+        val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
+        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+        view.findViewById<TextView>(R.id.descr_count).text = descrCounter.toString()
+        description = view.findViewById(R.id.descr_editTxt)
+        descrLayout.addView(view)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -85,18 +97,24 @@ class RecipeEditActivity : AppCompatActivity() {
                 REQUEST_TAKE_PHOTO -> setPic()
                 REQUEST_CODE_ADD_INGREDIENT -> {
                     data.notNull { dataIntent ->
-                        val name : String? = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name))
-                        val count : Int? = dataIntent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_count),0)
-                            .takeIf { it > 0 }
-                        val unit : String? = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_unit))
+                        ingrName = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name)) ?: ""
+                        ingrCount = dataIntent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_count),0)
+                        ingrUnit = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_unit)) ?: ""
+                        val ingredient = Ingredient(ingrCount, ingrUnit, ingrName)
+                        ingredients.add(ingredient)
                         //TODO: Add logic for adding an Ingredient
-
-                        println("RESULT IN RECIPEACTIVITY: Name : $name, Count : $count, unit: $unit")
-
+                        val ingrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_ingr)
+                        val view = layoutInflater.inflate(R.layout.recipe_edit_ingredient, null)
+                        view.findViewById<TextView>(R.id.ingredien_amount_txt).text = ingredient.count.toString()
+                        view.findViewById<TextView>(R.id.ingredient_unit_txt).text = ingredient.unit
+                        view.findViewById<TextView>(R.id.ingredient_name_txt).text = ingredient.name
+                        ingrLayout.addView(view)
                     }
                 }
             }
         }
+
+
 
         /*
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
@@ -117,35 +135,99 @@ class RecipeEditActivity : AppCompatActivity() {
             .onDone {
                 //setting name
                 title.text = Editable.Factory.getInstance().newEditable(it.name)
-                description.text = Editable.Factory.getInstance().newEditable(it.description)
                 imgView.setPictureFromPath(it.image)
-
+                currentPhotoPath = it.image
             }
+            .start()
+        CoroutineBackgroundTask<List<RecipeIngredient>>()
+            .executeInBackground { db.recipeDao().getIngredientByRecipeId(id) }
+            .onDone { ingredientsList = it; setIngredients(it) }
+            .start()
+        CoroutineBackgroundTask<List<RecipeDescription>>()
+            .executeInBackground { db.recipeDao().getDescriptionByRecipeId(id) }
+            .onDone { descriptionList = it; setDescription(it) }
             .start()
     }
 
-    fun addOrUpdateToDatabaseIfPossible() {
-        val name: String = title.text.toString()
-        val details: String = description.text.toString()
+    private fun setIngredients(list: List<RecipeIngredient>) {
+        for(el in list) {
+            val ingrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_ingr)
+            val view = layoutInflater.inflate(R.layout.recipe_edit_ingredient, null)
+            view.findViewById<TextView>(R.id.ingredien_amount_txt).text = el.count.toString()
+            view.findViewById<TextView>(R.id.ingredient_unit_txt).text = el.unit
+            view.findViewById<TextView>(R.id.ingredient_name_txt).text = el.name
+            ingrLayout.addView(view)
+        }
+    }
 
-        if(name.isNotBlank() && details.isNotBlank()){
-            //all input components are valid -> creating object and put it into database via coroutine
-            val recipe = Recipe(name, details, currentPhotoPath)
-            CoroutineBackgroundTask<Unit>().executeInBackground {
-                db.recipeDao().insertRecipe(recipe)
-            }.onDone {
-                finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
-            }.start()
+    private fun setDescription(list: List<RecipeDescription>) {
+        var counter = 0
+        for(el in list) {
+            counter++
+            val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
+            val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+            view.findViewById<TextView>(R.id.descr_count).text = counter.toString()
+            view.findViewById<EditText>(R.id.descr_editTxt).text = Editable.Factory.getInstance().newEditable(el.description)
+            descrLayout.addView(view)
         }
-        else{
-            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_parameters),
-                Toast.LENGTH_LONG).show()
-        }
+    }
+
+    private fun addOrUpdateToDatabaseIfPossible() {
+        val name: String = title.text.toString()
+        val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
+
+            if (name.isNotBlank()) {
+                //all input components are valid -> creating object and put it into database via coroutine
+                val recipe = Recipe(name, currentPhotoPath)
+                CoroutineBackgroundTask<Unit>().executeInBackground {
+                    //Update method in Dao not working properly, so deleting first, then adding new
+                    if(recipeid > 0) {
+                        db.recipeDao().deleteRecipe(Recipe(recipe.name, recipe.image, recipeid))
+                        db.recipeDao().deleteDescriptionByRecipeId(recipeid)
+                        db.recipeDao().deleteIngredientByRecipeId(recipeid)
+                        ingredientsList.forEach {
+                            db.recipeDao().insertIngredient(RecipeIngredient(it.name, it.count, it.unit, recipeid))
+                        }
+                    }
+                    recipeid = db.recipeDao().insertRecipe(recipe).toInt()
+                    println("RecipeID add: $recipeid")
+                    //add newly added ingredients
+                    ingredients.forEach {
+                        db.recipeDao().insertIngredient(
+                            RecipeIngredient(
+                                it.name,
+                                it.count,
+                                it.unit,
+                                recipeid
+                            )
+                        )
+                    }
+                    //add old ingredients (saved in list oncreateview)
+
+                    //description in edittext, so saving in 1 go
+                    for (el in descrLayout.children) {
+                        db.recipeDao().insertDescription(
+                            RecipeDescription(
+                                el.findViewById<EditText>(R.id.descr_editTxt).text.toString(),
+                                recipeid
+                            )
+                        )
+                    }
+                }.onDone {
+                    finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
+                }.start()
+            } else {
+                Toast.makeText(
+                    this, resources.getString(R.string.errormsg_invalid_parameters),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.recipe_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
+            R.id.recipe_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
@@ -155,22 +237,16 @@ class RecipeEditActivity : AppCompatActivity() {
     private fun initGuiComponents() {
         imgView = findViewById(R.id.recipe_edit_imgView)
         title = findViewById(R.id.recipe_edit_title_editTxt)
-        description = findViewById(R.id.recipe_edit_description_editTxt)
         addIngredientBtn = findViewById(R.id.recipe_edit_addIngredient_btn)
         imgView.setOnClickListener { dispatchTakePictureIntent() }
         addIngredientBtn.setOnClickListener { addIngredient() }
+        addDescrBtn = findViewById(R.id.recipe_edit_addDescription_btn)
+        addDescrBtn.setOnClickListener { addDescription() }
     }
 
     private fun addIngredient() {
         //TODO: Start AddIngredients-Activity and insert selected values in textfields
         switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class)
-
-        val recipeLayout = findViewById<LinearLayout>(R.id.recipe_edit_linlayout)
-        val view = layoutInflater.inflate(R.layout.recipe_list_ingredient_row, null)
-        view.findViewById<TextView>(R.id.ingredien_amount_txt).text = "1"
-        view.findViewById<TextView>(R.id.ingredient_unit_txt).text = "Stück"
-        view.findViewById<TextView>(R.id.ingredient_name_txt).text = "Butter"
-        recipeLayout.addView(view, 0)
     }
 
     private fun dispatchTakePictureIntent() {
@@ -214,16 +290,6 @@ class RecipeEditActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            /*
-            val imageBitmap = data?.extras?.get("data") as Bitmap
-            imgView.setImageBitmap(imageBitmap)
-             */
-            setPic()
-        }
-    }
 
     private fun setPic() {
         // Get the dimensions of the View

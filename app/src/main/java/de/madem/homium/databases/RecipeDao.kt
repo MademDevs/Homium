@@ -1,9 +1,6 @@
 package de.madem.homium.databases
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import de.madem.homium.models.Ingredients
+import androidx.room.*
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -12,8 +9,11 @@ import de.madem.homium.models.ShoppingItem
 @Dao
 interface RecipeDao {
 
+    @Query("SELECT * FROM ingredients")
+    fun getAllIngredients(): List<RecipeIngredient>
+
     @Insert
-    fun insertRecipe(vararg item: Recipe)
+    fun insertRecipe(item: Recipe): Long
 
     @Query("DELETE FROM recipe")
     fun deleteAllRecipe()
@@ -42,6 +42,24 @@ interface RecipeDao {
     @Query("DELETE FROM descriptions")
     fun deleteAllDescription()
 
-    //TODO: Queries for Recipe and Ingredients!
+    @Query("SELECT * FROM ingredients WHERE uid = :id")
+    fun getIngredientById(id: Int): RecipeIngredient
 
+    @Update
+    fun updateRecipe(vararg recipes: Recipe)
+
+    @Update
+    fun updateDescription(vararg descriptions: RecipeDescription)
+
+    @Update
+    fun updateIngredients(vararg ingredients: RecipeIngredient)
+
+    @Delete
+    fun deleteRecipe(vararg recipes: Recipe)
+
+    @Query("DELETE FROM descriptions WHERE recipeId = :id")
+    fun deleteDescriptionByRecipeId(id: Int)
+
+    @Query("DELETE FROM ingredients WHERE recipeId = :id")
+    fun deleteIngredientByRecipeId(id: Int)
 }

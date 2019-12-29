@@ -34,7 +34,10 @@ class RecipesViewModel : ViewModel() {
 
     fun deleteAllRecipes(callback: () -> Unit){
         CoroutineBackgroundTask<Unit>()
-            .executeInBackground { db.recipeDao().deleteAllRecipe() }
+            .executeInBackground {
+                db.recipeDao().deleteAllRecipe()
+                db.recipeDao().deleteAllIngredient()
+            }
             .onDone { callback() }
             .start()
         deleteImages()
