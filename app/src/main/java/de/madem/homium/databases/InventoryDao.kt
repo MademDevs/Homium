@@ -39,10 +39,26 @@ interface InventoryDao {
     @Query("SELECT name FROM inventoryItem;")
     fun getAllInventoryItemNames(): List<String>
 
+    @Query("SELECT location FROM inventoryItem;")
+    fun getAllInventoryLocations(): List<String>
+
     @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count AND unit LIKE :unit")
     fun deleteInventoryByNameCountUnit(name: String, count: Int, unit : String)
 
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND location LIKE :location")
+    fun deleteInventoryItemByNameLocation(name : String, location: String)
+
     @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count")
     fun deleteInventoryByNameCount(name: String, count: Int)
+
+    @Query("DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count AND location LIKE :location")
+    fun deleteInventoryByNameCountLocation(name: String, count: Int, location: String)
+
+    @Query("""DELETE FROM inventoryItem WHERE name LIKE :name AND count = :count 
+            AND unit LIKE :unit AND location LIKE :location""")
+    fun deleteInventory(name : String, count: Int, unit: String, location: String)
+
+    @Query("DELETE FROM inventoryItem WHERE location LIKE :location")
+    fun clearLocation(location: String)
 
 }

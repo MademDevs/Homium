@@ -11,6 +11,7 @@
     <string name="setting_shopping_sort">Sortierung der Einkaufsliste</string>
     <string name="setting_shopping_sort_normal">Neuste unten anfügen</string>
     <string name="setting_shopping_sort_reversed">Neuste oben anfügen</string>
+    <string name="setting_speech_assistent_delete_question">Sicherheitsfrage vor Löschaktionen</string>
 
     <!--Onboarding Headlines-->
     <string name="onboarding_welcome_headline">Willkommen zu Homium!</string>
@@ -59,6 +60,7 @@
     <string name="title_recipes">Rezepte</string>
     <string name="title_money">Bilanz</string>
     <string name="title_settings">Einstellungen</string>
+    <string name="title_speech_assistent">Sprachassistent</string>
 
     <!-- shopping list texts-->
     <string name="shopping_list_delete_question">Sollen die ausgewählten Listenelemente wirklich gelöscht löschen?</string>
@@ -125,9 +127,15 @@
     <string name="assistent_msg_inventory_added">Inventar wurde erfolgreich erweitert!</string>
     <string name="assistent_const_inventory_default_location">Kühlschrank</string>
     <string name="assistent_question_delete_all_inventory">Soll wirklich das gesamte Inventar gelöscht werden?</string>
-    <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Einkaufselemente mit der Angabe # gelöscht werden?</string>
+    <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Inventarelemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_msg_inventoryitem_with_param_deleted">Alle Inventarelemente mit der Angabe # wurden gelöscht.</string>
     <string name="assistent_question_delete_all_inventory_with_name_and_plural">Sollen wirklich alle Inventarelemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
+    <string name="assistent_question_delete_all_inventory_with_location">Sollen wirklich alle Inventarelemente mit der Angabe # aus dem Ort ~ gelöscht werden?</string>
+    <string name="assistent_msg_inventoryitem_with_param_deleted_with_location">Alle Inventarelemente mit der Angabe # wurden aus dem Ort ~ gelöscht.</string>
+    <string name="assistent_question_delete_all_inventory_with_name_and_plural_with_location">Sollen wirklich alle Inventarelemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
+
+    <string name="assistent_question_clear_location">Sollen wirklich alle Elemente aus dem Ort ~ gelöscht werden?</string>
+    <string name="assistent_msg_clear_location">Alle Elemente aus dem Ort ~ wurden gelöscht.</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
@@ -189,4 +197,5 @@
     <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
     <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
+    <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
 </resources>

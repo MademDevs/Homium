@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.main_actionbar_speech_assistent -> {
                 try {
+                    //speechAssistent?.executeCommand("Lege 2 Bananen in die Gefriertruhe")
                     startSpeechRecognition(REQUEST_CODE_SPEECH, Locale.GERMAN)
                 }
                 catch (ex : SpeechRecognitionException){
