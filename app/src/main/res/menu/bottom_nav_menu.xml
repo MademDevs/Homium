@@ -16,10 +16,10 @@
         android:icon="@drawable/baseline_receipt_black_18dp"
         android:title="@string/title_recipes" />
 
-    <item
+    <!--<item
         android:id="@+id/navigation_money"
         android:icon="@drawable/baseline_attach_money_black_18dp"
-        android:title="@string/title_money" />
+        android:title="@string/title_money" />-->
 
     <item
         android:id="@+id/navigation_settings"
