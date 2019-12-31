@@ -11,6 +11,12 @@
     <string name="setting_shopping_sort">Sortierung der Einkaufsliste</string>
     <string name="setting_shopping_sort_normal">Neuste unten anfügen</string>
     <string name="setting_shopping_sort_reversed">Neuste oben anfügen</string>
+    <string name="setting_shopping_check_behaviour">Sollen abgehakte Items beim Swipen in die Inventarliste verschoben werden?</string>
+    <string name="setting_shopping_check_behaviour_always">Immer</string>
+    <string name="setting_shopping_check_behaviour_never">Nie</string>
+    <string name="setting_shopping_check_behaviour_question">Jedes Mal Fragen</string>
+    <string name="setting_shopping_check_behaviour_question_alert_message">Sollen die abgehakte Items in die Inventarliste verschoben werden?</string>
+
     <string name="setting_speech_assistent_delete_question">Sicherheitsfrage vor Löschaktionen</string>
 
     <!--Onboarding Headlines-->
@@ -198,4 +204,5 @@
     <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
+    <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
 </resources>

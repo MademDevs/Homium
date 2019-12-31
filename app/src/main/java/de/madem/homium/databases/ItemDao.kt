@@ -29,6 +29,9 @@ interface ItemDao {
     @Query("SELECT * FROM shoppingItem")
     fun getAllShopping(): List<ShoppingItem>
 
+    @Query("SELECT * FROM shoppingItem WHERE checked = 1")
+    fun getAllCheckedShoppingItem(): List<ShoppingItem>
+
     @Query("SELECT * FROM shoppingItem ORDER BY uid DESC")
     fun getAllShoppingReversedOrder(): List<ShoppingItem>
 
