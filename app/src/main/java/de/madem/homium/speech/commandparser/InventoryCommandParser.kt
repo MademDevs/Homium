@@ -18,6 +18,59 @@ class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
         private const val fridgeConst = "Kühlschrank"
     }
 
+    fun parseInventory(args: List<String>): InventoryItem?{
+        //name
+        val name = args[2].trim().capitalizeEachWord()
+
+        if(name.isEmpty() || name.isBlank()){
+            return null
+        }
+
+        //count
+        val count = args[0].toIntOrNull() ?: return null
+
+        //unit
+        var unit : String = args[1].trim().capitalize()
+
+        if(unit == "Kilo"){
+            unit = contextRef.get()?.resources?.getString(R.string.data_units_kilogram) ?: "Kilogramm"
+        }
+
+
+        if(unit.contains(Units.PACK.getString())){
+            unit = unit.replace("en","")
+        }
+        else if (!(Units.stringShortcuts().contains(unit.toLowerCase()) || Units.stringValueArray().contains(unit))){
+            return null
+        }
+
+        //location
+        val location = args[3].trim().capitalize().takeIf { it.isNotEmpty() && it.isNotBlank() } ?: getInventoryDefaultLocation()
+
+        return InventoryItem(name,count, Units.shortCutToLongValue(unit), location)
+    }
+
+    suspend fun parseInventoryWithoutUnit(args : List<String>) : InventoryItem? = coroutineScope{
+        //getting pseudo inventory item
+        val args3 = args.slice(0..1)
+        val pseudoItem : InventoryItem = parseInventoryWithoutLocationUnit(args.slice(0..1))
+            ?: return@coroutineScope null
+
+        //getting location
+        return@coroutineScope if(args[2].isEmpty() || args[2].isBlank()) pseudoItem
+        else InventoryItem(pseudoItem.name,pseudoItem.count,pseudoItem.unit,args[2].trim().capitalize())
+
+    }
+
+    suspend fun parserInventoryWithoutUnitCount(args : List<String>) : InventoryItem? = coroutineScope {
+        //getting pseudo inventory item
+        val pseudoItem : InventoryItem = parseInventoryWithoutLocationUnitCount(args[0])
+            ?: return@coroutineScope null
+
+        return@coroutineScope if(args[1].isEmpty() || args[1].isBlank()) pseudoItem
+        else InventoryItem(pseudoItem.name,pseudoItem.count,pseudoItem.unit,args[1].trim().capitalize())
+    }
+
     fun parseInventoryWithoutLocation(args : List<String>) : InventoryItem?{
 
         //name

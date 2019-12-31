@@ -24,13 +24,13 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern()
 
-        val ADD_SHOPPING_ITEM = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
-        val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
-        val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("[sS]{1}[ei]tze ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
-        val CLEAR_SHOPPING_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [eE]{1}inkaufsliste")
-        val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
-        val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
-        val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val ADD_SHOPPING_ITEM = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("[sS]{1}[ei]tze ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        private val CLEAR_SHOPPING_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [eE]{1}inkaufsliste")
+        private val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
     }
 
     //functions
@@ -169,19 +169,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     }
 
     private fun matchClearShoppingList() : CoroutineBackgroundTask<Boolean> {
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
-            if(itemDao.shoppingListSize() != 0){
-                itemDao.deleteAllShopping()
-                true
-            }
-            else{
-                false
-            }
-
-
-
-        }.onDone {sucess ->
-
+        val onDoneFunc : (Boolean) -> Unit = {sucess ->
             contextRef.get().notNull {cntxt ->
                 if(sucess) {
                     Toast.makeText(cntxt, R.string.notification_remove_all_shoppingitems, Toast.LENGTH_SHORT).show()
@@ -195,13 +183,39 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             if(sucess){
                 ViewRefresher.shoppingRefresher.invoke()
             }
-
         }
 
+        val backgroundFunc : () -> Boolean = {
+            if(itemDao.shoppingListSize() != 0){
+                itemDao.deleteAllShopping()
+                true
+            }
+            else{
+                false
+            }
+        }
 
+        return if(shouldAskDeleteQuestion()){
+
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
+
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>().executeInBackground{
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
+        }
     }
 
     private fun matchDeleteShoppingWithName(command : String) : CoroutineBackgroundTask<Boolean>{
+
+        //getting data
         val words = DELETE_SHOPPING_WITH_NAME.find(command)?.groupValues
             ?.filter{it.isNotBlank() && it.isNotEmpty()}?.map{it.trim()}?.toMutableList()
             ?.apply{
@@ -228,10 +242,10 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
             getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"${name.capitalize()}\"")
         }
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
-
+        //creating functions and return right task
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
             if(!(itemDao.getAllShoppingNames().contains(name))){
-                return@executeInBackground false
+                return@backgroundFunc false
             }
 
             if(allShouldBeDeleted){
@@ -245,9 +259,11 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
 
             itemDao.deleteShoppingByName(name)
 
-            true
-        }.onDone {sucess ->
-            if(sucess){
+            return@backgroundFunc true
+         }
+
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
                 val sucessMsg = getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"${name.capitalize()}\"")
                 contextRef.get().notNull {
                     Toast.makeText(it,sucessMsg, Toast.LENGTH_SHORT).show()
@@ -260,9 +276,24 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
                     Toast.makeText(it,failMsg, Toast.LENGTH_SHORT).show()
                 }
             }
-
-
         }
+
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>().executeInBackground {
+                backgroundFunc.invoke()
+            }.onDone {success ->
+                onDoneFunc.invoke(success)
+            }
+        }
+
+
     }
 
     private fun matchDeleteShoppingWithAllParams(command: String) : CoroutineBackgroundTask<Boolean>{
@@ -283,37 +314,54 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         println(itemStr.toUpperCase())
 
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
-            .executeInBackground{
-
-                if(!(itemDao.getAllShoppingNames().contains(params[2].capitalizeEachWord()))){
-                    return@executeInBackground false
-                }
-
-                val item : ShoppingItem?= commandParser.parseShoppingItem(params)
-
-                if(item != null){
-                    itemDao.deleteShoppingByNameCountUnit(item.name,item.count,item.unit)
-                    true
-                }
-                else{
-                    false
-                }
-
-
+        //creating functions for execution
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
+            if(!(itemDao.getAllShoppingNames().contains(params[2].capitalizeEachWord()))){
+                return@backgroundFunc false
             }
-            .onDone {sucess ->
-                if(sucess){
-                    contextRef.get().notNull {
-                        Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"$itemStr\""),
-                            Toast.LENGTH_SHORT).show();
-                    }
-                    ViewRefresher.shoppingRefresher.invoke()
-                }
-                else{
-                    saySorry()
-                }
+
+            val item : ShoppingItem?= commandParser.parseShoppingItem(params)
+
+            if(item != null){
+                itemDao.deleteShoppingByNameCountUnit(item.name,item.count,item.unit)
+                return@backgroundFunc true
             }
+            else{
+                return@backgroundFunc false
+            }
+        }
+
+        val onDoneFunc : (Boolean) -> Unit = {success ->
+            if(success){
+                contextRef.get().notNull {
+                    Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"$itemStr\""),
+                        Toast.LENGTH_SHORT).show();
+                }
+                ViewRefresher.shoppingRefresher.invoke()
+            }
+            else{
+                saySorry()
+            }
+        }
+
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
+                .executeInBackground{
+                    backgroundFunc.invoke()
+                }
+                .onDone {success ->
+                    onDoneFunc.invoke(success)
+                }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground{
+                    backgroundFunc.invoke()
+                }
+                .onDone {success ->
+                    onDoneFunc.invoke(success)
+                }
+        }
     }
 
     private fun matchDeleteShoppingWithNameQuantity(command: String) : CoroutineBackgroundTask<Boolean>?{
@@ -326,48 +374,67 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }?.takeIf { it.size == 2 } ?: command.split(" ").slice(1..2).toMutableList()
         val pseudoOut : String = params.map { it.capitalizeEachWord() }.joinToString(" ")
 
-        return UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
-            ?.replace("#","\"${pseudoOut}\"") ?: "")
-            .executeInBackground {
+        //creating functions
+        val backgroundFunc : () -> Boolean = backgroundFunc@{
+            val searchCount = params.first().trim().toIntOrNull()
+            val searchName = params.last().trim().capitalizeEachWord()
 
-
-
-                val searchCount = params.first().trim().toIntOrNull()
-                val searchName = params.last().trim().capitalizeEachWord()
-
-                if(!(itemDao.getAllShoppingNames().contains(searchName))){
-                    return@executeInBackground false
-                }
-
-                if(searchCount != null){
-                    itemDao.deleteShoppingItemByNameCount(searchName,searchCount)
-                    true
-                }
-                else{
-                    false
-                }
-
-
-
-             }
-            .onDone {sucess ->
-                if(sucess){
-                    contextRef.get().notNull {
-                        Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"$pseudoOut\""),
-                            Toast.LENGTH_SHORT).show();
-                    }
-                    ViewRefresher.shoppingRefresher.invoke()
-                }
-                else{
-                    saySorry()
-                }
+            if(!(itemDao.getAllShoppingNames().contains(searchName))){
+                return@backgroundFunc false
             }
+
+            if(searchCount != null){
+                itemDao.deleteShoppingItemByNameCount(searchName,searchCount)
+                return@backgroundFunc true
+            }
+            else{
+                return@backgroundFunc false
+            }
+
+        }
+
+        val onDoneFunc : (Boolean) -> Unit= {success ->
+            if(success){
+                contextRef.get().notNull {
+                    Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_with_param_deleted).replace("#","\"$pseudoOut\""),
+                        Toast.LENGTH_SHORT).show();
+                }
+                ViewRefresher.shoppingRefresher.invoke()
+            }
+            else{
+                saySorry()
+            }
+        }
+
+        return if(shouldAskDeleteQuestion()){
+            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
+                ?.replace("#","\"${pseudoOut}\"") ?: "")
+                .executeInBackground {
+                    backgroundFunc.invoke()
+                }
+                .onDone {success ->
+                    onDoneFunc.invoke(success)
+                }
+        }
+        else{
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
+                    backgroundFunc.invoke()
+                }
+                .onDone {success ->
+                    onDoneFunc.invoke(success)
+                }
+        }
     }
 
     //helpFunctions
     private fun getStringRessource(id : Int) : String{
         return contextRef.get()?.resources?.getString(id)
             ?: HomiumApplication.appContext!!.resources.getString(id)
+    }
+
+    private fun shouldAskDeleteQuestion() : Boolean{
+        return contextRef.get()?.getSetting(getStringRessource(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),Boolean::class) ?: true
     }
 
     // saying Sorry if somthing failed
