@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.view.children
 import de.madem.homium.R
@@ -23,6 +24,7 @@ import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
 import de.madem.homium.utilities.*
+import kotlinx.android.synthetic.main.recipe_edit_description.view.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -37,8 +39,8 @@ class RecipeEditActivity : AppCompatActivity() {
     private lateinit var ingrName: String
     private lateinit var ingrUnit: String
     private var ingrCount: Int = 0
-    private lateinit var recipe: Recipe
     private var ingredients: MutableList<Ingredient> = mutableListOf()
+    private var descriptions: MutableList<String> = mutableListOf()
     private lateinit var addDescrBtn: ImageButton
     private lateinit var description: EditText
     private lateinit var descriptionList: List<RecipeDescription>
@@ -49,18 +51,35 @@ class RecipeEditActivity : AppCompatActivity() {
     var currentPhotoPath: String = ""
     private var recipeid: Int = -1
     private var descrCounter: Int = 0
+    private var ingredientCounter: Int = 0
 
-    data class Ingredient(val count: Int, val unit: String, val name: String)
+    data class Ingredient(val id: Int, val count: Int, val unit: String, val name: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_edit)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-
         initGuiComponents()
-
+        if(savedInstanceState != null) {
+            ingredientCounter = savedInstanceState.getInt("counter")
+            for(i in 1..ingredientCounter) {
+                val item: Ingredient? = savedInstanceState.getIngredient("$i")
+                if(item != null) {
+                    ingredients.add(item)
+                }
+            }
+            descrCounter = savedInstanceState.getInt("descriptions")
+            println("Counter: $descrCounter")
+            for(i in 1..descrCounter) {
+                val item: String? = savedInstanceState.getString("$i")
+                println("beschreibung: $item")
+                if(item != null) {
+                    descriptions.add(item)
+                }
+            }
+            setIngredientsFromBundle(ingredients)
+            setDescriptionsFromBundle(descriptions)
+        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         recipeid = intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
         if(recipeid >= 0) {
@@ -69,7 +88,49 @@ class RecipeEditActivity : AppCompatActivity() {
         } else {
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
         }
+    }
 
+    private fun setDescriptionsFromBundle(list: List<String>) {
+        //FEHLER IRGENDWO HIER!!!
+        for(el in list) {
+            val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
+            val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+            view.findViewById<TextView>(R.id.descr_count).text = (list.indexOf(el)+1).toString()
+            view.findViewById<EditText>(R.id.descr_editTxt).text = Editable.Factory.getInstance().newEditable(el)
+            descrLayout.addView(view)
+        }
+    }
+
+    private fun setIngredientsFromBundle(list: List<Ingredient>) {
+        for(el in list) {
+            val ingrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_ingr)
+            val view = layoutInflater.inflate(R.layout.recipe_edit_ingredient, null)
+            view.findViewById<TextView>(R.id.ingredien_amount_txt).text = el.count.toString()
+            view.findViewById<TextView>(R.id.ingredient_unit_txt).text = el.unit
+            view.findViewById<TextView>(R.id.ingredient_name_txt).text = el.name
+            ingrLayout.addView(view)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if(ingredientCounter > 0) {
+            outState.putInt("counter", ingredientCounter)
+            for (el in ingredients) {
+                outState.putIngredient("${el.id}", el)
+            }
+        }
+        if(descrCounter > 0) {
+            outState.putInt("descriptions", descrCounter)
+            println(descrCounter)
+            val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
+            var counter: Int = 0
+            for(el in descrLayout.children) {
+                counter++
+                println("Beschreibung: ${el.findViewById<EditText>(R.id.descr_editTxt).text}")
+                outState.putString("$counter", el.findViewById<EditText>(R.id.descr_editTxt).text.toString())
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -97,10 +158,11 @@ class RecipeEditActivity : AppCompatActivity() {
                 REQUEST_TAKE_PHOTO -> setPic()
                 REQUEST_CODE_ADD_INGREDIENT -> {
                     data.notNull { dataIntent ->
+                        ingredientCounter++
                         ingrName = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name)) ?: ""
                         ingrCount = dataIntent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_count),0)
                         ingrUnit = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_unit)) ?: ""
-                        val ingredient = Ingredient(ingrCount, ingrUnit, ingrName)
+                        val ingredient = Ingredient(ingredientCounter, ingrCount, ingrUnit, ingrName)
                         ingredients.add(ingredient)
                         //TODO: Add logic for adding an Ingredient
                         val ingrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_ingr)
@@ -226,7 +288,7 @@ class RecipeEditActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
             android.R.id.home -> finish()
         }

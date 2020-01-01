@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.WindowManager
@@ -12,8 +13,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
+import de.madem.homium.models.RecipeIngredient
+import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
@@ -202,4 +206,20 @@ private fun Context.vibrateInContext() {
     } else {
         vib?.vibrate(VibrationEffect.createOneShot(30, 10))
     }
+}
+
+fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
+    this.putBundle(key, bundleOf(Pair("id", value.id), Pair("name", value.name), Pair("count", value.count), Pair("unit", value.unit)))
+}
+
+fun Bundle.getIngredient(key: String): RecipeEditActivity.Ingredient? {
+    val content = this.getBundle(key)
+    if(content != null) {
+        val id: Int = content["id"]?.toString()?.toInt()!!
+        val count: Int = content["count"]?.toString()?.toInt()!!
+        val unit: String = content["unit"]?.toString()!!
+        val name: String = content["name"]?.toString()!!
+        return RecipeEditActivity.Ingredient(id, count, unit, name)
+    }
+    return null
 }
