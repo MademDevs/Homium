@@ -8,6 +8,8 @@ import org.hamcrest.Matcher
 
 object RecyclerViewUtils {
 
+    //Source: cmp. java code of:
+    //https://stackoverflow.com/questions/31394569/how-to-assert-inside-a-recyclerview-in-espresso
     fun atPosition(position: Int, itemMatcher: Matcher<View>?): BoundedMatcher<View?, RecyclerView> {
         checkNotNull(itemMatcher)
 
