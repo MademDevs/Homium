@@ -116,6 +116,7 @@ class OnboardingActivity : AppIntro() {
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),true)
+            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),R.id.radio_check_question)
         }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }

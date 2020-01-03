@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.RadioGroup
-import android.widget.Switch
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
+import de.madem.homium.databinding.FragmentSettingsBinding
 import de.madem.homium.utilities.getSetting
 import de.madem.homium.utilities.putSetting
 
@@ -18,96 +17,123 @@ class SettingsFragment : Fragment() {
     //viewmodel
     private lateinit var settingsViewModel: SettingsViewModel
 
-    //GUI components
-    private lateinit var vibrationSwitch : Switch
-    private lateinit var radioGroupSortShopping : RadioGroup
-    private lateinit var checkBoxDeleteQuestionSpeech : CheckBox
+    //binding
+    private lateinit var binding: FragmentSettingsBinding
 
     //functions
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         settingsViewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-        val root : View = inflater.inflate(R.layout.fragment_settings, container, false)
+
+        binding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_settings, container, false
+        )
+
+        binding.lifecycleOwner = this@SettingsFragment
 
         //setup general settings
-        setupGeneralSettings(root)
+        setupGeneralSettings()
 
         //setup shopping settings
-        setupShoppingSettings(root)
+        setupShoppingSettings()
 
         //setup speech assistent settings
-        setupSpeechAssistentSettings(root)
+        setupSpeechAssistentSettings()
 
 
-        return root
+        return binding.root
     }
-
-    override fun onPause() {
-        super.onPause()
-        putSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),vibrationSwitch.isChecked)
-    }
-
-
 
     //setup functions for general settings
-    private fun setupGeneralSettings(root: View){
-        setupVibrationSwitch(root)
+    private fun setupGeneralSettings() {
+        setupVibrationSwitch()
     }
 
-    private fun setupVibrationSwitch(root: View){
+    private fun setupVibrationSwitch() {
         //setup switch
-        vibrationSwitch = root.findViewById(R.id.vibrationSwitch)
-        val vibrationEnabled : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+        binding.vibrationAllowed = getSetting(
+            resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
+            Boolean::class
+        ) ?: true
 
-
-        vibrationSwitch.isChecked = vibrationEnabled
-        vibrationSwitch.setOnCheckedChangeListener { compoundButton, checked ->
-            //putSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),checked)
+        with(binding.vibrationSwitch) {
+            setOnCheckedChangeListener { compoundButton, checked ->
+                putSetting(
+                    resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
+                    checked
+                )
+            }
         }
     }
-
-
-
 
 
     //setup functions for shopping settings
-    private fun setupShoppingSettings(root: View){
-        setupShoppingSortRadios(root)
+    private fun setupShoppingSettings() {
+        setupShoppingSortRadios()
+        setupShoppingToInventoryRadios()
     }
 
-    private fun setupShoppingSortRadios(root : View){
-        radioGroupSortShopping = root.findViewById<RadioGroup>(R.id.radioGroup_sort_shopping)
-        var checkedRadioId : Int = getSetting<Int>(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),Int::class) ?: 0
+    private fun setupShoppingSortRadios() {
+        binding.shoppinglistSortId = getSetting(
+            resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
+            Int::class
+        ) ?: R.id.radio_sort_normal
 
-        if(checkedRadioId == 0){
-            checkedRadioId = R.id.radio_sort_normal
+        with(binding.radioGroupSortShopping) {
+
+            setOnCheckedChangeListener { _, _ ->
+                putSetting(
+                    resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
+                    checkedRadioButtonId
+                )
+            }
         }
+    }
 
-        radioGroupSortShopping.check(checkedRadioId)
+    private fun setupShoppingToInventoryRadios() {
+        binding.inventoryBehaviourQuestionId = getSetting(
+            resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
+            Int::class
+        ) ?: R.id.radio_check_question
 
-        radioGroupSortShopping.setOnCheckedChangeListener { radioGroup, i ->
-            putSetting<Int>(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),radioGroupSortShopping.checkedRadioButtonId)
+        println(binding.inventoryBehaviourQuestionId == R.id.radioGroup_check_behaviour)
+        println(binding.inventoryBehaviourQuestionId as Int)
+
+        with(binding.radioGroupCheckBehaviour) {
+            //check(checkedRadioId)
+
+            setOnCheckedChangeListener { radioGroup, i ->
+                putSetting(
+                    resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
+                    checkedRadioButtonId
+                )
+            }
         }
-
     }
 
 
     //setup functions for speech assistent
-    private fun setupSpeechAssistentSettings(root: View){
-        setupDeleteQuestionCheck(root)
+    private fun setupSpeechAssistentSettings() {
+        setupDeleteQuestionCheck()
     }
 
-    private fun setupDeleteQuestionCheck(root: View){
-        checkBoxDeleteQuestionSpeech = root.findViewById(R.id.checkbox_deletequestion_speech)
-        val questionAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
-            Boolean::class) ?: true
+    private fun setupDeleteQuestionCheck() {
+        binding.deleteQuestionAllowed = getSetting(
+            resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
+            Boolean::class
+        ) ?: true
 
-        checkBoxDeleteQuestionSpeech.isChecked = questionAllowed
-
-        checkBoxDeleteQuestionSpeech.setOnCheckedChangeListener { _, isChecked ->
-            putSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),isChecked)
+        with(binding.checkboxDeletequestionSpeech) {
+            setOnCheckedChangeListener { _, isChecked ->
+                putSetting(
+                    resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
+                    isChecked
+                )
+            }
         }
     }
-
-
 
 }

@@ -24,6 +24,10 @@ import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ShoppingFragment : Fragment() {
 
@@ -160,12 +164,32 @@ class ShoppingFragment : Fragment() {
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = true
 
-            shoppingViewModel.deleteAllCheckedItems {
-                swipeRefresh.isRefreshing = false
-                refreshViewModelData()
+            GlobalScope.launch(IO) {
+                //get checked items
+                val checkedItems = databaseDao.getAllCheckedShoppingItem()
 
-                showToastShort(R.string.notification_remove_bought_shoppingitems)
+                GlobalScope.launch(Main) {
+
+                    //handle shopping to inventory handler
+                    ShoppingToInventoryHandler(context!!).handleShoppingItems(checkedItems) {
+
+                        //delete checked items
+                        shoppingViewModel.deleteAllCheckedItems {
+                            GlobalScope.launch(Main) {
+                                swipeRefresh.isRefreshing = false
+                                refreshViewModelData()
+
+                                showToastShort(R.string.notification_remove_bought_shoppingitems)
+                            }
+                        }
+                    }
+
+                }
+
+
             }
+
+
         }
 
         //disable swipe refresh on action mode start and enable on stop
@@ -186,13 +210,15 @@ class ShoppingFragment : Fragment() {
             }
 
             clickDeleteButtonHandler = { itemHolders ->
-                AlertDialog.Builder(context!!)
+                AlertDialog.Builder(context)
                     .setMessage(R.string.shopping_list_delete_question)
                     .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                         CoroutineBackgroundTask<Unit>()
                             .executeInBackground {
-                                itemHolders.forEach {
-                                    databaseDao.deleteShoppingItemById(it.shoppingItem.uid)
+                                val shoppingCart = itemHolders.map { it.shoppingItem }
+
+                                shoppingCart.forEach {
+                                    databaseDao.deleteShoppingItemById(it.uid)
                                 }
                             }
                             .onDone {
