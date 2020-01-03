@@ -58,7 +58,9 @@ class RecipeEditActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_edit)
+
         initGuiComponents()
+
         if(savedInstanceState != null) {
             ingredientCounter = savedInstanceState.getInt("counter")
             for(i in 1..ingredientCounter) {
@@ -79,9 +81,12 @@ class RecipeEditActivity : AppCompatActivity() {
             setIngredientsFromBundle(ingredients)
             setDescriptionsFromBundle(descriptions)
         }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         recipeid = intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
+
         if(recipeid >= 0) {
             setRecipeToElements(recipeid)
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
@@ -290,7 +295,10 @@ class RecipeEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finish()
+            android.R.id.home -> {
+                finish()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
