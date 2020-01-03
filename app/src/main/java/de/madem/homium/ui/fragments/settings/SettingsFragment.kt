@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
 import de.madem.homium.databinding.FragmentSettingsBinding
@@ -31,6 +32,8 @@ class SettingsFragment : Fragment() {
             inflater, R.layout.fragment_settings, container, false
         )
 
+        binding.lifecycleOwner = this@SettingsFragment
+
         //setup general settings
         setupGeneralSettings()
 
@@ -51,13 +54,12 @@ class SettingsFragment : Fragment() {
 
     private fun setupVibrationSwitch() {
         //setup switch
-        val vibrationEnabled: Boolean = getSetting(
+        binding.vibrationAllowed = getSetting(
             resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
             Boolean::class
         ) ?: true
 
         with(binding.vibrationSwitch) {
-            isChecked = vibrationEnabled
             setOnCheckedChangeListener { compoundButton, checked ->
                 putSetting(
                     resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
@@ -75,17 +77,13 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupShoppingSortRadios() {
-        var checkedRadioId: Int = getSetting(
+        binding.shoppinglistSortId = getSetting(
             resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
             Int::class
-        ) ?: 0
-
-        if (checkedRadioId == 0) {
-            checkedRadioId = R.id.radio_sort_normal
-        }
+        ) ?: R.id.radio_sort_normal
 
         with(binding.radioGroupSortShopping) {
-            check(checkedRadioId)
+
             setOnCheckedChangeListener { _, _ ->
                 putSetting(
                     resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
@@ -96,17 +94,16 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupShoppingToInventoryRadios() {
-        var checkedRadioId: Int = getSetting(
+        binding.inventoryBehaviourQuestionId = getSetting(
             resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
             Int::class
-        ) ?: 0
+        ) ?: R.id.radio_check_question
 
-        if (checkedRadioId == 0) {
-            checkedRadioId = R.id.radio_check_question
-        }
+        println(binding.inventoryBehaviourQuestionId == R.id.radioGroup_check_behaviour)
+        println(binding.inventoryBehaviourQuestionId as Int)
 
         with(binding.radioGroupCheckBehaviour) {
-            check(checkedRadioId)
+            //check(checkedRadioId)
 
             setOnCheckedChangeListener { radioGroup, i ->
                 putSetting(
@@ -124,13 +121,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupDeleteQuestionCheck() {
-        val questionAllowed = getSetting(
+        binding.deleteQuestionAllowed = getSetting(
             resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
             Boolean::class
         ) ?: true
 
         with(binding.checkboxDeletequestionSpeech) {
-            isChecked = questionAllowed
             setOnCheckedChangeListener { _, isChecked ->
                 putSetting(
                     resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
