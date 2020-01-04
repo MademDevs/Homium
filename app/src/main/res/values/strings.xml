@@ -143,12 +143,15 @@
     <string name="assistent_question_clear_location">Sollen wirklich alle Elemente aus dem Ort ~ gelöscht werden?</string>
     <string name="assistent_msg_clear_location">Alle Elemente aus dem Ort ~ wurden gelöscht.</string>
 
+    <string name="assistent_msg_recipe_action_failed">Die gewünschte Aktion in der Rezeptverwaltung ist fehlgeschlagen. Bitte versuche es erneut.</string>
+
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
     <string name="data_transfer_intent_edit_ingredient_name">ingredientname</string>
     <string name="data_transfer_intent_edit_ingredient_unit">ingredientunit</string>
     <string name="data_transfer_intent_edit_ingredient_count">ingredientcount</string>
     <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
+    <string name="data_transfer_intent_edit_recipe_name">recipename</string>
 
     <!--data for units-->
     <string name="data_units_item">Stück</string>

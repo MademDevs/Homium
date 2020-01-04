@@ -67,6 +67,7 @@ class RecipeEditActivity : AppCompatActivity() {
             setRecipeToElements(recipeid)
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
         } else {
+            assignPreDefinedNameIfExisting()
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
         }
 
@@ -317,6 +318,13 @@ class RecipeEditActivity : AppCompatActivity() {
             }
         } else {
             imgView.setImageResource(R.mipmap.empty_picture)
+        }
+    }
+
+    private fun assignPreDefinedNameIfExisting(){
+        val name : String? = intent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_name))
+        name.notNull {
+            title.setText(name)
         }
     }
 
