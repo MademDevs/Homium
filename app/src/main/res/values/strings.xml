@@ -131,7 +131,7 @@
     <string name="assistent_question_delete_all_shopping_with_name_and_plural">Sollen wirklich alle Einkaufselemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
     <string name="assistent_msg_delete_failed">Leider konnte die Löschaktion aufgrund ungültiger Eingaben nicht durchgeführt werden. Bitte versuche es erneut!</string>
     <string name="assistent_msg_inventory_added">Inventar wurde erfolgreich erweitert!</string>
-    <string name="assistent_const_inventory_default_location">Kühlschrank</string>
+    <string name="assistent_const_inventory_default_location" />
     <string name="assistent_question_delete_all_inventory">Soll wirklich das gesamte Inventar gelöscht werden?</string>
     <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Inventarelemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_msg_inventoryitem_with_param_deleted">Alle Inventarelemente mit der Angabe # wurden gelöscht.</string>
