@@ -45,6 +45,7 @@
     <string name="screentitle_edit_shopppingitem_add">Produkt hinzufügen</string>
     <string name="screentitle_edit_shoppingitem_edit">Produkt bearbeiten</string>
     <string name="screentitle_main_actionmode_shopping">Optionen</string>
+    <string name="screentitle_main_actionmode_inventory">Optionen</string>
     <string name="screentitle_edit_ingredient_add">Zutat hinzufügen</string>
     <string name="screentitle_edit_ingredient_edit">Zutat bearbeiten</string>
     <string name="screentitle_edit_inventoryitem_add">Produkt hinzufügen</string>
