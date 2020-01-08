@@ -14,7 +14,8 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
     //companion
     companion object{
         //Patterns
-        val ADD_NEW_RECIPE = Regex("([eE]rstell[e]*[n]*|[eE]rzeug[e]*[n]*) \\S* \\S* Rezept( (namens|mit dem Titel) ([a-zA-ZäüöÄÜÖ ]+))?")
+        val ADD_NEW_RECIPE = Regex("([eE]rstell[e]*[n]*|[eE]rzeug[e]*[n]*) \\S* \\S* Rezept( (namens|mit dem Titel) ([a-zA-ZäüöÄÜÖß ]+))?")
+
     }
 
     //matching task
