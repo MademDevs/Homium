@@ -57,9 +57,7 @@ class RecipePresentation: AppCompatActivity() {
             collToolbar.title = recipe.name
             val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.recipe_pres_toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
-            toolbar.setNavigationOnClickListener {
-                finish()
-            }
+            toolbar.setNavigationOnClickListener { finish() }
             val viewPager = findViewById<ViewPager2>(R.id.recipe_pres_viewpager)
             viewPager.adapter = PresentationAdapter(recipe, description, ingredients)
             val tabLayout = findViewById<TabLayout>(R.id.recipe_pres_tablayout)
