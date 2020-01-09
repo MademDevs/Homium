@@ -210,6 +210,23 @@ class ShoppingFragment : Fragment() {
             }
 
             clickDeleteButtonHandler = { itemHolders ->
+                ConfirmDialog.show(R.string.shopping_list_delete_question) { dialog ->
+                    CoroutineBackgroundTask<Unit>()
+                        .executeInBackground {
+                            val shoppingCart = itemHolders.map { it.shoppingItem }
+
+                            shoppingCart.forEach {
+                                databaseDao.deleteShoppingItemById(it.uid)
+                            }
+                        }
+                        .onDone {
+                            finishActionMode()
+                            refreshViewModelData()
+                            dialog.dismiss()
+                        }
+                        .start()
+                }
+
                 AlertDialog.Builder(context)
                     .setMessage(R.string.shopping_list_delete_question)
                     .setPositiveButton(R.string.answer_yes) { dialog, _ ->
