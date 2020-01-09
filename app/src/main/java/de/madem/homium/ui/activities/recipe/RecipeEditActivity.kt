@@ -26,6 +26,7 @@ import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
 import de.madem.homium.utilities.*
+import kotlinx.android.synthetic.main.recipe_edit_description.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -63,37 +64,47 @@ class RecipeEditActivity : AppCompatActivity() {
         private const val DESCRIPTION_KEY_DUMMY = "DESCRIPTION_#"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recipe_edit)
+    lateinit var savedData: Bundle
 
-        initGuiComponents()
-
-
-        if(savedInstanceState != null) {
-            ingredientCounter = savedInstanceState.getInt("counter")
+    override fun onResume() {
+        super.onResume()
+        if(::savedData.isInitialized) {
+            ingredientCounter = savedData.getInt("counter")
             for(i in 1..ingredientCounter) {
-                val item: Ingredient? = savedInstanceState.getIngredient(INGREDIENT_KEY_DUMMY.replace("#","$i"))
+                val item: Ingredient? = savedData.getIngredient(INGREDIENT_KEY_DUMMY.replace("#","$i"))
                 if(item != null) {
                     ingredients.add(item)
                 }
             }
 
-            descrCounter = savedInstanceState.getInt("descriptions")
+            descrCounter = savedData.getInt("descriptions")
             println("Counter: $descrCounter")
             for(i in 1..descrCounter) {
-                val item: String? = savedInstanceState.getString(DESCRIPTION_KEY_DUMMY.replace("#","$i"))
+                val item: String? = savedData.getString(DESCRIPTION_KEY_DUMMY.replace("#","$i"))
                 println("beschreibung$i: $item")
                 if(item != null) {
                     descriptions.add(item)
                     addDescriptionToLayout(item,i)
                 }
             }
+
             setIngredientsFromBundle(ingredients)
             //addDescriptionToLayout(descriptions)
 
 
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recipe_edit)
+
+        initGuiComponents()
+
+        if(savedInstanceState != null) {
+            savedData = savedInstanceState
+        }
+
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -108,6 +119,7 @@ class RecipeEditActivity : AppCompatActivity() {
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
         }
     }
+
 
     private fun addDescriptionToLayout(text: String, index : Int) {
         //FEHLER IRGENDWO HIER!!!
@@ -125,6 +137,10 @@ class RecipeEditActivity : AppCompatActivity() {
         descriptionEditTexts.add(editTxt)
 
 
+        with(descriptionLayout.children.last().findViewById<EditText>(R.id.descr_editTxt)) {
+            setText(text)
+            println("addDescriptionToLayout: $text")
+        }
 
 
     }
