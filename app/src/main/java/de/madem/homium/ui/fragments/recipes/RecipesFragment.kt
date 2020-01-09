@@ -92,12 +92,18 @@ class RecipesFragment : Fragment() {
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)
             Intent(activity, RecipePresentation::class.java)
-                .apply { putExtra("recipe", recipe.uid) }
+                .apply {
+                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                    , recipe.uid)
+                }
                 .also { startActivity(it)}
         }
         adapter.longClickListener = {recipe, viewHolder ->
             Intent(activity, RecipeEditActivity::class.java)
-                .apply { putExtra("recipe", recipe.uid) }
+                .apply {
+                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                    , recipe.uid)
+                }
                 .also { startActivity(it) }
             false
         }

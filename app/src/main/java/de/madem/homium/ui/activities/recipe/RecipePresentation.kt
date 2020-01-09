@@ -34,7 +34,7 @@ class RecipePresentation: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_presentation)
-        recipeid = intent.getIntExtra("recipe", -1)
+        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
         if(recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
             val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
