@@ -68,9 +68,8 @@ class InventoryFragment : Fragment() {
                             showToastShort(R.string.notification_delete_inventoryitem_sucess)
                             dialog.dismiss()
                             finishActionMode()
+                            inventoryViewModel.reloadInventoryItems()
                         }
-                        inventoryViewModel.reloadInventoryItems()
-
                     }
                     .setNegativeButton(R.string.answer_no) { dialog, _ ->
                         dialog.dismiss()
