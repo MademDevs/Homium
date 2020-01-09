@@ -186,7 +186,7 @@ class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
     private fun getInventoryDefaultLocation() : String{
         return contextRef.get()?.resources?.getString(R.string.assistent_const_inventory_default_location)
             ?: HomiumApplication.appContext?.resources?.getString(R.string.assistent_const_inventory_default_location)
-            ?: "Kühlschrank"
+            ?: ""
     }
 
 }
