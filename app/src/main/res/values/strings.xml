@@ -95,6 +95,7 @@
     <string name="txtView_recipesName">Rezeptname</string>
     <string name="recipeEdit_title_add">Rezept hinzufügen</string>
     <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
+    <string name="recipe_actionmode_delete_question">Sollen die ausgewählten Rezepte wirklich gelöscht werden?</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>

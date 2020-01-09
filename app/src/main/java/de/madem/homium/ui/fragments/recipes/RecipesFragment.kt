@@ -19,10 +19,7 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentation
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.switchToActivity
-import de.madem.homium.utilities.vibrate
+import de.madem.homium.utilities.*
 
 class RecipesFragment : Fragment() {
 
@@ -69,35 +66,40 @@ class RecipesFragment : Fragment() {
     }
 
     private fun registerActionMode() {
-        actionModeHandler = RecipeActionModeHandler(context!!)
-
-        with(actionModeHandler) {
-            clickDeleteButtonHandler = { itemHolders ->
-                CoroutineBackgroundTask<Unit>()
-                    .executeInBackground {
-                        itemHolders.map { it.recipe }.forEach {
-                            db.recipeDao().deleteRecipe(it)
+        fun onDeleteButtonClicked(itemHolders: Collection<RecipeActionModeHandler.ItemHolder>) {
+            ConfirmDialog.show(context!!, R.string.recipe_actionmode_delete_question) {
+                onConfirm = {
+                    CoroutineBackgroundTask<Unit>()
+                        .executeInBackground {
+                            itemHolders.map { it.recipe }.forEach {
+                                db.recipeDao().deleteRecipe(it)
+                            }
                         }
-                    }
-                    .onDone {
-                        finishActionMode()
-                        recipesViewModel.reloadRecipes()
-                    }
-                    .start()
+                        .onDone {
+                            actionModeHandler.finishActionMode()
+                            recipesViewModel.reloadRecipes()
+                        }
+                        .start()
+                }
             }
         }
+
+        //init action mode
+        actionModeHandler = RecipeActionModeHandler(context!!)
+
+        //init action mode buttons
+        with(actionModeHandler) {
+            clickDeleteButtonHandler = ::onDeleteButtonClicked
+        }
+
     }
 
     private fun registerSwipeRefresh() {
         val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_recipes)
         swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
         swipeRefresh.setOnRefreshListener {
-            swipeRefresh.isRefreshing = true
-            //TODO: Swipe Refresh implement something useful^
-            recipesViewModel.deleteAllRecipes {
-                swipeRefresh.isRefreshing = false
-                recipesViewModel.reloadRecipes()
-            }
+            swipeRefresh.isRefreshing = false
+            //TODO: Swipe Refresh implement something useful^^
         }
     }
 
