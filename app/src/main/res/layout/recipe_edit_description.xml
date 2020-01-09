@@ -15,8 +15,7 @@
         android:id="@+id/descr_editTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="Beschreibung"
-        android:ems="10"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+
+        android:hint="Beschreibung" />
 </LinearLayout>
