@@ -2,10 +2,12 @@ package de.madem.homium.speech.recognizers
 
 import android.content.Context
 import android.content.Intent
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Recipe
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentation
 import de.madem.homium.utilities.*
@@ -26,7 +28,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
         val ADD_NEW_RECIPE = Regex("([eE]rstell[e]*[n]*|[eE]rzeug[e]*[n]*) \\S* \\S* Rezept( (namens|mit dem Titel) ([a-zA-ZäüöÄÜÖß ]+))?")
         val EDIT_RECIPE = Regex("([bB]earbeite[n]*[t]*|[eE]ditiere[n]*)[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
         val SHOW_RECIPE = Regex("([zZ]eig[e]*[n]*|([öÖ]ffne[t]*[n]*))[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
-
+        val RECOMMEND_RECIPE = Regex("([sS]chlage[r]*( ein)?( zufälliges)? Rezept vor)|([wW]as gibt es heute zu[m]? ([aA]bendbrot|[aA]bendessen|[mM]ittag|[mM]ittagessen|[fF]rühstück|[eE]ssen)([ ]*\\?)?)")
     }
 
     //matching task
@@ -35,6 +37,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             command.matches(ADD_NEW_RECIPE) -> matchAddNewRecipe(command)
             command.matches(EDIT_RECIPE) -> matchEditRecipe(command)
             command.matches(SHOW_RECIPE) -> matchShowRecipe(command)
+            command.matches(RECOMMEND_RECIPE) -> matchRecommendRecipe()
             else -> null
         }
 
@@ -137,6 +140,48 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
                 sayRecipeNotFound()
             }
 
+        }
+    }
+
+    private fun matchRecommendRecipe() : CoroutineBackgroundTask<Boolean>{
+
+        var randomRecipe : Recipe? = null
+
+        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+
+
+            val recipeIds : List<Int> = recipeDao.getRecipeIds()
+            val randomId : Int = recipeIds.random()
+            randomRecipe = if(randomId != 0) recipeDao.getRecipeById(randomId) else null
+                ?: return@executeInBackground false
+
+            true
+
+
+        }.onDone {success ->
+            if(success && randomRecipe != null){
+                contextReference.get().notNull {context ->
+                    with(context){
+                        val message = resources.getString(R.string.assistent_question_show_recommended_recipe)
+                            .replace("#","\n\"${randomRecipe?.name}\"\n")
+
+                        AlertDialog.Builder(this)
+                            .setMessage(message)
+                            .setPositiveButton(resources.getString(R.string.answer_yes)) { dialog, _ ->
+                                switchToActivity(RecipePresentation::class){ intent ->
+                                    intent.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+                                        randomRecipe?.uid ?: 0)
+                                }
+                            }
+                            .setNegativeButton(resources.getString(R.string.answer_no)) { dialog, _ ->
+                                dialog.dismiss()
+                            }.show()
+                    }
+                }
+            }
+            else{
+                saySorry()
+            }
         }
     }
 
