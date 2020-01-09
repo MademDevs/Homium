@@ -1,27 +1,39 @@
 package de.madem.homium.ui.fragments.inventory
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import de.madem.homium.application.HomiumApplication
+import androidx.lifecycle.viewModelScope
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
-import de.madem.homium.models.Units
-import de.madem.homium.utilities.CoroutineBackgroundTask
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 class InventoryViewModel : ViewModel() {
 
-    var inventoryItems = MutableLiveData<List<InventoryItem>>().apply { value = listOf() }
-    val context = HomiumApplication.appContext!!
-    val dao = AppDatabase.getInstance().inventoryDao()
+    //private properties
+    private val dao = AppDatabase.getInstance().inventoryDao()
 
+    //public properties
+    private val _inventoryItems by lazy {
+        MutableLiveData<List<InventoryItem>>().apply { value = listOf() }
+    }
+    val inventoryItems: LiveData<List<InventoryItem>> = _inventoryItems
+
+    //public methods
     fun reloadInventoryItems() {
-        GlobalScope.launch(IO) {
+        viewModelScope.launch(IO) {
             val items = dao.fetchAllInventoryItems()
-            inventoryItems.postValue(items)
+            _inventoryItems.postValue(items)
+        }
+    }
+
+    fun deleteInventoryItems(inventoryItems: Collection<InventoryItem>, onDone: () -> Unit) {
+        viewModelScope.launch(IO) {
+            inventoryItems.forEach { dao.deleteInventoryItemById(it.uid) }
+
+            viewModelScope.launch(Main) { onDone.invoke() }
         }
     }
 
