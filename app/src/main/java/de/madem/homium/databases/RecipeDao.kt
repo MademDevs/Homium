@@ -67,7 +67,7 @@ interface RecipeDao {
     fun containsRecipeWithName(name : String) : Boolean
 
     @Query("SELECT uid FROM recipe WHERE name LIKE :name")
-    fun idOf(name: String) : Int
+    fun getIdByName(name: String) : Int
 
     @Query("SELECT uid FROM recipe")
     fun getRecipeIds() : List<Int>

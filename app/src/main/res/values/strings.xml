@@ -156,6 +156,7 @@
     <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
     <string name="data_transfer_intent_edit_recipe_name">recipename</string>
     <string name="data_transfer_intent_edit_recipe_id">recipeid</string>
+    <string name="data_transfer_intent_recipe_cook_request">cookrequest</string>
 
     <!--data for units-->
     <string name="data_units_item">Stück</string>

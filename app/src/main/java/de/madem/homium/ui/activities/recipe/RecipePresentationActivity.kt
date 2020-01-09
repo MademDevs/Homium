@@ -24,7 +24,7 @@ import de.madem.homium.utilities.setPictureFromPath
 import kotlinx.coroutines.awaitAll
 
 
-class RecipePresentation: AppCompatActivity() {
+class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
     private lateinit var recipe: Recipe

@@ -1,15 +1,13 @@
 package de.madem.homium.speech.recognizers
 
 import android.content.Context
-import android.content.Intent
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
-import de.madem.homium.ui.activities.recipe.RecipePresentation
+import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -25,10 +23,11 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
     //companion
     companion object{
         //Patterns
-        val ADD_NEW_RECIPE = Regex("([eE]rstell[e]*[n]*|[eE]rzeug[e]*[n]*) \\S* \\S* Rezept( (namens|mit dem Titel) ([a-zA-ZäüöÄÜÖß ]+))?")
-        val EDIT_RECIPE = Regex("([bB]earbeite[n]*[t]*|[eE]ditiere[n]*)[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
-        val SHOW_RECIPE = Regex("([zZ]eig[e]*[n]*|([öÖ]ffne[t]*[n]*))[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
-        val RECOMMEND_RECIPE = Regex("([sS]chlage[r]*( ein)?( zufälliges)? Rezept vor)|([wW]as gibt es heute zu[m]? ([aA]bendbrot|[aA]bendessen|[mM]ittag|[mM]ittagessen|[fF]rühstück|[eE]ssen)([ ]*\\?)?)")
+        private val ADD_NEW_RECIPE = Regex("([eE]rstell[e]*[n]*|[eE]rzeug[e]*[n]*) \\S* \\S* Rezept( (namens|mit dem Titel) ([a-zA-ZäüöÄÜÖß ]+))?")
+        private val EDIT_RECIPE = Regex("([bB]earbeite[n]*[t]*|[eE]ditiere[n]*)[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
+        private val SHOW_RECIPE = Regex("([zZ]eig[e]*[n]*|([öÖ]ffne[t]*[n]*))[ das]*( Rezept)?( namens| mit dem Titel)? ([a-zA-ZäüöÄÜÖß ]+)")
+        private val RECOMMEND_RECIPE = Regex("([sS]chlage[r]*( ein)?( zufälliges)? Rezept vor)|([wW]as gibt es heute zu[m]? ([aA]bendbrot|[aA]bendessen|[mM]ittag|[mM]ittagessen|[fF]rühstück|[eE]ssen)([ ]*\\?)?)")
+        private val COOK_RECIPE = Regex("([kK]och[e]*[n]*|[bB]ack[e]*[n]*)(( das)? [rR]ezept)?( namens| mit dem [tT]itel)? ([a-zA-ZäüöÄÜÖß ]+)")
     }
 
     //matching task
@@ -38,6 +37,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             command.matches(EDIT_RECIPE) -> matchEditRecipe(command)
             command.matches(SHOW_RECIPE) -> matchShowRecipe(command)
             command.matches(RECOMMEND_RECIPE) -> matchRecommendRecipe()
+            command.matches(COOK_RECIPE) -> matchCookRecipe(command)
             else -> null
         }
 
@@ -72,8 +72,8 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
                     context.switchToActivity(RecipeEditActivity::class){intent ->
                         if(name.isNotEmpty() && name.isNotBlank()){
-                           intent.putExtra(context.resources.getString(R.string.data_transfer_intent_edit_recipe_name),
-                               name)
+                            intent.putExtra(context.resources.getString(R.string.data_transfer_intent_edit_recipe_name),
+                                name)
                         }
                     }
                 }
@@ -103,13 +103,13 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
             val recipeName = params.first()
 
-            val recipeId = recipeDao.idOf(name=recipeName)
+            val recipeId = recipeDao.getIdByName(name=recipeName)
 
             changedActivityIfValid(RecipeEditActivity::class,recipeId)
 
         }.onDone {success ->
             if(!success){
-               sayRecipeNotFound()
+                sayRecipeNotFound()
             }
 
         }
@@ -131,9 +131,9 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
             val recipeName = params.first()
 
-            val recipeId = recipeDao.idOf(name=recipeName)
+            val recipeId = recipeDao.getIdByName(name=recipeName)
 
-            changedActivityIfValid(RecipePresentation::class,recipeId)
+            changedActivityIfValid(RecipePresentationActivity::class,recipeId)
 
         }.onDone {success ->
             if(!success){
@@ -168,7 +168,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
                         AlertDialog.Builder(this)
                             .setMessage(message)
                             .setPositiveButton(resources.getString(R.string.answer_yes)) { dialog, _ ->
-                                switchToActivity(RecipePresentation::class){ intent ->
+                                switchToActivity(RecipePresentationActivity::class){ intent ->
                                     intent.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
                                         randomRecipe?.uid ?: 0)
                                 }
@@ -182,6 +182,53 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             else{
                 saySorry()
             }
+        }
+    }
+
+    private fun matchCookRecipe(command: String) : CoroutineBackgroundTask<Boolean>{
+        var recipeId = 0
+
+        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+            val params : List<String> = COOK_RECIPE.find(command)?.groupValues
+                ?.asSequence()
+                ?.map{it.trim()}
+                ?.filterIndexed{idx,_ -> idx != 0}
+                ?.filter{!(it.matches(Regex("([kK]och[e]*[n]*|[bB]ack[e]*[n]*)")))}
+                ?.filter{!(it.matches(Regex("(das)?")) || it.matches(Regex("((das)? [rR]ezept)?")))}
+                ?.filter{!(it.matches(Regex("(namens|mit dem [tT]itel)?")))}
+                ?.toList()
+                ?.takeIf { it.size == 1 }
+                ?: return@executeInBackground false
+
+            //validation
+            recipeId = recipeDao.getIdByName(name=params.first())
+
+            if(recipeId <= 0) {
+                return@executeInBackground false
+            }
+            else{
+                //TODO: IMPLEMENT LOGIC FOR CALLING COOKING ACTIONS --> DONE LATER IN OTHER BRANCH
+                true
+            }
+
+
+        }.onDone {success ->
+            if (success){
+                contextReference.get().notNull {context ->
+                    with(context){
+                        //switch Screen
+                        switchToActivity(RecipePresentationActivity::class){ intent ->
+                            intent.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
+                            intent.putExtra(resources.getString(R.string.data_transfer_intent_recipe_cook_request),
+                                REQUEST_CODE_COOK_RECIPE)
+                        }
+                    }
+                }
+            }
+            else{
+                sayRecipeNotFound()
+            }
+
         }
     }
 
