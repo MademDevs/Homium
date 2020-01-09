@@ -19,6 +19,7 @@ import androidx.core.view.children
 import com.google.android.material.textfield.TextInputEditText
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
+import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.constants.REQUEST_TAKE_PHOTO
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
@@ -324,7 +325,8 @@ class RecipeEditActivity : AppCompatActivity() {
                         )
                     }
                 }.onDone {
-                    finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
+                    println("recipeedit $recipeid")
+                    finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
                 }.start()
             } else {
                 Toast.makeText(
