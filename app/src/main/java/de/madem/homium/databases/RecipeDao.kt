@@ -62,4 +62,10 @@ interface RecipeDao {
 
     @Query("DELETE FROM ingredients WHERE recipeId = :id")
     fun deleteIngredientByRecipeId(id: Int)
+
+    @Query("SELECT CASE WHEN name LIKE :name THEN 1 ELSE 0 END FROM recipe")
+    fun containsRecipeWithName(name : String) : Boolean
+
+    @Query("SELECT uid FROM recipe WHERE name LIKE :name")
+    fun idOf(name: String) : Int
 }

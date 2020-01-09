@@ -144,6 +144,7 @@
     <string name="assistent_msg_clear_location">Alle Elemente aus dem Ort ~ wurden gelöscht.</string>
 
     <string name="assistent_msg_recipe_action_failed">Die gewünschte Aktion in der Rezeptverwaltung ist fehlgeschlagen. Bitte versuche es erneut.</string>
+    <string name="assistent_msg_recipe_not_found">Das Rezept konnte nicht gefunden werden. Bitte stelle sicher, dass es in der Rezeptverwaltung existiert oder wiederhole den Sprachbefehl.</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
@@ -152,6 +153,7 @@
     <string name="data_transfer_intent_edit_ingredient_count">ingredientcount</string>
     <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
     <string name="data_transfer_intent_edit_recipe_name">recipename</string>
+    <string name="data_transfer_intent_edit_recipe_id">recipeid</string>
 
     <!--data for units-->
     <string name="data_units_item">Stück</string>

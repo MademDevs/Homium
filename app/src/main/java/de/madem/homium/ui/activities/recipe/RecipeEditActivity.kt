@@ -97,7 +97,7 @@ class RecipeEditActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        recipeid = intent.getIntExtra("recipe", -1)
+        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)//intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
 
 
