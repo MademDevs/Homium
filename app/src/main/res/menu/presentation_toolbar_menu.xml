@@ -13,7 +13,7 @@
         android:title="presentationCook"
         android:id="@+id/presentation_toolbar_cook"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_add_white">
+        android:icon="@drawable/ic_cooking_pot">
     </item>
 
 </menu>
