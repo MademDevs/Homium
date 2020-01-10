@@ -1,5 +1,6 @@
 package de.madem.homium.ui.activities.recipe
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -18,16 +19,16 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.setPictureFromPath
-import de.madem.homium.utilities.switchToActivityForResult
+import de.madem.homium.utilities.*
 import kotlinx.coroutines.awaitAll
+import java.lang.ref.WeakReference
 
 
 class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
     private lateinit var recipe: Recipe
+    private var cookingAssistant : CookingAssistant? = null
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
 
@@ -48,6 +49,9 @@ class RecipePresentationActivity : AppCompatActivity() {
                 .onDone { recipe = it; op1.start() }
                 .start()
         }
+
+        //init Cooking assistant
+        cookingAssistant = CookingAssistant(WeakReference<Context>(this))
     }
 
     private fun initGuiElements() {
@@ -112,7 +116,22 @@ class RecipePresentationActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    //function for trigger recipe cooking
+    private fun cookRecipe(){
+        if(cookingAssistant == null){
+            showToastShort(R.string.errormsg_cooking_impossible)
+        }
+        else{
+            //only doing this because smart cast is not availible here xD
+            cookingAssistant.notNull {
+                it.cookRecipe(recipe)
+            }
+        }
+    }
+
 }
+
+
 
 
 class PresentationAdapter(val recipe: Recipe, val description: List<RecipeDescription>, val ingredients: List<RecipeIngredient>): RecyclerView.Adapter<PresentationAdapter.PresentationViewHolder>() {
