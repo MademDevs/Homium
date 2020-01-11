@@ -90,7 +90,7 @@ class RecipePresentationActivity : AppCompatActivity() {
             return true
         }
         if(id == R.id.presentation_toolbar_cook) {
-            println("Cooking function called")
+            cookRecipe()
             return true
         }
         if(id == android.R.id.home) {
@@ -118,12 +118,14 @@ class RecipePresentationActivity : AppCompatActivity() {
 
     //function for trigger recipe cooking
     private fun cookRecipe(){
+        println("Cooking function called")
         if(cookingAssistant == null){
             showToastShort(R.string.errormsg_cooking_impossible)
         }
         else{
             //only doing this because smart cast is not availible here xD
             cookingAssistant.notNull {
+                println("readyToCook")
                 it.cookRecipe(recipe)
             }
         }

@@ -61,4 +61,9 @@ interface InventoryDao {
     @Query("DELETE FROM inventoryItem WHERE location LIKE :location")
     fun clearLocation(location: String)
 
+    @Query("SELECT SUM(count) FROM inventoryItem WHERE name LIKE :name AND unit LIKE :unit")
+    fun sumOfQuantityByNameUnit(name: String,unit: String): Int
+
+    @Query("SELECT uid FROM inventoryItem WHERE name LIKE :name AND unit LIKE :unit")
+    fun getUIdsByNameUnit(name: String,unit: String): List<Int>
 }
