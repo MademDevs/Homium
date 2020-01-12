@@ -25,13 +25,17 @@
     <string name="onboarding_comingSoon_headline">Coming Soon ;)</string>
     <string name="onboarding_recipe_headline">Erstelle eigene Rezepte</string>
     <string name="onboarding_speachAssistant_headline">Der Sprachassistent zur leichteren Bedienung</string>
+    <string name="onboarding_inventory_headline">Behalte den Überblick mit der Inventarliste</string>
 
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
     Es folgt eine kleine Erklärung zur Bedienung der App</string>
 
     <string name="onboarding_shopping">Erstelle eine Einkaufsliste für den Wocheneinkauf. Markiere per Antippen deine Produkte und entferne
-        die eingekauften Elemente per Swipe von der Liste. Ein Bearbeiten ist ganz einfach per langem Tippen möglich. </string>
+        die eingekauften Elemente per Swipe nach unten von der Liste. Ein Bearbeiten ist ganz einfach mit langem Tippen möglich. </string>
+
+    <string name="onboarding_inventory">Speichere deine vorhandenen Lebensmittel und Haushaltsgegenstände im Inventar und über-
+        prüfe jederzeit deinen aktuellen Versorgungsstand.</string>
 
     <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
 
@@ -214,4 +218,7 @@
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
     <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
