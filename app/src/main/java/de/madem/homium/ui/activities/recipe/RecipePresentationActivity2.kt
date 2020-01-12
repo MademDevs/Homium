@@ -21,6 +21,8 @@ import de.madem.homium.utilities.setPictureFromPath
 
 class RecipePresentationActivity2 : AppCompatActivity(){
 
+    //quelle: https://github.com/saulmm/CoordinatorExamples
+
     private var recipeid = -1
     private lateinit var recipe: Recipe
     private lateinit var description: List<RecipeDescription>
