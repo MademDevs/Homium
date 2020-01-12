@@ -45,7 +45,7 @@ public class FakePageFragment extends Fragment {
 		mRootView.setAdapter(new FakePageAdapter(20));
 	}
 
-	public static Fragment newInstance() {
+	public static FakePageFragment newInstance() {
 		return new FakePageFragment();
 	}
 

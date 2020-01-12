@@ -17,8 +17,7 @@
             android:layout_height="200dp"
             app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp"
-            app:layout_scrollFlags="scroll|snap"
-            >
+            app:layout_scrollFlags="scroll|snap">
             ​
             <ImageView
                 android:id="@+id/materialup.profile_backdrop"
@@ -28,14 +27,6 @@
                 android:src="@drawable/material_flat"
                 app:layout_collapseMode="parallax" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-        ​​
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/materialup.toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            app:theme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="scroll|enterAlways|snap" />
         ​
         <LinearLayout
             android:id="@+id/materialup.title_container"
@@ -82,5 +73,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
+
+    <!--<androidx.viewpager.widget.ViewPager
+        android:id="@+id/materialup.viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

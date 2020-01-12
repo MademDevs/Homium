@@ -35,12 +35,15 @@ class RecipePresentationActivity : AppCompatActivity() {
         recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
         if(recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
+
             val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
                 .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
                 .onDone { description = it; initGuiElements() }
+
             val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
                 .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
                 .onDone { ingredients = it; op2.start() }
+
             CoroutineBackgroundTask<Recipe>()
                 .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
                 .onDone { recipe = it; op1.start() }
