@@ -18,7 +18,7 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
-import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
+import de.madem.homium.ui.activities.recipe.RecipePresentationActivity2
 import de.madem.homium.utilities.switchToActivity
 
 class RecipesFragment : Fragment() {
@@ -91,7 +91,7 @@ class RecipesFragment : Fragment() {
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)
-            Intent(activity, RecipePresentationActivity::class.java)
+            Intent(activity, RecipePresentationActivity2::class.java)
                 .apply {
                     putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
                     , recipe.uid)

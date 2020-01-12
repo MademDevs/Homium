@@ -82,6 +82,10 @@
             android:exported="false"
             android:parentActivityName=".ui.activities.main.MainActivity">
         </activity>
+        <activity android:name=".ui.activities.recipe.RecipePresentationActivity2"
+            android:exported="false"
+            android:parentActivityName=".ui.activities.main.MainActivity">
+        </activity>
     </application>
 
 </manifest>

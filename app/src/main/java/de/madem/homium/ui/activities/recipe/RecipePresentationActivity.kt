@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -21,7 +20,6 @@ import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.setPictureFromPath
 import de.madem.homium.utilities.switchToActivityForResult
-import kotlinx.coroutines.awaitAll
 
 
 class RecipePresentationActivity : AppCompatActivity() {
@@ -51,25 +49,26 @@ class RecipePresentationActivity : AppCompatActivity() {
     }
 
     private fun initGuiElements() {
-            val image = findViewById<ImageView>(R.id.recipe_pres_image)
-            image.setPictureFromPath(recipe.image)
-            val collToolbar = findViewById<CollapsingToolbarLayout>(R.id.recipe_pres_coll_toolbar)
-            collToolbar.title = recipe.name
-            val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.recipe_pres_toolbar)
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
-            toolbar.setNavigationOnClickListener { finish() }
-            val viewPager = findViewById<ViewPager2>(R.id.recipe_pres_viewpager)
-            viewPager.adapter = PresentationAdapter(recipe, description, ingredients)
-            val tabLayout = findViewById<TabLayout>(R.id.recipe_pres_tablayout)
-            TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                //name tabs
-                if (position == 0) {
-                    tab.text = "Zutaten"
-                } else {
-                    tab.text = "Schritt ${position}"
-                }
-            }.attach()
-            setSupportActionBar(toolbar)
+        val image = findViewById<ImageView>(R.id.recipe_pres_image)
+        image.setPictureFromPath(recipe.image)
+        val collToolbar = findViewById<CollapsingToolbarLayout>(R.id.recipe_pres_coll_toolbar)
+        collToolbar.title = recipe.name
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.recipe_pres_toolbar)
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+        toolbar.setNavigationOnClickListener { finish() }
+        val viewPager = findViewById<ViewPager2>(R.id.recipe_pres_viewpager)
+
+        viewPager.adapter = PresentationAdapter(recipe, description, ingredients)
+        val tabLayout = findViewById<TabLayout>(R.id.recipe_pres_tablayout)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            //name tabs
+            if (position == 0) {
+                tab.text = "Zutaten"
+            } else {
+                tab.text = "Schritt ${position}"
+            }
+        }.attach()
+        setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -131,7 +130,10 @@ class PresentationAdapter(val recipe: Recipe, val description: List<RecipeDescri
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PresentationViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recipe_presentation_viewpager, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PresentationViewHolder {
+        return PresentationViewHolder(LayoutInflater.from(parent.context)
+            .inflate(R.layout.recipe_presentation_viewpager, parent, false))
+    }
 
     class PresentationViewHolder(val view: View): RecyclerView.ViewHolder(view) {
         val txt = view.findViewById<TextView>(R.id.recipe_pres_txtView)
