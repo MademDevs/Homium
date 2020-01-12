@@ -9,8 +9,7 @@
         android:id="@+id/materialup.appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        >
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         ​
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/main.collapsing"
@@ -21,7 +20,6 @@
             app:layout_scrollFlags="scroll|snap"
             >
             ​
-
             <ImageView
                 android:id="@+id/materialup.profile_backdrop"
                 android:layout_width="match_parent"
@@ -38,8 +36,6 @@
             android:minHeight="?attr/actionBarSize"
             app:theme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap" />
-            <!--style="@style/ToolBarWithNavigationBack"-->
-
         ​
         <LinearLayout
             android:id="@+id/materialup.title_container"
@@ -87,16 +83,4 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/materialup.profile_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/user_avatar"
-        app:layout_anchor="@id/materialup.title_container"
-        android:elevation="8dp"
-        app:layout_scrollFlags="scroll"
-        app:layout_anchorGravity="top|center_horizontal"
-
-        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

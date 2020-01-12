@@ -2,7 +2,6 @@ package de.madem.homium.ui.activities.recipe
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -14,14 +13,9 @@ import com.google.android.material.tabs.TabLayout
 import de.madem.homium.R
 import de.madem.homium.utilities.FakePageFragment
 
-class RecipePresentationActivity2 : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
+class RecipePresentationActivity2 : AppCompatActivity(){
 
-    val PERCENTAGE_TO_ANIMATE_AVATAR = 20
-    var mIsAvatarShown = true
-
-    var mProfileImage: ImageView? = null
     var mMaxScrollSize = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,34 +27,12 @@ class RecipePresentationActivity2 : AppCompatActivity(), AppBarLayout.OnOffsetCh
             findViewById<View>(R.id.materialup_viewpager) as ViewPager
         val appbarLayout =
             findViewById<View>(R.id.materialup_appbar) as AppBarLayout
-        mProfileImage =
-            findViewById<View>(R.id.materialup_profile_image) as ImageView
         val toolbar =
             findViewById<View>(R.id.materialup_toolbar) as Toolbar
         toolbar.setNavigationOnClickListener { onBackPressed() }
-        appbarLayout.addOnOffsetChangedListener(this)
         mMaxScrollSize = appbarLayout.totalScrollRange
         viewPager.adapter = TabsAdapter(supportFragmentManager)
         tabLayout.setupWithViewPager(viewPager)
-    }
-
-
-    override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
-        if (mMaxScrollSize == 0) mMaxScrollSize = appBarLayout!!.totalScrollRange
-        val percentage = Math.abs(verticalOffset) * 100 / mMaxScrollSize
-        if (percentage >= PERCENTAGE_TO_ANIMATE_AVATAR && mIsAvatarShown) {
-            mIsAvatarShown = false
-            mProfileImage!!.animate()
-                .scaleY(0f).scaleX(0f)
-                .setDuration(200)
-                .start()
-        }
-        if (percentage <= PERCENTAGE_TO_ANIMATE_AVATAR && !mIsAvatarShown) {
-            mIsAvatarShown = true
-            mProfileImage!!.animate()
-                .scaleY(1f).scaleX(1f)
-                .start()
-        }
     }
 
     class TabsAdapter(fm: FragmentManager?) : FragmentPagerAdapter(fm!!) {
