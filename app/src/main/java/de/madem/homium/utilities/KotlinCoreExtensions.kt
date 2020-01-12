@@ -23,3 +23,14 @@ fun <T> T?.applyNotNull(function: T.() -> Unit): T {
 fun String.capitalizeEachWord() : String{
     return this.split(Regex(" ")).joinToString(" ") { it.capitalize() }
 }
+
+fun String.capitalizeEachWordExcept(vararg except: String) : String{
+    return this.split(Regex(" ")).joinToString(" ") {
+        if(!(except.contains(it))){
+            it.capitalize()
+        }
+        else{
+            it
+        }
+    }
+}

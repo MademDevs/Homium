@@ -19,20 +19,20 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern().also { println(it) }
-        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION = Regex("([sS][ei]tze|[nN]ehme) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
-        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT = Regex("([sS][ei]tze|[nN]ehme) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
-        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT = Regex("([sS][ei]tze|[nN]ehme) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
-        private val ADD_INVENTORY_ITEM = Regex("([sS][ei]tze|[lL]ege) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜ( )*]+)")
-        private val ADD_INVENTORY_ITEM_WITHOUT_UNIT = Regex("([sS][ei]tze|[lL]ege) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜ( )*]+)")
-        private val ADD_INVENTORY_ITEM_WITHOUT_UNIT_COUNT = Regex("([sS][ei]tze|[lL]ege) ([a-zA-ZäöüÄÖÜ( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜ( )*]+)")
+        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION = Regex("([sS][ei]tze|[nN]ehme) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
+        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT = Regex("([sS][ei]tze|[nN]ehme) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
+        private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT = Regex("([sS][ei]tze|[nN]ehme) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
+        private val ADD_INVENTORY_ITEM = Regex("([sS][ei]tze|[lL]ege) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜß( )*]+)")
+        private val ADD_INVENTORY_ITEM_WITHOUT_UNIT = Regex("([sS][ei]tze|[lL]ege) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜß( )*]+)")
+        private val ADD_INVENTORY_ITEM_WITHOUT_UNIT_COUNT = Regex("([sS][ei]tze|[lL]ege) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das| den)? ([a-zA-ZäöüÄÖÜß( )*]+)")
         private val CLEAR_INVENTORY_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*) [^ ]* [iI]nventar(liste)?")
-        private val DELETE_INVENTORY_ITEM_WITH_NAME = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*)( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
-        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY_UNIT = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
-        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
-        private val DELETE_INVENTORY_ITEM_WITH_NAME_LOCATION = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜ( )*]+)[heraus]?")
-        private val DELETE_INVENTORY_ITEM_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜ( )*]+)[heraus]?")
-        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY_LOCATION = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*)( alle)? (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜ( )*]+)[heraus]?")
-        private val CLEAR_LOCATION = Regex("(lösch(e)*|(be)?reinig(e)*(n)*|leere|lehre)( alles)?( aus| von)? [derniasm]*[ ]*([a-zA-ZäöüÄÖÜ( )*]+)")
+        private val DELETE_INVENTORY_ITEM_WITH_NAME = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*)( alle)? ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
+        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY_UNIT = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
+        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* [iI]nventar(liste)?( heraus)?")
+        private val DELETE_INVENTORY_ITEM_WITH_NAME_LOCATION = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜß( )*]+)[heraus]?")
+        private val DELETE_INVENTORY_ITEM_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜß( )*]+)[heraus]?")
+        private val DELETE_INVENTORY_ITEM_WITH_NAME_QUANTITY_LOCATION = Regex("(lösch(e)*|welche|entfern(e)*|nehm(e)*)( alle)? (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von)[ derm]* ([a-zA-ZäöüÄÖÜß( )*]+)[heraus]?")
+        private val CLEAR_LOCATION = Regex("(lösch(e)*|(be)?reinig(e)*(n)*|leere|lehre)( alles)?( aus| von)? [derniasm]*[ ]*([a-zA-ZäöüÄÖÜß( )*]+)")
     }
 
     override fun matchingTask(command: String): CoroutineBackgroundTask<Boolean>? {

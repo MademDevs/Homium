@@ -5,6 +5,7 @@ import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.speech.recognizers.InventoryRecognizer
 import de.madem.homium.speech.recognizers.PatternRecognizer
+import de.madem.homium.speech.recognizers.RecipeRecognizer
 import de.madem.homium.speech.recognizers.ShoppingRecognizer
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import java.lang.ref.WeakReference
@@ -15,7 +16,8 @@ class SpeechAssistent(val context: Context) {
 
     private val recognizers = listOf<PatternRecognizer>(
         ShoppingRecognizer(WeakReference<Context>(context)),
-        InventoryRecognizer(WeakReference<Context>(context)))
+        InventoryRecognizer(WeakReference<Context>(context)),
+        RecipeRecognizer(WeakReference<Context>(context)))
 
     //public function
     fun executeCommand(command : String){
@@ -26,7 +28,13 @@ class SpeechAssistent(val context: Context) {
             var resultTask : CoroutineBackgroundTask<Boolean>? = null
 
             for(rec in recognizers){
-                val result = rec.matchingTask(formattedCommand)
+                val result = if(rec is RecipeRecognizer){
+                     rec.matchingTask(command)
+                }
+                else{
+                    rec.matchingTask(formattedCommand)
+                }
+
                 if(result != null){
                     resultTask = result
                     break

@@ -64,7 +64,7 @@
             android:name=".ui.activities.recipe.RecipeEditActivity"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
-            android:name=".ui.activities.recipe.RecipePresentation"
+            android:name=".ui.activities.recipe.RecipePresentationActivity"
         android:theme="@style/NoActionBarTheme"/>
 
         <activity android:name=".ui.activities.test.TestActivity" />

@@ -28,6 +28,24 @@ fun <T : Any> Activity.switchToActivity(clazz: KClass<T>) {
     startActivity(Intent(this, clazz.java))
 }
 
+fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>,optionFunc: (Intent) -> Unit) {
+    val intent : Intent = Intent(context,clazz.java)
+    optionFunc.invoke(intent)
+    startActivity(intent)
+}
+
+fun <T : Any> Activity.switchToActivity(clazz: KClass<T>,optionFunc: (Intent) -> Unit) {
+    val intent : Intent = Intent(this,clazz.java)
+    optionFunc.invoke(intent)
+    startActivity(intent)
+}
+
+fun <T : Any> Context.switchToActivity(clazz: KClass<T>,optionFunc: (Intent) -> Unit) {
+    val intent : Intent = Intent(this,clazz.java)
+    optionFunc.invoke(intent)
+    startActivity(intent)
+}
+
 fun AppCompatActivity.hideKeyboard() {
     val view = this.currentFocus
     if (view != null) {

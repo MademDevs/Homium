@@ -24,13 +24,13 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern()
 
-        private val ADD_SHOPPING_ITEM = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
-        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
-        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("[sS]{1}[ei]tze ([a-zA-ZäöüÄÖÜ( )*]+) auf die [eE]{1}inkaufsliste")
+        private val ADD_SHOPPING_ITEM = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜß( )*]+) auf die [eE]{1}inkaufsliste")
+        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT = Regex("[sS]{1}[ei]tze (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+) auf die [eE]{1}inkaufsliste")
+        private val ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY = Regex("[sS]{1}[ei]tze ([a-zA-ZäöüÄÖÜß( )*]+) auf die [eE]{1}inkaufsliste")
         private val CLEAR_SHOPPING_LIST = Regex("(lösch(e)*|(be)?reinig(e)*(n)*){1} [^ ]* [eE]{1}inkaufsliste")
-        private val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
-        private val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
-        private val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜ( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val DELETE_SHOPPING_WITH_NAME = Regex("lösch(e)*( alle)? ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val DELETE_SHOPPING_WITH_ALL_PARAMS = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}){1} ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
+        private val DELETE_SHOPPING_WITH_NAME_QUANTITY = Regex("(lösch(e)*|welche){1} (( )*[(0-9)]+( )*) ([a-zA-ZäöüÄÖÜß( )*]+) (aus|von){1} der [eE]{1}inkaufsliste( heraus)?")
     }
 
     //functions
