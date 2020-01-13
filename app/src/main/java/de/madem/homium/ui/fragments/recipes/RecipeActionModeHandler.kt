@@ -4,9 +4,7 @@ import android.content.Context
 import android.view.MenuItem
 import de.madem.homium.R
 import de.madem.homium.managers.adapters.RecipesListAdapter
-import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.Recipe
-import de.madem.homium.models.ShoppingItem
 import de.madem.homium.utilities.actionmode.ActionModeHandler
 import de.madem.homium.utilities.actionmode.ActionModeItemHolder
 
@@ -21,8 +19,8 @@ class RecipeActionModeHandler(context: Context) : ActionModeHandler<RecipeAction
 
 
     //public api properties
-    var clickDeleteButtonHandler: (Collection<ItemHolder>) -> Unit = { _ -> }
-
+    var clickDeleteButtonHandler = { _: Collection<ItemHolder> -> }
+    var clickEditButtonHandler = { _: ItemHolder -> }
 
     //protected functions
     override fun onMenuItemClicked(item: MenuItem): Boolean {
@@ -30,6 +28,10 @@ class RecipeActionModeHandler(context: Context) : ActionModeHandler<RecipeAction
         when (item.itemId) {
             R.id.recipe_item_am_btn_delete -> {
                 clickDeleteButtonHandler.invoke(selectedItems)
+                return true
+            }
+            R.id.recipe_item_am_btn_edit -> {
+                clickEditButtonHandler.invoke(selectedItems.first())
                 return true
             }
         }
@@ -43,6 +45,9 @@ class RecipeActionModeHandler(context: Context) : ActionModeHandler<RecipeAction
     ) {
         val itemHolder = ItemHolder.of(recipe, adapterViewHolder)
         clickItem(itemHolder)
+
+        //only visible if maximum one item is selected
+        menu?.findItem(R.id.recipe_item_am_btn_edit)?.isVisible = selectedItems.size == 1
     }
 
 

@@ -84,12 +84,19 @@ class RecipesFragment : Fragment() {
             }
         }
 
+        fun onEditButtonClicked(itemHolder: RecipeActionModeHandler.ItemHolder) {
+            Intent(activity, RecipeEditActivity::class.java)
+                .apply { putExtra("recipe", itemHolder.recipe.uid) }
+                .also { startActivity(it) }
+        }
+
         //init action mode
         actionModeHandler = RecipeActionModeHandler(context!!)
 
         //init action mode buttons
         with(actionModeHandler) {
             clickDeleteButtonHandler = ::onDeleteButtonClicked
+            clickEditButtonHandler = ::onEditButtonClicked
         }
 
     }
