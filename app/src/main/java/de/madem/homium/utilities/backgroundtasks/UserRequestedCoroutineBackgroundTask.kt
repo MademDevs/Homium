@@ -1,9 +1,10 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.backgroundtasks
 
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
+import de.madem.homium.utilities.extensions.notNull
 import kotlinx.coroutines.CoroutineScope
 import java.lang.ref.WeakReference
 

@@ -1,4 +1,4 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.extensions
 
 import android.app.Activity
 import android.content.Context
@@ -16,7 +16,6 @@ import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
-import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
 

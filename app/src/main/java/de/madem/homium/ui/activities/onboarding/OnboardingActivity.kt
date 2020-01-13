@@ -8,10 +8,10 @@ import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.fragments.onboarding.*
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.putSetting
-import de.madem.homium.utilities.switchToActivity
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.putSetting
+import de.madem.homium.utilities.extensions.switchToActivity
 
 class OnboardingActivity : AppIntro() {
 
@@ -112,7 +112,8 @@ class OnboardingActivity : AppIntro() {
     //init app settings
     private fun initAppSettings(){
         //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
-        CoroutineBackgroundTask<Unit>().executeInBackground {
+        CoroutineBackgroundTask<Unit>()
+            .executeInBackground {
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),true)

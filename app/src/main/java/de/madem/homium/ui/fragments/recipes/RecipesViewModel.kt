@@ -1,12 +1,10 @@
 package de.madem.homium.ui.fragments.recipes
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
-import de.madem.homium.models.ShoppingItem
-import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import kotlinx.coroutines.Job
 import java.io.File
 

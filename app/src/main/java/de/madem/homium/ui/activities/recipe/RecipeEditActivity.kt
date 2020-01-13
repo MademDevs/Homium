@@ -8,15 +8,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.FileProvider
 import androidx.core.view.children
-import com.google.android.material.textfield.TextInputEditText
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
@@ -26,8 +23,8 @@ import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
-import de.madem.homium.utilities.*
-import kotlinx.android.synthetic.main.recipe_edit_description.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -291,7 +288,8 @@ class RecipeEditActivity : AppCompatActivity() {
             if (name.isNotBlank()) {
                 //all input components are valid -> creating object and put it into database via coroutine
                 val recipe = Recipe(name, currentPhotoPath)
-                CoroutineBackgroundTask<Unit>().executeInBackground {
+                CoroutineBackgroundTask<Unit>()
+                    .executeInBackground {
                     //Update method in Dao not working properly, so deleting first, then adding new
                     if(recipeid > 0) {
                         db.recipeDao().deleteRecipe(Recipe(recipe.name, recipe.image, recipeid))

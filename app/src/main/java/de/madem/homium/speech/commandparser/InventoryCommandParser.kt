@@ -7,7 +7,7 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.capitalizeEachWord
+import de.madem.homium.utilities.extensions.capitalizeEachWord
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.lang.ref.WeakReference

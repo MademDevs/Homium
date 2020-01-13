@@ -8,7 +8,10 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
-import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.extensions.switchToActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -49,7 +52,8 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
         if(context != null){
             var name = ""
 
-            return CoroutineBackgroundTask<Boolean>().executeInBackground{
+            return CoroutineBackgroundTask<Boolean>()
+                .executeInBackground{
                 val params = ADD_NEW_RECIPE.find(command)?.groupValues
                     ?.map{it.trim()}
                     ?.asSequence()
@@ -88,8 +92,9 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
     }
 
-    private fun matchEditRecipe(command : String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchEditRecipe(command : String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params : List<String> = EDIT_RECIPE.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}
@@ -115,8 +120,9 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
         }
     }
 
-    private fun matchShowRecipe(command: String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchShowRecipe(command: String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params  : List<String> = SHOW_RECIPE.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}
@@ -143,11 +149,12 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
         }
     }
 
-    private fun matchRecommendRecipe() : CoroutineBackgroundTask<Boolean>{
+    private fun matchRecommendRecipe() : CoroutineBackgroundTask<Boolean> {
 
         var randomRecipe : Recipe? = null
 
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
 
 
             val recipeIds : List<Int> = recipeDao.getRecipeIds()
@@ -185,10 +192,11 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
         }
     }
 
-    private fun matchCookRecipe(command: String) : CoroutineBackgroundTask<Boolean>{
+    private fun matchCookRecipe(command: String) : CoroutineBackgroundTask<Boolean> {
         var recipeId = 0
 
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params : List<String> = COOK_RECIPE.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}

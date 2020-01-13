@@ -7,6 +7,11 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastLong
+import de.madem.homium.utilities.extensions.showToastShort
 import java.lang.ref.WeakReference
 
 
@@ -40,7 +45,8 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
     //public functions
     fun cookRecipe(recipe: Recipe){
 
-        CoroutineBackgroundTask<AnalysisResult>().executeInBackground {
+        CoroutineBackgroundTask<AnalysisResult>()
+            .executeInBackground {
             //analyze
             analyzeRecipe(recipe)
 
@@ -115,7 +121,10 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
 
         val msg = createMissingShoppingMessage(missingItems)
 
-        UserRequestedCoroutineBackgroundTask<Boolean>(contextReference, message = msg)
+        UserRequestedCoroutineBackgroundTask<Boolean>(
+            contextReference,
+            message = msg
+        )
             .executeInBackground {
                 if (missingItems.isEmpty()){
                     return@executeInBackground false

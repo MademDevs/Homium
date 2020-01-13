@@ -8,7 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import de.madem.homium.utilities.applyNotNull
+import de.madem.homium.utilities.extensions.applyNotNull
 
 abstract class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context){
 

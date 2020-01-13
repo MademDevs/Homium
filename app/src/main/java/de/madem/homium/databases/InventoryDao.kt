@@ -33,6 +33,9 @@ interface InventoryDao {
         """)
     fun updateInventoryItem(id: Int, name: String, count: Int, unit: String, location: String)
 
+    @Query("UPDATE inventoryItem SET count=:count, unit=:unit WHERE uid=:id")
+    fun updateQuantityOf(id: Int, count: Int, unit: String)
+
     @Query("SELECT COUNT(uid) FROM inventoryItem;")
     fun inventorySize() : Int
 

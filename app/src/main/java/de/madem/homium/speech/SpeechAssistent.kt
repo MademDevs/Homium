@@ -7,7 +7,7 @@ import de.madem.homium.speech.recognizers.InventoryRecognizer
 import de.madem.homium.speech.recognizers.PatternRecognizer
 import de.madem.homium.speech.recognizers.RecipeRecognizer
 import de.madem.homium.speech.recognizers.ShoppingRecognizer
-import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import java.lang.ref.WeakReference
 
 class SpeechAssistent(val context: Context) {
@@ -24,7 +24,8 @@ class SpeechAssistent(val context: Context) {
 
         val formattedCommand = replaceNumberWords(command.toLowerCase())
 
-        CoroutineBackgroundTask<CoroutineBackgroundTask<Boolean>?>().executeInBackground {
+        CoroutineBackgroundTask<CoroutineBackgroundTask<Boolean>?>()
+            .executeInBackground {
             var resultTask : CoroutineBackgroundTask<Boolean>? = null
 
             for(rec in recognizers){

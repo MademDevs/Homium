@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -20,7 +19,11 @@ import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.*
-import kotlinx.coroutines.awaitAll
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.setPictureFromPath
+import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.extensions.switchToActivityForResult
 import java.lang.ref.WeakReference
 
 

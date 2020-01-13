@@ -1,6 +1,5 @@
 package de.madem.homium.ui.activities.launch
 
-import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,7 +7,7 @@ import androidx.core.content.ContextCompat
 import de.madem.homium.R
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.activities.onboarding.OnboardingActivity
-import de.madem.homium.utilities.getSetting
+import de.madem.homium.utilities.extensions.getSetting
 import gr.net.maroulis.library.EasySplashScreen
 
 class LaunchActivity : AppCompatActivity() {

@@ -15,10 +15,10 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.finishWithResultData
-import de.madem.homium.utilities.notNull
-import de.madem.homium.utilities.showToastShort
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.finishWithResultData
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
 
 class IngredientEditActivity : AppCompatActivity() {
 
@@ -265,7 +265,8 @@ class IngredientEditActivity : AppCompatActivity() {
     private fun getIngredientFromDatabase(id : Int){
 
         if(id >= 0){
-           CoroutineBackgroundTask<RecipeIngredient>().executeInBackground{
+           CoroutineBackgroundTask<RecipeIngredient>()
+               .executeInBackground{
                 dao.getIngredientById(id)
            }.onDone { result ->
                 result.notNull {

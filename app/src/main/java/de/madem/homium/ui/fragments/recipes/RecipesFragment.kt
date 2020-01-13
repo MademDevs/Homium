@@ -19,7 +19,7 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
-import de.madem.homium.utilities.switchToActivity
+import de.madem.homium.utilities.extensions.switchToActivity
 
 class RecipesFragment : Fragment() {
 

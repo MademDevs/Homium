@@ -1,8 +1,5 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.backgroundtasks
 
-import android.app.AlertDialog
-import android.content.Context
-import de.madem.homium.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -15,7 +12,7 @@ open class CoroutineBackgroundTask<T> {
     private var onDone : (T) -> Unit = {}
 
     //functions
-    fun onPrepare(function: () -> Boolean) : CoroutineBackgroundTask<T>{
+    fun onPrepare(function: () -> Boolean) : CoroutineBackgroundTask<T> {
         onPrepare = function
         return this
     }
