@@ -18,7 +18,7 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
-import de.madem.homium.ui.activities.recipe.RecipePresentation
+import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
 
 class RecipesFragment : Fragment() {
@@ -87,8 +87,8 @@ class RecipesFragment : Fragment() {
         fun onEditButtonClicked(itemHolder: RecipeActionModeHandler.ItemHolder) {
             Intent(activity, RecipeEditActivity::class.java)
                 .apply {
-                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
-                        , recipe.uid)
+                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+                        itemHolder.recipe.uid)
                 }
                 .also { startActivity(it) }
         }
