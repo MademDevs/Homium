@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -16,7 +18,6 @@ import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
-import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
 
@@ -257,3 +258,5 @@ fun Bundle.getIngredient(key: String): RecipeEditActivity.Ingredient? {
     }
     return null
 }
+
+fun ViewGroup.inflater() = LayoutInflater.from(context)

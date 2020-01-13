@@ -1,19 +1,17 @@
 package de.madem.homium.ui.activities.recipe
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databinding.ActivityRecipePresentationxBinding
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -21,17 +19,28 @@ import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.setPictureFromPath
 import de.madem.homium.utilities.switchToActivityForResult
 
+class RecipePresentationActivity : AppCompatActivity(){
 
-class RecipePresentationActivity : AppCompatActivity() {
+    //quelle: https://github.com/saulmm/CoordinatorExamples
 
     private var recipeid = -1
     private lateinit var recipe: Recipe
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
 
+    private lateinit var binding: ActivityRecipePresentationxBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recipe_presentation)
+
+        binding = DataBindingUtil.setContentView(
+            this, R.layout.activity_recipe_presentationx
+        )
+
+        loadRecipe()
+    }
+
+    private fun loadRecipe() {
         recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
         if(recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
@@ -49,29 +58,6 @@ class RecipePresentationActivity : AppCompatActivity() {
                 .onDone { recipe = it; op1.start() }
                 .start()
         }
-    }
-
-    private fun initGuiElements() {
-        val image = findViewById<ImageView>(R.id.recipe_pres_image)
-        image.setPictureFromPath(recipe.image)
-        val collToolbar = findViewById<CollapsingToolbarLayout>(R.id.recipe_pres_coll_toolbar)
-        collToolbar.title = recipe.name
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.recipe_pres_toolbar)
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
-        toolbar.setNavigationOnClickListener { finish() }
-        val viewPager = findViewById<ViewPager2>(R.id.recipe_pres_viewpager)
-
-        viewPager.adapter = PresentationAdapter(recipe, description, ingredients)
-        val tabLayout = findViewById<TabLayout>(R.id.recipe_pres_tablayout)
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            //name tabs
-            if (position == 0) {
-                tab.text = "Zutaten"
-            } else {
-                tab.text = "Schritt ${position}"
-            }
-        }.attach()
-        setSupportActionBar(toolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -97,50 +83,43 @@ class RecipePresentationActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("recipepres $recipeid")
-        if(requestCode == REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION) {
-            val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
-                .onDone { description = it; initGuiElements() }
-            val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
-                .onDone { ingredients = it; op2.start() }
-            CoroutineBackgroundTask<Recipe>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
-                .onDone { recipe = it; op1.start() }
-                .start()
-        }
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun initGuiElements() = with(binding) {
+        ivBanner.setPictureFromPath(recipe.image)
+        viewpager.adapter = TabsAdapter(supportFragmentManager, description, ingredients)
+        layoutTab.setupWithViewPager(viewpager)
+        tvHeaderFirstline.text = recipe.name
     }
 
-}
+    class TabsAdapter(
+        fm: FragmentManager?,
+        private val description: List<RecipeDescription>,
+        private val ingredients: List<RecipeIngredient>
+    ) : FragmentStatePagerAdapter(fm!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
+        override fun getCount(): Int {
+            return 1 + description.size
+        }
 
-class PresentationAdapter(val recipe: Recipe, val description: List<RecipeDescription>, val ingredients: List<RecipeIngredient>): RecyclerView.Adapter<PresentationAdapter.PresentationViewHolder>() {
-
-    override fun getItemCount(): Int = description.count()+1
-
-    override fun onBindViewHolder(holder: PresentationViewHolder, position: Int) {
-        if(position == 0) {
-            var text = ""
-            for(el in ingredients) {
-                text += "${el.count} ${el.unit} ${el.name} \n"
+        override fun getItem(position: Int): Fragment {
+            return if(position == 0) {
+                var text = ""
+                for(el in ingredients) {
+                    text += "${el.count} ${el.unit} ${el.name} \n"
+                }
+                RecipePresentationStepFragment(text)
+            } else {
+                RecipePresentationStepFragment(description[position-1].description)
             }
-            holder.txt.text = text
-        } else {
-            holder.txt.text = description[position-1].description
         }
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return when (position) {
+                0 -> "Zutaten"
+                else -> "Schritt $position"
+            }
+        }
+
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PresentationViewHolder {
-        return PresentationViewHolder(LayoutInflater.from(parent.context)
-            .inflate(R.layout.recipe_presentation_viewpager, parent, false))
-    }
-
-    class PresentationViewHolder(val view: View): RecyclerView.ViewHolder(view) {
-        val txt = view.findViewById<TextView>(R.id.recipe_pres_txtView)
-    }
 
 }
-
