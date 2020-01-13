@@ -19,6 +19,7 @@ import androidx.core.view.children
 import com.google.android.material.textfield.TextInputEditText
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
+import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.constants.REQUEST_TAKE_PHOTO
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
@@ -108,7 +109,7 @@ class RecipeEditActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        recipeid = intent.getIntExtra("recipe", -1)
+        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)//intent.getIntExtra("recipe", -1)
         println("Recipe-ID: $recipeid")
 
 
@@ -116,6 +117,7 @@ class RecipeEditActivity : AppCompatActivity() {
             setRecipeToElements(recipeid)
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
         } else {
+            assignPreDefinedNameIfExisting()
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
         }
     }
@@ -324,7 +326,8 @@ class RecipeEditActivity : AppCompatActivity() {
                         )
                     }
                 }.onDone {
-                    finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
+                    println("recipeedit $recipeid")
+                    finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
                 }.start()
             } else {
                 Toast.makeText(
@@ -431,6 +434,13 @@ class RecipeEditActivity : AppCompatActivity() {
             }
         } else {
             imgView.setImageResource(R.mipmap.empty_picture)
+        }
+    }
+
+    private fun assignPreDefinedNameIfExisting(){
+        val name : String? = intent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_name))
+        name.notNull {
+            title.setText(name)
         }
     }
 

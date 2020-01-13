@@ -45,6 +45,7 @@
     <string name="screentitle_edit_shopppingitem_add">Produkt hinzufügen</string>
     <string name="screentitle_edit_shoppingitem_edit">Produkt bearbeiten</string>
     <string name="screentitle_main_actionmode_shopping">Optionen</string>
+    <string name="screentitle_main_actionmode_inventory">Optionen</string>
     <string name="screentitle_edit_ingredient_add">Zutat hinzufügen</string>
     <string name="screentitle_edit_ingredient_edit">Zutat bearbeiten</string>
     <string name="screentitle_edit_inventoryitem_add">Produkt hinzufügen</string>
@@ -132,7 +133,7 @@
     <string name="assistent_question_delete_all_shopping_with_name_and_plural">Sollen wirklich alle Einkaufselemente mit der Angabe # in Ein- und Mehrzahl gelöscht werden?</string>
     <string name="assistent_msg_delete_failed">Leider konnte die Löschaktion aufgrund ungültiger Eingaben nicht durchgeführt werden. Bitte versuche es erneut!</string>
     <string name="assistent_msg_inventory_added">Inventar wurde erfolgreich erweitert!</string>
-    <string name="assistent_const_inventory_default_location">Kühlschrank</string>
+    <string name="assistent_const_inventory_default_location" />
     <string name="assistent_question_delete_all_inventory">Soll wirklich das gesamte Inventar gelöscht werden?</string>
     <string name="assistent_question_delete_all_inventory_with_name">Sollen wirklich alle Inventarelemente mit der Angabe # gelöscht werden?</string>
     <string name="assistent_msg_inventoryitem_with_param_deleted">Alle Inventarelemente mit der Angabe # wurden gelöscht.</string>
@@ -144,12 +145,20 @@
     <string name="assistent_question_clear_location">Sollen wirklich alle Elemente aus dem Ort ~ gelöscht werden?</string>
     <string name="assistent_msg_clear_location">Alle Elemente aus dem Ort ~ wurden gelöscht.</string>
 
+    <string name="assistent_msg_recipe_action_failed">Die gewünschte Aktion in der Rezeptverwaltung ist fehlgeschlagen. Bitte versuche es erneut.</string>
+    <string name="assistent_msg_recipe_not_found">Das Rezept konnte nicht gefunden werden. Bitte stelle sicher, dass es in der Rezeptverwaltung existiert oder wiederhole den Sprachbefehl.</string>
+    <string name="assistent_question_show_recommended_recipe">Das Rezept # wurde ausgewählt. Soll es geöffnet werden?</string>
+
+
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
     <string name="data_transfer_intent_edit_ingredient_name">ingredientname</string>
     <string name="data_transfer_intent_edit_ingredient_unit">ingredientunit</string>
     <string name="data_transfer_intent_edit_ingredient_count">ingredientcount</string>
     <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
+    <string name="data_transfer_intent_edit_recipe_name">recipename</string>
+    <string name="data_transfer_intent_edit_recipe_id">recipeid</string>
+    <string name="data_transfer_intent_recipe_cook_request">cookrequest</string>
 
     <!--data for units-->
     <string name="data_units_item">Stück</string>

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
@@ -14,7 +14,7 @@ import de.madem.homium.application.HomiumApplication
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 
-class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: MutableLiveData<List<InventoryItem>>)
+class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<List<InventoryItem>>)
     : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>() {
 
     companion object {

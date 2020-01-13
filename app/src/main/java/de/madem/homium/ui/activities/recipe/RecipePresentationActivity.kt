@@ -1,10 +1,8 @@
 package de.madem.homium.ui.activities.recipe
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toolbar
@@ -15,16 +13,18 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.setPictureFromPath
+import de.madem.homium.utilities.switchToActivityForResult
 import kotlinx.coroutines.awaitAll
 
 
-class RecipePresentation: AppCompatActivity() {
+class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
     private lateinit var recipe: Recipe
@@ -34,7 +34,7 @@ class RecipePresentation: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_presentation)
-        recipeid = intent.getIntExtra("recipe", -1)
+        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
         if(recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
             val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
@@ -69,7 +69,49 @@ class RecipePresentation: AppCompatActivity() {
                     tab.text = "Schritt ${position}"
                 }
             }.attach()
+            setSupportActionBar(toolbar)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.presentation_toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if(id == R.id.presentation_toolbar_edit) {
+            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivity::class) {
+                it.putExtra("recipe", recipeid)
+            }
+            return true
+        }
+        if(id == R.id.presentation_toolbar_cook) {
+            println("Cooking function called")
+            return true
+        }
+        if(id == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        println("recipepres $recipeid")
+        if(requestCode == REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION) {
+            val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
+                .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
+                .onDone { description = it; initGuiElements() }
+            val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
+                .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
+                .onDone { ingredients = it; op2.start() }
+            CoroutineBackgroundTask<Recipe>()
+                .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
+                .onDone { recipe = it; op1.start() }
+                .start()
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
 }
 
 

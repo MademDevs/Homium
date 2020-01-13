@@ -9,4 +9,11 @@
         android:icon="@drawable/ic_edit">
     </item>
 
+    <item
+        android:title="presentationCook"
+        android:id="@+id/presentation_toolbar_cook"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_add_white">
+    </item>
+
 </menu>

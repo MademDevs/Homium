@@ -86,7 +86,10 @@ class RecipesFragment : Fragment() {
 
         fun onEditButtonClicked(itemHolder: RecipeActionModeHandler.ItemHolder) {
             Intent(activity, RecipeEditActivity::class.java)
-                .apply { putExtra("recipe", itemHolder.recipe.uid) }
+                .apply {
+                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                        , recipe.uid)
+                }
                 .also { startActivity(it) }
         }
 
@@ -140,8 +143,11 @@ class RecipesFragment : Fragment() {
             } else {
 
                 //update check status
-                Intent(activity, RecipePresentation::class.java)
-                    .apply { putExtra("recipe", recipe.uid) }
+                Intent(activity, RecipePresentationActivity::class.java)
+                    .apply {
+                        putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                            , recipe.uid)
+                    }
                     .also { startActivity(it)}
             }
 
