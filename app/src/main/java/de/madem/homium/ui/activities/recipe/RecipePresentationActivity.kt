@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.databinding.ActivityRecipePresentationxBinding
+import de.madem.homium.databinding.ActivityRecipePresentationBinding
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -28,13 +28,13 @@ class RecipePresentationActivity : AppCompatActivity(){
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
 
-    private lateinit var binding: ActivityRecipePresentationxBinding
+    private lateinit var binding: ActivityRecipePresentationBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(
-            this, R.layout.activity_recipe_presentationx
+            this, R.layout.activity_recipe_presentation
         )
 
         loadRecipe()
@@ -79,6 +79,7 @@ class RecipePresentationActivity : AppCompatActivity(){
         }
         if(id == android.R.id.home) {
             finish()
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
