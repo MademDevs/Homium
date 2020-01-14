@@ -12,6 +12,7 @@ import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroun
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.quantitycalculation.UnitConverter
 import java.lang.ref.WeakReference
 
 
@@ -41,6 +42,8 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
     private val recipeDao = AppDatabase.getInstance().recipeDao()
     private val inventoryDao = AppDatabase.getInstance().inventoryDao()
     private val shoppingDao = AppDatabase.getInstance().itemDao()
+
+    private val unitConverter : UnitConverter = UnitConverter()
 
     //public functions
     fun cookRecipe(recipe: Recipe){
@@ -101,7 +104,33 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
             }
             //case of "difficult"/convertable unit
             else{
-                //TODO: Implement logic for analyzing data with convertable units
+                //Getting all inventoryitems with an convertible unit and name of ingredient
+                val convertibleItemsWithName = inventoryDao.getInventoryItemWithNameWithoutForbiddenUnits(
+                    name = ingredient.name,
+                    forbiddenUnits = Units.nonconvertibleUnits())
+
+                //creating unit value of ingriedient unit string (if not possible, ingriedent is ignored)
+                val ingredientUnit : Units = Units.unitOf(ingredient.unit) ?: continue
+
+                //getting sum of quantity of convertible units
+                val quantitySumInInventory = convertibleItemsWithName
+                    .map { unitConverter.convertUnitOf(it,ingredientUnit) }
+                    .map { it.count }
+                    .sum()
+
+                //decide what to do depending on quantitySum
+                //case that there is less in inventory than needed in ingredient
+                if(quantitySumInInventory < ingredient.count){
+                    val countDifference = ingredient.count - quantitySumInInventory
+                    missingShoppingItems.add(ShoppingItem(ingredient.name,countDifference,ingredient.unit))
+                }
+                //case that there is more in inventory than needed in ingredient
+                else{
+                    val subtractValues : Triple<List<Int>,Int,String> =
+                        Triple(convertibleItemsWithName.map{it.uid},ingredient.count,ingredient.unit)
+                    subtractQuantities.add(InventoryQuantityOperationInformation(subtractValues))
+                }
+
             }
 
 

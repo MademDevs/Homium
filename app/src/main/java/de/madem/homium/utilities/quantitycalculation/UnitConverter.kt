@@ -1,6 +1,7 @@
 package de.madem.homium.utilities.quantitycalculation
 
 import de.madem.homium.models.InventoryItem
+import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 
 class UnitConverter {
@@ -34,6 +35,13 @@ class UnitConverter {
         val convertResult = convertUnit(Pair(item.count,item.unit),newUnit)
 
         return InventoryItem(item.name,convertResult.first,convertResult.second,item.location,item.uid)
+    }
+
+    // Be careful with using this method in context of databases. It returns an exact copy of the shopping item (even id) with changed count and unit
+    fun convertUnitOf(item : ShoppingItem, newUnit: Units) : ShoppingItem{
+        val convertResult = convertUnit(Pair(item.count,item.unit),newUnit)
+
+        return ShoppingItem(item.name,convertResult.first,convertResult.second,item.checked,item.uid)
     }
 
     //private functions

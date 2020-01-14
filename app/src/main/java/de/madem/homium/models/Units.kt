@@ -25,6 +25,10 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return values().filter{ it.isConvertible() }.map { it.getString() }.toList()
         }
 
+        fun nonconvertibleUnits() : List<String>{
+            return values().filter { !(it.isConvertible()) }.map { it.getString() }
+        }
+
         fun stringValueMap() : Map<Units,String>{
             return values().toList().associateWith { it.getString() }
         }

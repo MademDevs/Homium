@@ -295,9 +295,7 @@ class RecipeEditActivity : AppCompatActivity() {
                         db.recipeDao().deleteRecipe(Recipe(recipe.name, recipe.image, recipeid))
                         db.recipeDao().deleteDescriptionByRecipeId(recipeid)
                         db.recipeDao().deleteIngredientByRecipeId(recipeid)
-                        ingredientsList.forEach {
-                            db.recipeDao().insertIngredient(RecipeIngredient(it.name, it.count, it.unit, recipeid))
-                        }
+
                     }
                     recipeid = db.recipeDao().insertRecipe(recipe).toInt()
                     println("RecipeID add: $recipeid")
@@ -313,6 +311,9 @@ class RecipeEditActivity : AppCompatActivity() {
                         )
                     }
                     //add old ingredients (saved in list oncreateview)
+                        ingredientsList.forEach {
+                            db.recipeDao().insertIngredient(RecipeIngredient(it.name, it.count, it.unit, recipeid))
+                        }
 
                     //description in edittext, so saving in 1 go
                     for (el in descrLayout.children) {

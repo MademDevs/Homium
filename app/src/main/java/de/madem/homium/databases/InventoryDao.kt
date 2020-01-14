@@ -69,4 +69,7 @@ interface InventoryDao {
 
     @Query("SELECT uid FROM inventoryItem WHERE name LIKE :name AND unit LIKE :unit")
     fun getUIdsByNameUnit(name: String,unit: String): List<Int>
+
+    @Query("SELECT * FROM inventoryItem WHERE name LIKE :name AND unit NOT IN (:forbiddenUnits)")
+    fun getInventoryItemWithNameWithoutForbiddenUnits(name : String, forbiddenUnits: List<String>) : List<InventoryItem>
 }
