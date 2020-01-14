@@ -3,7 +3,6 @@ package de.madem.homium.utilities
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -16,7 +15,6 @@ import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import de.madem.homium.R
-import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
 
@@ -57,15 +55,16 @@ fun AppCompatActivity.hideKeyboard() {
     // }
 }
 
-fun ImageView.setPictureFromPath(path: String) {
+fun ImageView.setPictureFromPath(path: String, reqWidth: Int = 400, reqHeight: Int = 400) {
     if(path.isNotEmpty()) {
-        BitmapFactory.decodeFile(path)?.also { bitmap ->
-            this.setImageBitmap(bitmap)
-        }
+        val bitmap = BitmapUtil.loadBitmapFromPath(path, reqWidth, reqHeight)
+
+        setImageBitmap(bitmap)
     } else {
-        this.setImageResource(R.mipmap.empty_picture)
+        setImageResource(R.mipmap.empty_picture)
     }
 }
+
 
 fun Fragment.showToastShort(string: String) = context.showToastShort(string)
 fun Fragment.showToastLong(string: String) = context.showToastLong(string)
