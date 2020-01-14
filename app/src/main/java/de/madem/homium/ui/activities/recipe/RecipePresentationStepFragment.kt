@@ -10,7 +10,10 @@ import de.madem.homium.databinding.FragmentPresentationStepBinding
 import de.madem.homium.databinding.FragmentPresentationStepCardBinding
 import de.madem.homium.utilities.inflater
 
-class RecipePresentationStepFragment(private val textToDisplay: String) : Fragment() {
+class RecipePresentationStepFragment
+    : Fragment() {
+
+    lateinit var textToDisplay: String
 
     private lateinit var binding: FragmentPresentationStepBinding
 

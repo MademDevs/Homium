@@ -107,9 +107,9 @@ class RecipePresentationActivity : AppCompatActivity(){
                 for(el in ingredients) {
                     text += "${el.count} ${el.unit} ${el.name} \n"
                 }
-                RecipePresentationStepFragment(text)
+                RecipePresentationStepFragment().apply { textToDisplay = text }
             } else {
-                RecipePresentationStepFragment(description[position-1].description)
+                RecipePresentationStepFragment().apply { textToDisplay = description[position-1].description }
             }
         }
 
