@@ -12,6 +12,7 @@ import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroun
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.quantitycalculation.QuantityCalculator
 import de.madem.homium.utilities.quantitycalculation.UnitConverter
 import java.lang.ref.WeakReference
 
@@ -44,6 +45,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
     private val shoppingDao = AppDatabase.getInstance().itemDao()
 
     private val unitConverter : UnitConverter = UnitConverter()
+    private val quantityCalculator = QuantityCalculator(unitConverter)
 
     //public functions
     fun cookRecipe(recipe: Recipe){
@@ -55,8 +57,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
 
         }.onDone {analysisResult ->
             if(analysisResult.first.isEmpty()){
-                //TODO: Implement logic for subtracting from inventory
-                showToast("STILL TODO: DELETE FROM INVENTORY")
+                subtractFromInventory(analysisResult.second)
             }
             else{
                 addMissingShoppingItemsToShoppingList(analysisResult.first)
@@ -133,12 +134,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
 
             }
 
-
-
-
         }
-
-        //TODO: create code for returning a list of shopping items to be set on shopping list or data to be subtracted from Inventory
 
         //creating and returning result
         return AnalysisResult(missingShoppingItems, subtractQuantities)
@@ -170,6 +166,26 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
                     showToast(R.string.cooking_error_failed_add_missing_shoppingitems)
                 }
             }.start()
+    }
+
+    private fun subtractFromInventory(operations : List<InventoryQuantityOperationInformation>){
+        UserRequestedCoroutineBackgroundTask<Unit>(contextReference,R.string.cooking_question_subtract_items_from_inventory)
+            .executeInBackground {
+
+                //executing each operation
+                operations.forEach { operationInfo ->
+
+                    val quantity = operationInfo.info.second
+
+                    while (quantity > 0){
+                        //TODO: Implement Logic for subtracting quantity from Inventoryitems
+                    }
+                }
+
+            }.onDone {
+                showToast("STILL TODO: DELETE FROM INVENTORY")
+            }.start()
+
     }
 
 
