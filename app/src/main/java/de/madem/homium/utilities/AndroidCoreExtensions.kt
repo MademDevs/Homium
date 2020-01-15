@@ -17,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import de.madem.homium.R
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
@@ -260,3 +263,14 @@ fun Bundle.getIngredient(key: String): RecipeEditActivity.Ingredient? {
 }
 
 fun ViewGroup.inflater() = LayoutInflater.from(context)
+
+fun <T> LiveData<T>.observe(lifecycleOwner: LifecycleOwner?, onUpdate: (T) -> Unit) {
+    if (lifecycleOwner != null) {
+        observe(lifecycleOwner, Observer(onUpdate))
+    }
+}
+
+fun <T> LiveData<T>.applyAndObserver(lifecycleOwner: LifecycleOwner?, initialValue: T?, onUpdate: (T) -> Unit) {
+    initialValue?.let { onUpdate(initialValue) }
+    observe(lifecycleOwner, onUpdate)
+}

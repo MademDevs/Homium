@@ -19,9 +19,7 @@ import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.setPictureFromPath
 import de.madem.homium.utilities.switchToActivityForResult
 
-class RecipePresentationActivity : AppCompatActivity(){
-
-    //quelle: https://github.com/saulmm/CoordinatorExamples
+class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
     private lateinit var recipe: Recipe
@@ -41,20 +39,29 @@ class RecipePresentationActivity : AppCompatActivity(){
     }
 
     private fun loadRecipe() {
-        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
-        if(recipeid > 0) {
+        recipeid = intent.getIntExtra(
+            resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+            -1
+        )
+        if (recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
 
             val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid)
+                }
                 .onDone { description = it; initGuiElements() }
 
             val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid)
+                }
                 .onDone { ingredients = it; op2.start() }
 
             CoroutineBackgroundTask<Recipe>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getRecipeById(recipeid)
+                }
                 .onDone { recipe = it; op1.start() }
                 .start()
         }
@@ -67,17 +74,20 @@ class RecipePresentationActivity : AppCompatActivity(){
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if(id == R.id.presentation_toolbar_edit) {
-            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivity::class) {
+        if (id == R.id.presentation_toolbar_edit) {
+            switchToActivityForResult(
+                REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
+                RecipeEditActivity::class
+            ) {
                 it.putExtra("recipe", recipeid)
             }
             return true
         }
-        if(id == R.id.presentation_toolbar_cook) {
+        if (id == R.id.presentation_toolbar_cook) {
             println("Cooking function called")
             return true
         }
-        if(id == android.R.id.home) {
+        if (id == android.R.id.home) {
             finish()
             return true
         }
@@ -93,31 +103,36 @@ class RecipePresentationActivity : AppCompatActivity(){
 
     class TabsAdapter(
         fm: FragmentManager?,
-        private val description: List<RecipeDescription>,
-        private val ingredients: List<RecipeIngredient>
+        description: List<RecipeDescription>,
+        ingredients: List<RecipeIngredient>
     ) : FragmentStatePagerAdapter(fm!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        override fun getCount(): Int {
-            return 1 + description.size
-        }
+        private val fragments = mutableListOf<Fragment>()
 
-        override fun getItem(position: Int): Fragment {
-            return if(position == 0) {
-                var text = ""
-                for(el in ingredients) {
-                    text += "${el.count} ${el.unit} ${el.name} \n"
-                }
-                RecipePresentationStepFragment().apply { textToDisplay.value = text }
-            } else {
-                RecipePresentationStepFragment().apply { textToDisplay.value = description[position-1].description }
+        init {
+            var text = ""
+            for (el in ingredients) {
+                text += "${el.count} ${el.unit} ${el.name} \n"
             }
+
+            fragments.add(
+                RecipePresentationStepFragment.with(text)
+            )
+
+            fragments.addAll(
+                description.map {
+                    RecipePresentationStepFragment.with(it.description)
+                }
+            )
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
-            return when (position) {
+        override fun getCount(): Int = fragments.size
+
+        override fun getItem(position: Int): Fragment = fragments[position]
+
+        override fun getPageTitle(position: Int): CharSequence? =  when (position) {
                 0 -> "Zutaten"
                 else -> "Schritt $position"
-            }
         }
 
     }

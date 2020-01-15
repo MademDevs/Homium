@@ -4,69 +4,66 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.databinding.FragmentPresentationStepBinding
 import de.madem.homium.databinding.FragmentPresentationStepCardBinding
+import de.madem.homium.utilities.applyAndObserver
 import de.madem.homium.utilities.inflater
 
-class RecipePresentationStepFragment
-    : Fragment() {
+private typealias StepBinding = FragmentPresentationStepBinding
+private typealias StepCardBinding = FragmentPresentationStepCardBinding
+private typealias StepViewModel = RecipePresentationStepViewModel
 
-    var textToDisplay: MutableLiveData<String> = MutableLiveData("")
+private typealias RVVH = RecyclerView.ViewHolder
+private typealias RVAdapter<T> = RecyclerView.Adapter<T>
 
-    private lateinit var binding: FragmentPresentationStepBinding
+class RecipePresentationStepFragment : Fragment() {
+
+    companion object {
+        fun with(text: String) = RecipePresentationStepFragment()
+            .apply {
+                arguments = bundleOf(
+                    Pair("text", text)
+                )
+            }
+    }
+
+    private lateinit var viewModel: StepViewModel
+    private lateinit var binding: StepBinding
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, sis: Bundle?): View? {
-        binding = FragmentPresentationStepBinding.inflate(inflater, parent, false)
+        //init data binding
+        binding = StepBinding.inflate(inflater, parent, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        binding.recyclerView.adapter = Adapter(viewLifecycleOwner, textToDisplay)
-    }
+        //init view model
+        viewModel = ViewModelProviders.of(this).get(StepViewModel::class.java).apply {
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString("text", textToDisplay.value)
-
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        savedInstanceState?.getString("text")
-            .takeIf { it?.isNotEmpty() ?: false }
-            .also { textToDisplay.value = it }
-    }
-
-
-    private class Adapter(
-        owner: LifecycleOwner, textLiveData: LiveData<String>
-    ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
-
-        private var textToDisplay: String = ""
-
-        init {
-            textLiveData.observe(owner, Observer {
-                textToDisplay = it
-                notifyDataSetChanged()
-            })
+            //get text from bundle and add it to view model
+            textToDisplay.value = arguments?.getString("text") ?: ""
         }
+    }
 
-        private class ViewHolder(
-            val binding: FragmentPresentationStepCardBinding
-        ) : RecyclerView.ViewHolder(binding.root)
+    override fun onViewCreated(view: View, sis: Bundle?) {
+        super.onViewCreated(view, sis)
+
+        binding.recyclerView.adapter = Adapter(viewModel.textToDisplay)
+    }
+
+    private class Adapter(var textToDisplay: LiveData<String>) : RVAdapter<Adapter.ViewHolder>() {
+
+        private class ViewHolder(val binding: StepCardBinding) : RVVH(binding.root)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = FragmentPresentationStepCardBinding.inflate(
+            val binding = StepCardBinding.inflate(
                 parent.inflater(), parent, false
             )
 
@@ -75,8 +72,10 @@ class RecipePresentationStepFragment
 
         override fun getItemCount() = 1
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.binding){
-            cardText.text = textToDisplay
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.binding) {
+            textToDisplay.applyAndObserver(lifecycleOwner, textToDisplay.value) {
+                cardText.text = it
+            }
         }
     }
 
