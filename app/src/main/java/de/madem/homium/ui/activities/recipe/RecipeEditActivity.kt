@@ -67,34 +67,7 @@ class RecipeEditActivity : AppCompatActivity() {
 
     lateinit var savedData: Bundle
 
-    override fun onResume() {
-        super.onResume()
-        if(::savedData.isInitialized) {
-            ingredientCounter = savedData.getInt("counter")
-            for(i in 1..ingredientCounter) {
-                val item: Ingredient? = savedData.getIngredient(INGREDIENT_KEY_DUMMY.replace("#","$i"))
-                if(item != null) {
-                    ingredients.add(item)
-                }
-            }
 
-            descrCounter = savedData.getInt("descriptions")
-            println("Counter: $descrCounter")
-            for(i in 1..descrCounter) {
-                val item: String? = savedData.getString(DESCRIPTION_KEY_DUMMY.replace("#","$i"))
-                println("beschreibung$i: $item")
-                if(item != null) {
-                    descriptions.add(item)
-                    addDescriptionToLayout(item,i)
-                }
-            }
-
-            setIngredientsFromBundle(ingredients)
-            //addDescriptionToLayout(descriptions)
-
-
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,24 +75,6 @@ class RecipeEditActivity : AppCompatActivity() {
 
         initGuiComponents()
 
-        if(savedInstanceState != null) {
-            savedData = savedInstanceState
-        }
-
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)//intent.getIntExtra("recipe", -1)
-        println("Recipe-ID: $recipeid")
-
-
-        if(recipeid >= 0) {
-            setRecipeToElements(recipeid)
-            supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
-        } else {
-            assignPreDefinedNameIfExisting()
-            supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
-        }
     }
 
 
