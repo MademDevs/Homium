@@ -5,6 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.databinding.FragmentPresentationStepBinding
 import de.madem.homium.databinding.FragmentPresentationStepCardBinding
@@ -13,7 +17,7 @@ import de.madem.homium.utilities.inflater
 class RecipePresentationStepFragment
     : Fragment() {
 
-    lateinit var textToDisplay: String
+    var textToDisplay: MutableLiveData<String> = MutableLiveData("")
 
     private lateinit var binding: FragmentPresentationStepBinding
 
@@ -22,15 +26,40 @@ class RecipePresentationStepFragment
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) = with(binding) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        recyclerView.adapter = Adapter(textToDisplay)
+        binding.recyclerView.adapter = Adapter(viewLifecycleOwner, textToDisplay)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("text", textToDisplay.value)
+
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        savedInstanceState?.getString("text")
+            .takeIf { it?.isNotEmpty() ?: false }
+            .also { textToDisplay.value = it }
+    }
+
+
     private class Adapter(
-        private val textToDisplay: String
+        owner: LifecycleOwner, textLiveData: LiveData<String>
     ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+        private var textToDisplay: String = ""
+
+        init {
+            textLiveData.observe(owner, Observer {
+                textToDisplay = it
+                notifyDataSetChanged()
+            })
+        }
 
         private class ViewHolder(
             val binding: FragmentPresentationStepCardBinding
@@ -49,7 +78,6 @@ class RecipePresentationStepFragment
         override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder.binding){
             cardText.text = textToDisplay
         }
-
     }
 
 }
