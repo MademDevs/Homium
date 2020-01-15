@@ -80,7 +80,7 @@ class RecipePresentationActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if(id == R.id.presentation_toolbar_edit) {
-            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivity::class) {
+            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivityNew::class) {
                 it.putExtra("recipe", recipeid)
             }
             return true

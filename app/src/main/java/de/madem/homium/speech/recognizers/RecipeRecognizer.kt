@@ -6,7 +6,7 @@ import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
-import de.madem.homium.ui.activities.recipe.RecipeEditActivity
+import de.madem.homium.ui.activities.recipe.RecipeEditActivityNew
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +70,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             }.onDone {success ->
                 if(success){
 
-                    context.switchToActivity(RecipeEditActivity::class){intent ->
+                    context.switchToActivity(RecipeEditActivityNew::class){ intent ->
                         if(name.isNotEmpty() && name.isNotBlank()){
                             intent.putExtra(context.resources.getString(R.string.data_transfer_intent_edit_recipe_name),
                                 name)
@@ -105,7 +105,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
             val recipeId = recipeDao.getIdByName(name=recipeName)
 
-            changedActivityIfValid(RecipeEditActivity::class,recipeId)
+            changedActivityIfValid(RecipeEditActivityNew::class,recipeId)
 
         }.onDone {success ->
             if(!success){

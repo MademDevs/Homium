@@ -19,15 +19,15 @@ class RecipeEditViewModelFactory(private val recipeId: Int?): ViewModelProvider.
     }
 }
 
-class RecipeEditViewModel(val recipeId: Int?): ViewModel() {
+class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
 
-    private val _recipe = MutableLiveData<Recipe>()
+    private var _recipe = MutableLiveData<Recipe>()
     val recipe: LiveData<Recipe>
         get() = _recipe
-    private val _ingredients = MutableLiveData<MutableList<RecipeIngredient>>()
+    private var _ingredients = MutableLiveData<MutableList<RecipeIngredient>>()
     val ingredients: LiveData<MutableList<RecipeIngredient>>
         get() = _ingredients
-    private val _descriptions = MutableLiveData<MutableList<RecipeDescription>>()
+    private var _descriptions = MutableLiveData<MutableList<RecipeDescription>>()
     val descriptions: LiveData<MutableList<RecipeDescription>>
         get() = _descriptions
     private val database = AppDatabase.getInstance()
@@ -55,6 +55,54 @@ class RecipeEditViewModel(val recipeId: Int?): ViewModel() {
             .executeInBackground { database.recipeDao().getDescriptionByRecipeId(recipeId!!) }
             .onDone { _descriptions.value = it.toMutableList() }
             .start()
+    }
+
+    fun setImagePath(path: String) {
+        _recipe.value?.image = path
+    }
+
+    fun addIngredient(item: RecipeIngredient) {
+        val list = _ingredients.value
+        list?.add(item)
+        _ingredients.value = list
+    }
+
+    fun addDescription(item: RecipeDescription) {
+        val list = _descriptions.value
+        list?.add(item)
+        _descriptions.value = list
+    }
+
+    fun editDescription(index: Int, item: RecipeDescription) {
+        println("editDescription: $index - ${item.description}")
+        val list = _descriptions.value
+        list?.set(index, item)
+        _descriptions.value = list
+    }
+
+    fun addDataToDatabase() {
+        CoroutineBackgroundTask<Unit>().executeInBackground {
+            if (recipeId == null) {
+                var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
+                changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
+                _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
+                _descriptions.value?.forEach { database.recipeDao().insertDescription(it) }
+            } else {
+                changeIngredientsAndDescriptionsRecipeId(recipeId)
+                database.recipeDao().deleteIngredientByRecipeId(recipeId)
+                database.recipeDao().deleteDescriptionByRecipeId(recipeId)
+                database.recipeDao().updateRecipe(_recipe.value!!)
+                _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
+                _descriptions.value?.forEach { database.recipeDao().insertDescription(it) }
+            }
+        }.onDone {
+            println("inserted reciped with ingredients and descriptions")
+        }.start()
+    }
+
+    private fun changeIngredientsAndDescriptionsRecipeId(id: Int) {
+        _ingredients.value?.forEach { it.recipeId = id }
+        _descriptions.value?.forEach { it.recipeID = id }
     }
 
 }
