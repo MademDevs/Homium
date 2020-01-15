@@ -94,7 +94,10 @@ class InventoryItemEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.inventory_item_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
+            android.R.id.home -> {
+                finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)

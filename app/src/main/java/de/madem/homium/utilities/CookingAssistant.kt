@@ -12,7 +12,7 @@ import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroun
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.showToastShort
-import de.madem.homium.utilities.quantitycalculation.QuantityCalculator
+import de.madem.homium.utilities.quantitycalculation.InventoryQuantityCalculationOperator
 import de.madem.homium.utilities.quantitycalculation.UnitConverter
 import java.lang.ref.WeakReference
 
@@ -45,7 +45,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
     private val shoppingDao = AppDatabase.getInstance().itemDao()
 
     private val unitConverter : UnitConverter = UnitConverter()
-    private val quantityCalculator = QuantityCalculator(unitConverter)
+    private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter)
 
     //public functions
     fun cookRecipe(recipe: Recipe){
@@ -202,12 +202,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
 
                 //executing each operation
                 operations.forEach { operationInfo ->
-
-                    val quantity = operationInfo.info.second
-
-                    while (quantity > 0){
-                        //TODO: Implement Logic for subtracting quantity from Inventoryitems
-                    }
+                    inventoryQuantityOperator.subractFromInventory(operationInfo)
                 }
 
             }.onDone {
