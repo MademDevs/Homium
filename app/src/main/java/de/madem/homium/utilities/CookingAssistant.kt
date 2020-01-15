@@ -111,7 +111,20 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
                     forbiddenUnits = Units.nonconvertibleUnits())
 
                 //creating unit value of ingriedient unit string (if not possible, ingriedent is ignored)
-                val ingredientUnit : Units = Units.unitOf(ingredient.unit) ?: continue
+                val ingredientOriginUnit : Units = Units.unitOf(ingredient.unit) ?: continue
+
+                var ingredientUnit = ingredientOriginUnit
+                var ingredientCount = ingredient.count
+
+                if(ingredientOriginUnit.isBigUnit()){
+                    //scale down big units to small unit to avoid mistakes because of integer division
+                    val convResult = unitConverter.convertUnit(Pair(ingredientCount,ingredientUnit.getString()),
+                        ingredientUnit.getDownscaledUnit())
+
+                    ingredientCount = convResult.first
+                    ingredientUnit = Units.unitOf(convResult.second) ?: continue
+                }
+
 
                 //getting sum of quantity of convertible units
                 val quantitySumInInventory = convertibleItemsWithName
@@ -121,14 +134,29 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
 
                 //decide what to do depending on quantitySum
                 //case that there is less in inventory than needed in ingredient
-                if(quantitySumInInventory < ingredient.count){
-                    val countDifference = ingredient.count - quantitySumInInventory
-                    missingShoppingItems.add(ShoppingItem(ingredient.name,countDifference,ingredient.unit))
+                if(quantitySumInInventory < ingredientCount){
+                    val countDifference = ingredientCount - quantitySumInInventory
+                    if(allowedToScaleBack(countDifference,ingredientOriginUnit)){
+                        val backConvert = unitConverter.convertUnit(Pair(countDifference,ingredientUnit.getString()),ingredientOriginUnit)
+                        missingShoppingItems.add(ShoppingItem(ingredient.name,backConvert.first,backConvert.second))
+                    }
+                    else{
+                        missingShoppingItems.add(ShoppingItem(ingredient.name,countDifference,ingredientUnit.getString()))
+                    }
+
                 }
                 //case that there is more in inventory than needed in ingredient
                 else{
                     val subtractValues : Triple<List<Int>,Int,String> =
-                        Triple(convertibleItemsWithName.map{it.uid},ingredient.count,ingredient.unit)
+                        if(allowedToScaleBack(ingredientCount,ingredientUnit)) {
+                            val backConvert = unitConverter.convertUnit(Pair(ingredientCount,ingredientUnit.getString()),ingredientOriginUnit)
+                            Triple(convertibleItemsWithName.map{it.uid},backConvert.first,backConvert.second)
+                    }
+                    else{
+                        Triple(convertibleItemsWithName.map{it.uid},ingredientCount,ingredientUnit.getString())
+                    }
+
+
                     subtractQuantities.add(InventoryQuantityOperationInformation(subtractValues))
                 }
 
@@ -186,6 +214,10 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
                 showToast("STILL TODO: DELETE FROM INVENTORY")
             }.start()
 
+    }
+
+    private fun allowedToScaleBack(count : Int, originUnit : Units): Boolean {
+        return (count % 1000 == 0) && (originUnit.isBigUnit())
     }
 
 

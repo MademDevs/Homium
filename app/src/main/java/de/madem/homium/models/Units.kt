@@ -98,6 +98,38 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
         }
     }
 
+    fun getAssociatedUnitInOtherScale() : Units{
+        return if(this.isConvertible()){
+            when(this){
+                GRAM -> KILOGRAM
+                KILOGRAM -> GRAM
+                LITRE -> MILLILITRE
+                MILLILITRE -> LITRE
+                else -> ITEM
+            }
+        }
+        else{
+             this
+        }
+    }
+
+    fun isBigUnit() : Boolean{
+        return this == KILOGRAM || this == LITRE
+    }
+
+    fun isSmallUnit() : Boolean{
+        return this == GRAM || this == MILLILITRE
+    }
+
+    fun getDownscaledUnit() : Units{
+        return if(isBigUnit()){
+            getAssociatedUnitInOtherScale()
+        }
+        else{
+            this
+        }
+    }
+
 
 
 }
