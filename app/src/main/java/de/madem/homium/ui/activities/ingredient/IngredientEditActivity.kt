@@ -106,6 +106,10 @@ class IngredientEditActivity : AppCompatActivity() {
                     false
                 }
             }
+            android.R.id.home -> {
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

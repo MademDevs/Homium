@@ -49,13 +49,16 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
             .start()
         CoroutineBackgroundTask<List<RecipeIngredient>>()
             .executeInBackground { database.recipeDao().getIngredientByRecipeId(recipeId!!) }
-            .onDone { _ingredients.value = it.toMutableList() }
+            .onDone {
+                _ingredients.value = it.toMutableList()
+                _ingredients.value?.forEach { println("load ingredient from Database: $it") }
+            }
             .start()
         CoroutineBackgroundTask<List<RecipeDescription>>()
             .executeInBackground { database.recipeDao().getDescriptionByRecipeId(recipeId!!) }
             .onDone {
                 _descriptions.value = it.toMutableList()
-                println(_descriptions.value)
+                _descriptions.value?.forEach { println("load description from Database: $it") }
             }
             .start()
     }
@@ -85,10 +88,9 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
         _descriptions.value = list
     }
 
-    fun editDescription(index: Int, item: RecipeDescription) {
-        println("editDescription: $index - ${item.description}")
+    fun editDescription(index: Int, name: String) {
         val list = _descriptions.value
-        list?.set(index, item)
+        list?.get(index)?.description = name
         _descriptions.value = list
     }
 
@@ -101,13 +103,19 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
                 _descriptions.value?.forEach { database.recipeDao().insertDescription(it) }
             } else {
                 changeIngredientsAndDescriptionsRecipeId(recipeId)
-                //database.recipeDao().deleteIngredientByRecipeId(recipeId)
-                //database.recipeDao().deleteDescriptionByRecipeId(recipeId)
+                database.recipeDao().deleteIngredientByRecipeId(recipeId)
+                database.recipeDao().deleteDescriptionByRecipeId(recipeId)
                 database.recipeDao().updateRecipe(_recipe.value!!)
-                //_ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
-                //_descriptions.value?.forEach { database.recipeDao().insertDescription(it) }
-                _ingredients.value?.forEach { database.recipeDao().updateIngredients(it) }
-                _descriptions.value?.forEach { database.recipeDao().updateDescription(it) }
+                _ingredients.value?.forEach {
+                    val index = _ingredients.value?.indexOf(it)
+                    println("add ingredient to Database: $it")
+                    database.recipeDao().insertIngredient(it)
+                }
+                _descriptions.value?.forEach {
+                    val index = _descriptions.value?.indexOf(it)
+                    println("add description to Database: $it")
+                    database.recipeDao().insertDescription(it)
+                }
             }
         }.onDone {
             println("inserted reciped with ingredients and descriptions")

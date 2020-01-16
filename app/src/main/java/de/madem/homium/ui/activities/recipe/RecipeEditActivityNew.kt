@@ -70,7 +70,7 @@ class RecipeEditActivityNew: AppCompatActivity() {
                     setOnFocusChangeListener { _, hasFocus ->
                         if(hasFocus) {  }
                         if(!hasFocus) {
-                            recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(text.toString(), 0))
+                            recipeEditViewModel.editDescription(newDescription.indexOf(el), text.toString())
                         }
                     }
                 }
@@ -102,30 +102,6 @@ class RecipeEditActivityNew: AppCompatActivity() {
                 binding.recipeEditLayoutIngr.addView(view)
             }
         })
-        /*
-        recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
-            binding.recipeEditLayoutDescr.removeAllViews()
-            var descriptionList = mutableListOf<String>()
-            for(el in newDescription) {
-                descriptionList.add(el.description)
-                println(el.description)
-                val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
-                with(view.findViewById<EditText>(R.id.descr_editTxt)) {
-                    println("edittext setter ${el.description}")
-                    setText(el.description)
-                    setOnFocusChangeListener { _, hasFocus ->
-                        if(hasFocus) {  }
-                        if(!hasFocus) {
-                            println("edittext listener $text")
-                            recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(text.toString(), 0))
-                        }
-                    }
-                }
-                binding.recipeEditLayoutDescr.addView(view)
-            }
-        })
-         */
         binding.recipeEditTitleEditTxt.setOnFocusChangeListener { v, hasFocus ->
             if(!hasFocus) {
                 val editText = v as EditText
