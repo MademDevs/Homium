@@ -81,11 +81,10 @@ class RecipeEditActivityNew: AppCompatActivity() {
                     setText(el.description)
                     //TODO: TextChangeListener not working properly yet -> Fires on every change in edittext instead of when done with editing
                     //TODO: OrientationChange still messed up
-                    addTextChangedListener( object: TextWatcher {
-                        override fun afterTextChanged(p0: Editable?) { recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(p0.toString(), 0)) }
-                        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {  }
-                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {  }
-                    })
+                    setOnFocusChangeListener { v, hasFocus ->
+                        if(hasFocus) { println("edittext focus") }
+                        if(!hasFocus) { println("edittext no focus") }
+                    }
                 }
                 binding.recipeEditLayoutDescr.addView(view)
             }
