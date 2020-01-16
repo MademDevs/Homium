@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -74,16 +75,19 @@ class RecipeEditActivityNew: AppCompatActivity() {
         })
         recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
             binding.recipeEditLayoutDescr.removeAllViews()
+            var descriptionList = mutableListOf<String>()
             for(el in newDescription) {
+                descriptionList.add(el.description)
+                println(el.description)
                 val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
                 view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
                 with(view.findViewById<EditText>(R.id.descr_editTxt)) {
                     setText(el.description)
-                    //TODO: TextChangeListener not working properly yet -> Fires on every change in edittext instead of when done with editing
-                    //TODO: OrientationChange still messed up
                     setOnFocusChangeListener { v, hasFocus ->
-                        if(hasFocus) { println("edittext focus") }
-                        if(!hasFocus) { println("edittext no focus") }
+                        if(hasFocus) {  }
+                        if(!hasFocus) {
+                            recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(text.toString(), 0))
+                        }
                     }
                 }
                 binding.recipeEditLayoutDescr.addView(view)
