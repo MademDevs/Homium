@@ -58,6 +58,35 @@ class RecipeEditActivityNew: AppCompatActivity() {
         initGuiComponents()
     }
 
+    override fun onResume() {
+        super.onResume()
+        recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
+            binding.recipeEditLayoutDescr.removeAllViews()
+            for(el in newDescription) {
+                val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+                view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
+                with(view.findViewById<EditText>(R.id.descr_editTxt)) {
+                    setText(el.description)
+                    setOnFocusChangeListener { _, hasFocus ->
+                        if(hasFocus) {  }
+                        if(!hasFocus) {
+                            recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(text.toString(), 0))
+                        }
+                    }
+                }
+                binding.recipeEditLayoutDescr.addView(view)
+            }
+        })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        for (el in binding.recipeEditLayoutDescr.children) {
+            el.findViewById<EditText>(R.id.descr_editTxt).isFocusable = false
+        }
+        binding.recipeEditTitleEditTxt.isFocusable = false
+    }
+
     private fun initGuiComponents() {
         recipeEditViewModel.recipe.observe(this, Observer { newRecipe ->
             binding.recipeEditTitleEditTxt.setText(newRecipe.name)
@@ -73,6 +102,7 @@ class RecipeEditActivityNew: AppCompatActivity() {
                 binding.recipeEditLayoutIngr.addView(view)
             }
         })
+        /*
         recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
             binding.recipeEditLayoutDescr.removeAllViews()
             var descriptionList = mutableListOf<String>()
@@ -82,10 +112,12 @@ class RecipeEditActivityNew: AppCompatActivity() {
                 val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
                 view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
                 with(view.findViewById<EditText>(R.id.descr_editTxt)) {
+                    println("edittext setter ${el.description}")
                     setText(el.description)
-                    setOnFocusChangeListener { v, hasFocus ->
+                    setOnFocusChangeListener { _, hasFocus ->
                         if(hasFocus) {  }
                         if(!hasFocus) {
+                            println("edittext listener $text")
                             recipeEditViewModel.editDescription(newDescription.indexOf(el), RecipeDescription(text.toString(), 0))
                         }
                     }
@@ -93,12 +125,13 @@ class RecipeEditActivityNew: AppCompatActivity() {
                 binding.recipeEditLayoutDescr.addView(view)
             }
         })
-        //TODO: Implement working listener also for RecipeName
-        binding.recipeEditTitleEditTxt.addTextChangedListener( object: TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {  }
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {  }
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {  }
-        })
+         */
+        binding.recipeEditTitleEditTxt.setOnFocusChangeListener { v, hasFocus ->
+            if(!hasFocus) {
+                val editText = v as EditText
+                recipeEditViewModel.editRecipeName(editText.text.toString())
+            }
+        }
         binding.recipeEditImgView.setOnClickListener { dispatchTakePictureIntent() }
         binding.recipeEditAddIngredientBtn.setOnClickListener { switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class) }
         binding.recipeEditAddDescriptionBtn.setOnClickListener { recipeEditViewModel.addDescription(RecipeDescription("", 0)) }
@@ -130,7 +163,7 @@ class RecipeEditActivityNew: AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_TAKE_PHOTO -> recipeEditViewModel.setImagePath(picturePath)
+                REQUEST_TAKE_PHOTO -> recipeEditViewModel.editImagePath(picturePath)
                 REQUEST_CODE_ADD_INGREDIENT -> {
                     data.notNull { dataIntent ->
                         val ingrName = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name)) ?: ""
@@ -156,6 +189,10 @@ class RecipeEditActivityNew: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> {
+                for(el in binding.recipeEditLayoutDescr.children) {
+                    el.findViewById<EditText>(R.id.descr_editTxt).isFocusable = false
+                }
+                binding.recipeEditTitleEditTxt.isFocusable = false
                 recipeEditViewModel.addDataToDatabase()
                 finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
             }
