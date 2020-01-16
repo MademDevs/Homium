@@ -96,6 +96,7 @@
     <string name="txtView_recipesName">Rezeptname</string>
     <string name="recipeEdit_title_add">Rezept hinzufügen</string>
     <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
+    <string name="recipe_actionmode_delete_question">Sollen die ausgewählten Rezepte wirklich gelöscht werden?</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>
@@ -220,4 +221,19 @@
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
     <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
+
+
+    <string name="lorem">
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+		In mollis est vitae erat laoreet consectetur. Mauris dui mauris,
+		dictum vel egestas vel, porta sed ante. Phasellus congue viverra ipsum,
+		in elementum arcu ultricies nec.Morbi tincidunt nisl lacinia, placerat nisi eget, luctus tortor.
+		Morbi efficitur dictum leo, sit amet volutpat lorem sodales nec. Quisque et erat et turpis fringilla condimentum.
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris auctor vulputate libero vitae iaculis.
+		Curabitur id blandit quam. Praesent massa ante, pulvinar vitae sagittis commodo, scelerisque porttitor eros.
+		Mauris suscipit a enim nec congue. Mauris tristique cursus aliquet. Nunc quis hendrerit nunc. Praesent tristique tellus purus,
+		a pretium ex gravida id. Cras laoreet malesuada nulla, at bibendum metus ultricies a. Fusce eu ornare arcu. Proin ut molestie est.
+	</string>
+
+
 </resources>

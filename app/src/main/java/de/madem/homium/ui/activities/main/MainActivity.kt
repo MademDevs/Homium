@@ -13,12 +13,15 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import de.madem.homium.BuildConfig
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SPEECH
 import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.utilities.showToastLong
+import de.madem.homium.utilities.switchToActivity
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import java.lang.Exception
@@ -64,6 +67,9 @@ class MainActivity : AppCompatActivity() {
             menuInflater.inflate(R.menu.activity_main_actionbar_menu,menu)
         }
 
+        if (!BuildConfig.DEBUG) {
+            menu?.findItem(R.id.main_actionbar_testezone)?.isVisible = false
+        }
 
         return super.onCreateOptionsMenu(menu)
     }
