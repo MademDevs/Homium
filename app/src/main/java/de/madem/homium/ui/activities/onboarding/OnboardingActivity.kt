@@ -60,8 +60,6 @@ class OnboardingActivity : AppIntro() {
         addSlide(OnboardingSlideInventory())
         addSlide(OnboardingSlideRecipe())
         addSlide(OnboardingSlideSpeachAssistant())
-
-        //addSlide(OnboardingSlideComingSoon())
     }
 
     private fun goToMain() {

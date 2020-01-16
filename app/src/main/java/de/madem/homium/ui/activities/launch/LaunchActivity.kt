@@ -26,7 +26,7 @@ class LaunchActivity : AppCompatActivity() {
             .withTargetActivity(target)
             .withSplashTimeOut(2000)
             .withBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .withLogo(R.drawable.onboarding_logo)
+            .withLogo(R.drawable.logo_svg)
             .withAfterLogoText(resources.getString(R.string.app_name))
 
         with(splashScreen){
