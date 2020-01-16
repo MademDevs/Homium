@@ -51,14 +51,12 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
             .executeInBackground { database.recipeDao().getIngredientByRecipeId(recipeId!!) }
             .onDone {
                 _ingredients.value = it.toMutableList()
-                _ingredients.value?.forEach { println("load ingredient from Database: $it") }
             }
             .start()
         CoroutineBackgroundTask<List<RecipeDescription>>()
             .executeInBackground { database.recipeDao().getDescriptionByRecipeId(recipeId!!) }
             .onDone {
                 _descriptions.value = it.toMutableList()
-                _descriptions.value?.forEach { println("load description from Database: $it") }
             }
             .start()
     }
@@ -100,21 +98,23 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
                 var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
                 changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
                 _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
-                _descriptions.value?.forEach { database.recipeDao().insertDescription(it) }
+                _descriptions.value?.forEach {
+                    if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                        database.recipeDao().insertDescription(it)
+                    }
+                }
             } else {
                 changeIngredientsAndDescriptionsRecipeId(recipeId)
                 database.recipeDao().deleteIngredientByRecipeId(recipeId)
                 database.recipeDao().deleteDescriptionByRecipeId(recipeId)
                 database.recipeDao().updateRecipe(_recipe.value!!)
                 _ingredients.value?.forEach {
-                    val index = _ingredients.value?.indexOf(it)
-                    println("add ingredient to Database: $it")
                     database.recipeDao().insertIngredient(it)
                 }
                 _descriptions.value?.forEach {
-                    val index = _descriptions.value?.indexOf(it)
-                    println("add description to Database: $it")
-                    database.recipeDao().insertDescription(it)
+                    if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                        database.recipeDao().insertDescription(it)
+                    }
                 }
             }
         }.onDone {
