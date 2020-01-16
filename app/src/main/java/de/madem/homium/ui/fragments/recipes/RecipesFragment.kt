@@ -20,6 +20,10 @@ import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.switchToActivity
+import de.madem.homium.utilities.extensions.vibrate
 
 class RecipesFragment : Fragment() {
 

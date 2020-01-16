@@ -20,8 +20,6 @@ import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
-import de.madem.homium.utilities.showToastLong
-import de.madem.homium.utilities.switchToActivity
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import java.lang.Exception

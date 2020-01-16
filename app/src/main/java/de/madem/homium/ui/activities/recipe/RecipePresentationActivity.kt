@@ -1,5 +1,6 @@
 package de.madem.homium.ui.activities.recipe
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,9 +16,11 @@ import de.madem.homium.databinding.ActivityRecipePresentationBinding
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.setPictureFromPath
-import de.madem.homium.utilities.switchToActivityForResult
+import de.madem.homium.utilities.CookingAssistant
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.setPictureFromPath
+import de.madem.homium.utilities.extensions.switchToActivityForResult
+import java.lang.ref.WeakReference
 
 class RecipePresentationActivity : AppCompatActivity() {
 
@@ -25,6 +28,7 @@ class RecipePresentationActivity : AppCompatActivity() {
     private lateinit var recipe: Recipe
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
+    private lateinit var cookingAssistant : CookingAssistant
 
     private lateinit var binding: ActivityRecipePresentationBinding
 
@@ -34,6 +38,8 @@ class RecipePresentationActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(
             this, R.layout.activity_recipe_presentation
         )
+
+        cookingAssistant = CookingAssistant(WeakReference<Context>(this))
 
         loadRecipe()
     }
@@ -84,6 +90,7 @@ class RecipePresentationActivity : AppCompatActivity() {
             return true
         }
         if (id == R.id.presentation_toolbar_cook) {
+            cookRecipe()
             println("Cooking function called")
             return true
         }
@@ -135,6 +142,10 @@ class RecipePresentationActivity : AppCompatActivity() {
                 else -> "Schritt $position"
         }
 
+    }
+
+    private fun cookRecipe(){
+        cookingAssistant.cookRecipe(recipe)
     }
 
 
