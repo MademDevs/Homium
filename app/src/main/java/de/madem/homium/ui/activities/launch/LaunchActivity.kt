@@ -1,6 +1,5 @@
 package de.madem.homium.ui.activities.launch
 
-import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,9 +23,9 @@ class LaunchActivity : AppCompatActivity() {
         val splashScreen = EasySplashScreen(this@LaunchActivity)
             .withFullScreen()
             .withTargetActivity(target)
-            .withSplashTimeOut(2000)
+            .withSplashTimeOut(500)
             .withBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .withLogo(R.drawable.onboarding_logo)
+            .withLogo(R.drawable.logo_svg)
             .withAfterLogoText(resources.getString(R.string.app_name))
 
         with(splashScreen){

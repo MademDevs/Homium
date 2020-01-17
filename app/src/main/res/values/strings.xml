@@ -25,13 +25,17 @@
     <string name="onboarding_comingSoon_headline">Coming Soon ;)</string>
     <string name="onboarding_recipe_headline">Erstelle eigene Rezepte</string>
     <string name="onboarding_speachAssistant_headline">Der Sprachassistent zur leichteren Bedienung</string>
+    <string name="onboarding_inventory_headline">Behalte den Überblick mit der Inventarliste</string>
 
     <!--Onboarding Decriptions-->
     <string name="onboarding_welcome">Willkommen zu Homeium - deinem Haushaltsassistenten!
     Es folgt eine kleine Erklärung zur Bedienung der App</string>
 
     <string name="onboarding_shopping">Erstelle eine Einkaufsliste für den Wocheneinkauf. Markiere per Antippen deine Produkte und entferne
-        die eingekauften Elemente per Swipe von der Liste. Ein Bearbeiten ist ganz einfach per langem Tippen möglich. </string>
+        die eingekauften Elemente per Swipe nach unten von der Liste. Ein Bearbeiten ist ganz einfach mit langem Tippen möglich. </string>
+
+    <string name="onboarding_inventory">Speichere deine vorhandenen Lebensmittel und Haushaltsgegenstände im Inventar und über-
+        prüfe jederzeit deinen aktuellen Versorgungsstand.</string>
 
     <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
 
@@ -215,19 +219,4 @@
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
     <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
-
-
-    <string name="lorem">
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-		In mollis est vitae erat laoreet consectetur. Mauris dui mauris,
-		dictum vel egestas vel, porta sed ante. Phasellus congue viverra ipsum,
-		in elementum arcu ultricies nec.Morbi tincidunt nisl lacinia, placerat nisi eget, luctus tortor.
-		Morbi efficitur dictum leo, sit amet volutpat lorem sodales nec. Quisque et erat et turpis fringilla condimentum.
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris auctor vulputate libero vitae iaculis.
-		Curabitur id blandit quam. Praesent massa ante, pulvinar vitae sagittis commodo, scelerisque porttitor eros.
-		Mauris suscipit a enim nec congue. Mauris tristique cursus aliquet. Nunc quis hendrerit nunc. Praesent tristique tellus purus,
-		a pretium ex gravida id. Cras laoreet malesuada nulla, at bibendum metus ultricies a. Fusce eu ornare arcu. Proin ut molestie est.
-	</string>
-
-
 </resources>

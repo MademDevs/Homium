@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/navigation_shopping"
-        android:icon="@drawable/baseline_shopping_cart_black_18dp"
+        android:icon="@drawable/shopping_svg"
         android:title="@string/title_shopping" />
 
     <item
         android:id="@+id/navigation_inventory"
-        android:icon="@drawable/baseline_list_black_18dp"
+        android:icon="@drawable/inventory_svg"
         android:title="@string/title_inventory" />
 
     <item
         android:id="@+id/navigation_recipes"
-        android:icon="@drawable/baseline_receipt_black_18dp"
+        android:icon="@drawable/recipe_svg"
         android:title="@string/title_recipes" />
 
     <!--<item
@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/baseline_settings_applications_black_18dp"
+        android:icon="@drawable/settings_svg"
         android:title="@string/title_settings" />
 
 
