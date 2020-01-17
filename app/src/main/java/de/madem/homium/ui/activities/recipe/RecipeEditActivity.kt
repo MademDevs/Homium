@@ -329,7 +329,11 @@ class RecipeEditActivity : AppCompatActivity() {
                 }
             }.onDone {
                 println("recipeedit $recipeid")
-                finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
+                finishWithResultData(Activity.RESULT_OK){
+                    it.putExtra("dataChanged",true)
+                    it.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeid)
+                }
+                //finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
             }.start()
         } else {
             Toast.makeText(

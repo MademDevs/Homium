@@ -1,5 +1,6 @@
 package de.madem.homium.ui.activities.recipe
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -49,6 +50,8 @@ class RecipePresentationActivity : AppCompatActivity() {
 
         cookingAssistant = CookingAssistant(WeakReference<Context>(this))
 
+        recipeid = intent.getIntExtra(
+            resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
         loadRecipe(savedInstanceState)
     }
 
@@ -58,11 +61,8 @@ class RecipePresentationActivity : AppCompatActivity() {
 
     }
 
-    private fun loadRecipe(savedInstanceState: Bundle?) {
-        recipeid = intent.getIntExtra(
-            resources.getString(R.string.data_transfer_intent_edit_recipe_id),
-            -1
-        )
+    private fun loadRecipe(savedInstanceState: Bundle? = null) {
+
         if (recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
 
@@ -86,7 +86,10 @@ class RecipePresentationActivity : AppCompatActivity() {
                 .executeInBackground {
                     AppDatabase.getInstance().recipeDao().getRecipeById(recipeid)
                 }
-                .onDone { recipe = it; op1.start() }
+                .onDone {
+                    recipe = it;
+                    op1.start()
+                }
                 .start()
         }
     }
@@ -96,6 +99,8 @@ class RecipePresentationActivity : AppCompatActivity() {
         return true
     }
 
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.presentation_toolbar_edit) {
@@ -103,7 +108,7 @@ class RecipePresentationActivity : AppCompatActivity() {
                 REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
                 RecipeEditActivity::class
             ) {
-                it.putExtra("recipe", recipeid)
+                it.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), recipeid)
             }
             return true
         }
@@ -117,6 +122,23 @@ class RecipePresentationActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        data.notNull { intent ->
+            if(resultCode == Activity.RESULT_OK){
+                when(requestCode){
+                    REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION -> {
+                        val dataChanged = intent.getBooleanExtra("dataChanged",false)
+                        if(dataChanged){
+                            recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),-1)
+                            loadRecipe()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun initGuiElements() = with(binding) {
