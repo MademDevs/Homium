@@ -1,6 +1,7 @@
 package de.madem.homium.ui.activities.recipe
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityRecipePresentationBinding
@@ -18,6 +20,7 @@ import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.CookingAssistant
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.setPictureFromPath
 import de.madem.homium.utilities.extensions.switchToActivityForResult
 import java.lang.ref.WeakReference
@@ -25,12 +28,17 @@ import java.lang.ref.WeakReference
 class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
-    private lateinit var recipe: Recipe
+    private var recipe: Recipe? = null
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
     private lateinit var cookingAssistant : CookingAssistant
+    private var allowedToAutoStartCooking : Boolean = false
 
     private lateinit var binding: ActivityRecipePresentationBinding
+
+    companion object{
+        private const val SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING = "autostartcookingpermission"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +49,16 @@ class RecipePresentationActivity : AppCompatActivity() {
 
         cookingAssistant = CookingAssistant(WeakReference<Context>(this))
 
-        loadRecipe()
+        loadRecipe(savedInstanceState)
     }
 
-    private fun loadRecipe() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING,allowedToAutoStartCooking)
+
+    }
+
+    private fun loadRecipe(savedInstanceState: Bundle?) {
         recipeid = intent.getIntExtra(
             resources.getString(R.string.data_transfer_intent_edit_recipe_id),
             -1
@@ -56,7 +70,11 @@ class RecipePresentationActivity : AppCompatActivity() {
                 .executeInBackground {
                     AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid)
                 }
-                .onDone { description = it; initGuiElements() }
+                .onDone {
+                    description = it;
+                    initGuiElements()
+                    autoStartCookingIfRequested(savedInstanceState)
+                }
 
             val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
                 .executeInBackground {
@@ -102,10 +120,13 @@ class RecipePresentationActivity : AppCompatActivity() {
     }
 
     private fun initGuiElements() = with(binding) {
-        ivBanner.setPictureFromPath(recipe.image)
+        recipe.notNull {
+            ivBanner.setPictureFromPath(it.image)
+            tvHeaderFirstline.text = it.name
+        }
         viewpager.adapter = TabsAdapter(supportFragmentManager, description, ingredients)
         layoutTab.setupWithViewPager(viewpager)
-        tvHeaderFirstline.text = recipe.name
+
     }
 
     class TabsAdapter(
@@ -145,7 +166,27 @@ class RecipePresentationActivity : AppCompatActivity() {
     }
 
     private fun cookRecipe(){
-        cookingAssistant.cookRecipe(recipe)
+        recipe.notNull {
+            cookingAssistant.cookRecipe(it)
+            allowedToAutoStartCooking = false
+        }
+
+    }
+
+    private fun autoStartCookingIfRequested(savedInstanceState: Bundle?){
+
+        allowedToAutoStartCooking = if(savedInstanceState == null){
+            intent.getIntExtra(resources.getString(R.string.data_transfer_intent_recipe_cook_request),
+                -1) == REQUEST_CODE_COOK_RECIPE
+        } else{
+            savedInstanceState.getBoolean(
+                SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING)
+        }
+
+
+        if(allowedToAutoStartCooking){
+            cookRecipe()
+        }
     }
 
 
