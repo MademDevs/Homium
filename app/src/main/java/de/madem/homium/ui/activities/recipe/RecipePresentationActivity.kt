@@ -11,6 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
@@ -36,6 +38,7 @@ class RecipePresentationActivity : AppCompatActivity() {
     private var allowedToAutoStartCooking : Boolean = false
 
     private lateinit var binding: ActivityRecipePresentationBinding
+    private lateinit var viewModel : RecipePresentationViewModel
 
     companion object{
         private const val SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING = "autostartcookingpermission"
@@ -50,8 +53,31 @@ class RecipePresentationActivity : AppCompatActivity() {
 
         cookingAssistant = CookingAssistant(WeakReference<Context>(this))
 
-        recipeid = intent.getIntExtra(
+        //setup viewModel
+        setupViewModel()
+
+        //getting id right
+        val intentId = intent.getIntExtra(
             resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
+
+        //end activity if there is no valid id in intent
+        if(intentId < 0){
+            finish()
+        }
+        else{
+            val vMiD : Int = viewModel.recipeId
+            if(vMiD < 0){
+                //live data in viewmodel is not initialized
+                viewModel.updateRecipeId(intentId)
+                recipeid = intentId
+            }
+            else{
+                recipeid = vMiD
+            }
+
+        }
+
+
         loadRecipe(savedInstanceState)
     }
 
@@ -132,7 +158,9 @@ class RecipePresentationActivity : AppCompatActivity() {
                     REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION -> {
                         val dataChanged = intent.getBooleanExtra("dataChanged",false)
                         if(dataChanged){
-                            recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),-1)
+                            val id = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),-1)
+                            viewModel.updateRecipeId(id)
+                            recipeid = id
                             loadRecipe()
                         }
                     }
@@ -185,6 +213,10 @@ class RecipePresentationActivity : AppCompatActivity() {
                 else -> "Schritt $position"
         }
 
+    }
+
+    private fun setupViewModel(){
+        viewModel = ViewModelProviders.of(this)[RecipePresentationViewModel::class.java]
     }
 
     private fun cookRecipe(){
