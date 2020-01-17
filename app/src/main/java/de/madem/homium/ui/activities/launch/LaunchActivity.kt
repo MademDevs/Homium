@@ -23,7 +23,7 @@ class LaunchActivity : AppCompatActivity() {
         val splashScreen = EasySplashScreen(this@LaunchActivity)
             .withFullScreen()
             .withTargetActivity(target)
-            .withSplashTimeOut(2000)
+            .withSplashTimeOut(500)
             .withBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
             .withLogo(R.drawable.logo_svg)
             .withAfterLogoText(resources.getString(R.string.app_name))
