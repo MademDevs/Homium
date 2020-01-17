@@ -100,6 +100,7 @@
     <string name="txtView_recipesName">Rezeptname</string>
     <string name="recipeEdit_title_add">Rezept hinzufügen</string>
     <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
+    <string name="recipe_actionmode_delete_question">Sollen die ausgewählten Rezepte wirklich gelöscht werden?</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>
@@ -218,7 +219,4 @@
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
     <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
