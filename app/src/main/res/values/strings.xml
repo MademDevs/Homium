@@ -155,6 +155,7 @@
     <string name="cooking_question_subtract_items_from_inventory">Das Rezept kann gekocht werden! Sollen die angegebenen Zutaten aus dem Inventar entfernt werden?</string>
     <string name="cooking_error_failed_add_missing_shoppingitems">Ein Fehler ist aufgetreten. Die fehlenden Zutaten konnten nicht oder nur teilweise auf die Einkaufsliste gesetzt werden.</string>
     <string name="cooking_notification_success_add_missing_shoppingitems">Die fehlenden Zutaten wurden erfolgreich auf die Einkaufsliste gesetzt.</string>
+    <string name="cooking_notification_success_subtract_from_inventory">Das Rezept wurde erfolgeich gekocht und die Zutaten in entsprechender Menge aus dem Inventar entfernt.</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>

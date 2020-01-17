@@ -206,7 +206,7 @@ class CookingAssistant(private val contextReference: WeakReference<Context>) {
                 }
 
             }.onDone {
-                showToast("STILL TODO: DELETE FROM INVENTORY")
+                showToast(R.string.cooking_notification_success_subtract_from_inventory,Toast.LENGTH_LONG)
             }.start()
 
     }
