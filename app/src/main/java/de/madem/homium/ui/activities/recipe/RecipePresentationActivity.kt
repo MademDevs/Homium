@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -21,7 +20,6 @@ import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.CoroutineBackgroundTask
 import de.madem.homium.utilities.setPictureFromPath
 import de.madem.homium.utilities.switchToActivityForResult
-import kotlinx.coroutines.awaitAll
 
 
 class RecipePresentationActivity : AppCompatActivity() {
@@ -80,7 +78,7 @@ class RecipePresentationActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if(id == R.id.presentation_toolbar_edit) {
-            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivityNew::class) {
+            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivity::class) {
                 it.putExtra("recipe", recipeid)
             }
             return true

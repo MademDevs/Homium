@@ -21,7 +21,7 @@
         <activity
             android:name=".ui.activities.ingredient.IngredientEditActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.recipe.RecipeEditActivityNew"
+            android:parentActivityName=".ui.activities.recipe.RecipeEditActivity"
             android:noHistory="true"/>
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -61,7 +61,7 @@
             android:noHistory="true"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
-            android:name=".ui.activities.recipe.RecipeEditActivityNew"
+            android:name=".ui.activities.recipe.RecipeEditActivity"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
             android:name=".ui.activities.recipe.RecipePresentationActivity"

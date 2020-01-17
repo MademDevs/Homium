@@ -42,6 +42,11 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        println("viewmodel destroyed")
+    }
+
     private fun getRecipeFromDatabaseAndSetValues() {
         CoroutineBackgroundTask<Recipe>()
             .executeInBackground { database.recipeDao().getRecipeById(recipeId!!) }
@@ -62,7 +67,6 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editRecipeName(name: String) {
-        println("recipe name setter $name")
         val recipe = _recipe.value
         recipe?.name = name
         _recipe.value = recipe
@@ -87,9 +91,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editDescription(index: Int, name: String) {
-        val list = _descriptions.value
-        list?.get(index)?.description = name
-        _descriptions.value = list
+        _descriptions.value?.get(index)?.description = name
     }
 
     fun addDataToDatabase() {

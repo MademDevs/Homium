@@ -6,15 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.view.children
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -35,13 +31,15 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RecipeEditActivityNew: AppCompatActivity() {
+class RecipeEditActivity: AppCompatActivity() {
 
     private lateinit var recipeEditViewModel: RecipeEditViewModel
     private lateinit var recipeEditViewModelFactory: RecipeEditViewModelFactory
     private lateinit var binding: ActivityRecipeEditBinding
     private var recipeId: Int? = null
     private var picturePath = ""
+    private var editTextList = mutableListOf<EditText>()
+    private var addDescription = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,31 +58,44 @@ class RecipeEditActivityNew: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        editTextList = mutableListOf()
         recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
-            binding.recipeEditLayoutDescr.removeAllViews()
-            for(el in newDescription) {
-                val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
-                with(view.findViewById<EditText>(R.id.descr_editTxt)) {
-                    setText(el.description)
-                    setOnFocusChangeListener { _, hasFocus ->
-                        if(hasFocus) {  }
-                        if(!hasFocus) {
-                            recipeEditViewModel.editDescription(newDescription.indexOf(el), text.toString())
-                        }
+            if(newDescription.isNotEmpty()) {
+                if(addDescription) {
+                    with(newDescription.last()) {
+                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+                        view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.count())}"
+                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
+                        editText.setText(this.description)
+                        binding.recipeEditLayoutDescr.addView(view)
+                        editTextList.add(editText)
+                    }
+                    addDescription = false
+                } else {
+                    binding.recipeEditLayoutDescr.removeAllViews()
+                    for(el in newDescription) {
+                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+                        view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.indexOf(el)+1)}"
+                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
+                        editText.setText(el.description)
+                        binding.recipeEditLayoutDescr.addView(view)
+                        editTextList.add(editText)
                     }
                 }
-                binding.recipeEditLayoutDescr.addView(view)
             }
         })
     }
 
     override fun onPause() {
         super.onPause()
-        for (el in binding.recipeEditLayoutDescr.children) {
-            el.findViewById<EditText>(R.id.descr_editTxt).isFocusable = false
+        writeDescriptionAndRecipeTitleToViewModel()
+    }
+
+    private fun writeDescriptionAndRecipeTitleToViewModel() {
+        recipeEditViewModel.editRecipeName(binding.recipeEditTitleEditTxt.text.toString())
+        editTextList.forEach {
+            recipeEditViewModel.editDescription(editTextList.indexOf(it), it.text.toString())
         }
-        binding.recipeEditTitleEditTxt.isFocusable = false
     }
 
     private fun initGuiComponents() {
@@ -102,15 +113,12 @@ class RecipeEditActivityNew: AppCompatActivity() {
                 binding.recipeEditLayoutIngr.addView(view)
             }
         })
-        binding.recipeEditTitleEditTxt.setOnFocusChangeListener { v, hasFocus ->
-            if(!hasFocus) {
-                val editText = v as EditText
-                recipeEditViewModel.editRecipeName(editText.text.toString())
-            }
-        }
         binding.recipeEditImgView.setOnClickListener { dispatchTakePictureIntent() }
         binding.recipeEditAddIngredientBtn.setOnClickListener { switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class) }
-        binding.recipeEditAddDescriptionBtn.setOnClickListener { recipeEditViewModel.addDescription(RecipeDescription("", 0)) }
+        binding.recipeEditAddDescriptionBtn.setOnClickListener {
+            addDescription = true
+            recipeEditViewModel.addDescription(RecipeDescription("", 0))
+        }
     }
 
     private fun dispatchTakePictureIntent() {
@@ -165,10 +173,7 @@ class RecipeEditActivityNew: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> {
-                for(el in binding.recipeEditLayoutDescr.children) {
-                    el.findViewById<EditText>(R.id.descr_editTxt).isFocusable = false
-                }
-                binding.recipeEditTitleEditTxt.isFocusable = false
+                writeDescriptionAndRecipeTitleToViewModel()
                 recipeEditViewModel.addDataToDatabase()
                 finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
             }
