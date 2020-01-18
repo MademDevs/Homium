@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             if(requestCode == REQUEST_CODE_SPEECH && data != null){
                 val resultOfSpeechRecognition = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
 
-                if(resultOfSpeechRecognition.isNotEmpty()){
+                if(resultOfSpeechRecognition.isNotEmpty() && resultOfSpeechRecognition.isNotBlank()){
                     speechAssistent?.executeCommand(command = resultOfSpeechRecognition)
                 }
             }
