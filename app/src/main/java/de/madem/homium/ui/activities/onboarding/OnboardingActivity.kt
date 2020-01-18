@@ -8,17 +8,15 @@ import de.madem.homium.R
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.fragments.onboarding.*
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.putSetting
-import de.madem.homium.utilities.switchToActivity
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.putSetting
+import de.madem.homium.utilities.extensions.switchToActivity
 
 class OnboardingActivity : AppIntro() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //val textSlide11 = findViewById<TextView>(R.id.text_slide1) as TextView
-        //textSlide11.movementMethod = ScrollingMovementMethod()
 
         //not initialized database = app runs for the first time
         val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
@@ -51,31 +49,6 @@ class OnboardingActivity : AppIntro() {
 
     private fun showIntroSlides() {
 
-        /*
-        val pageOne = SliderPagerBuilder()
-            .title("Willkommen zu Homium")
-            .description(getString(R.string.onboarding_welcome))
-            .imageDrawable(R.drawable.onboarding_logo)
-            .bgColor(ContextCompat.getColor(this,R.color.colorPrimary))//Color.parseColor("#176A93")
-            .build()
-
-        val pageTwo = SliderPagerBuilder()
-            .title("So verwendest du die Einkaufsliste")
-            .description(getString(R.string.onboarding_shopping))
-            .imageDrawable(R.drawable.onboarding_shoppingcart)
-            .bgColor(ContextCompat.getColor(this,R.color.colorPrimary))
-            .build()
-
-        val pageThree = SliderPagerBuilder()
-            .title("Coming soon ;)")
-            .description(getString(R.string.onboarding_moreFeatures))
-            .imageDrawable(R.drawable.onboarding_comingsoon)
-            .bgColor(ContextCompat.getColor(this,R.color.colorPrimary))
-            .build()
-
-         */
-
-//Können uns hier noch die Übergangsanimation aussuchen ;)
         setFadeAnimation()
         //setZoomAnimation()
         //setFlowAnimation()
@@ -84,13 +57,9 @@ class OnboardingActivity : AppIntro() {
 
         addSlide(OnboardingSlideWelcome())
         addSlide(OnboardingSlideShopping())
+        addSlide(OnboardingSlideInventory())
         addSlide(OnboardingSlideRecipe())
         addSlide(OnboardingSlideSpeachAssistant())
-        addSlide(OnboardingSlideComingSoon())
-
-        //addSlide(AppIntro2Fragment.newInstance(pageOne))
-        //addSlide(AppIntro2Fragment.newInstance(pageTwo))
-        //addSlide(AppIntro2Fragment.newInstance(pageThree))
     }
 
     private fun goToMain() {
@@ -112,7 +81,8 @@ class OnboardingActivity : AppIntro() {
     //init app settings
     private fun initAppSettings(){
         //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
-        CoroutineBackgroundTask<Unit>().executeInBackground {
+        CoroutineBackgroundTask<Unit>()
+            .executeInBackground {
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
             this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),true)

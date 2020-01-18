@@ -79,4 +79,13 @@ class ShoppingListRoomTest {
 
         Assert.assertEquals(initSize, list.size) //list sadly don't updates on item insert
     }
+
+    @Test
+    fun testUIdValueAfterShoppingCreation(){
+        val testItem = ShoppingItem("testitem",12,Units.ITEM.getString(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        Assert.assertEquals(0,testItem.uid)
+    }
+
+
 }

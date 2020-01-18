@@ -1,73 +1,123 @@
 package de.madem.homium.ui.activities.recipe
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
+import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databinding.ActivityRecipePresentationBinding
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.setPictureFromPath
-import de.madem.homium.utilities.switchToActivityForResult
-
+import de.madem.homium.utilities.CookingAssistant
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.setPictureFromPath
+import de.madem.homium.utilities.extensions.switchToActivityForResult
+import java.lang.ref.WeakReference
 
 class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
-    private lateinit var recipe: Recipe
+    private var recipe: Recipe? = null
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
+    private lateinit var cookingAssistant : CookingAssistant
+    private var allowedToAutoStartCooking : Boolean = false
+
+    private lateinit var binding: ActivityRecipePresentationBinding
+    private lateinit var viewModel : RecipePresentationViewModel
+
+    companion object{
+        private const val SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING = "autostartcookingpermission"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recipe_presentation)
-        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
-        if(recipeid > 0) {
-            //nesting coroutines to avaid not initialized properties -> also possible with await?
-            val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
-                .onDone { description = it; initGuiElements() }
-            val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
-                .onDone { ingredients = it; op2.start() }
-            CoroutineBackgroundTask<Recipe>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
-                .onDone { recipe = it; op1.start() }
-                .start()
+
+        binding = DataBindingUtil.setContentView(
+            this, R.layout.activity_recipe_presentation
+        )
+
+        cookingAssistant = CookingAssistant(WeakReference<Context>(this))
+
+        //setup viewModel
+        setupViewModel()
+
+        //getting id right
+        val intentId = intent.getIntExtra(
+            resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
+
+        //end activity if there is no valid id in intent
+        if(intentId < 0){
+            finish()
         }
+        else{
+            val vMiD : Int = viewModel.recipeId
+            if(vMiD < 0){
+                //live data in viewmodel is not initialized
+                viewModel.updateRecipeId(intentId)
+                recipeid = intentId
+            }
+            else{
+                recipeid = vMiD
+            }
+
+        }
+
+
+        loadRecipe(savedInstanceState)
     }
 
-    private fun initGuiElements() {
-            val image = findViewById<ImageView>(R.id.recipe_pres_image)
-            image.setPictureFromPath(recipe.image)
-            val collToolbar = findViewById<CollapsingToolbarLayout>(R.id.recipe_pres_coll_toolbar)
-            collToolbar.title = recipe.name
-            val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.recipe_pres_toolbar)
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
-            toolbar.setNavigationOnClickListener { finish() }
-            val viewPager = findViewById<ViewPager2>(R.id.recipe_pres_viewpager)
-            viewPager.adapter = PresentationAdapter(recipe, description, ingredients)
-            val tabLayout = findViewById<TabLayout>(R.id.recipe_pres_tablayout)
-            TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                //name tabs
-                if (position == 0) {
-                    tab.text = "Zutaten"
-                } else {
-                    tab.text = "Schritt ${position}"
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING,allowedToAutoStartCooking)
+
+    }
+
+    private fun loadRecipe(savedInstanceState: Bundle? = null) {
+
+        if (recipeid > 0) {
+            //nesting coroutines to avaid not initialized properties -> also possible with await?
+
+            val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid)
                 }
-            }.attach()
-            setSupportActionBar(toolbar)
+                .onDone {
+                    description = it;
+                    initGuiElements()
+                    autoStartCookingIfRequested(savedInstanceState)
+                }
+
+            val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid)
+                }
+                .onDone { ingredients = it; op2.start() }
+
+            CoroutineBackgroundTask<Recipe>()
+                .executeInBackground {
+                    AppDatabase.getInstance().recipeDao().getRecipeById(recipeid)
+                }
+                .onDone {
+                    recipe = it;
+                    op1.start()
+                }
+                .start()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -75,65 +125,123 @@ class RecipePresentationActivity : AppCompatActivity() {
         return true
     }
 
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if(id == R.id.presentation_toolbar_edit) {
-            switchToActivityForResult(REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION, RecipeEditActivity::class) {
-                it.putExtra("recipe", recipeid)
+        if (id == R.id.presentation_toolbar_edit) {
+            switchToActivityForResult(
+                REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
+                RecipeEditActivity::class
+            ) {
+                it.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), recipeid)
             }
             return true
         }
-        if(id == R.id.presentation_toolbar_cook) {
+        if (id == R.id.presentation_toolbar_cook) {
+            cookRecipe()
             println("Cooking function called")
             return true
         }
-        if(id == android.R.id.home) {
+        if (id == android.R.id.home) {
             finish()
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("recipepres $recipeid")
-        if(requestCode == REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION) {
-            val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid) }
-                .onDone { description = it; initGuiElements() }
-            val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid) }
-                .onDone { ingredients = it; op2.start() }
-            CoroutineBackgroundTask<Recipe>()
-                .executeInBackground { AppDatabase.getInstance().recipeDao().getRecipeById(recipeid) }
-                .onDone { recipe = it; op1.start() }
-                .start()
-        }
         super.onActivityResult(requestCode, resultCode, data)
+        data.notNull { intent ->
+            if(resultCode == Activity.RESULT_OK){
+                when(requestCode){
+                    REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION -> {
+                        val dataChanged = intent.getBooleanExtra("dataChanged",false)
+                        if(dataChanged){
+                            val id = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),-1)
+                            viewModel.updateRecipeId(id)
+                            recipeid = id
+                            loadRecipe()
+                        }
+                    }
+                }
+            }
+        }
     }
 
-}
+    private fun initGuiElements() = with(binding) {
+        recipe.notNull {
+            ivBanner.setPictureFromPath(it.image)
+            tvHeaderFirstline.text = it.name
+        }
+        viewpager.adapter = TabsAdapter(supportFragmentManager, description, ingredients)
+        layoutTab.setupWithViewPager(viewpager)
 
+    }
 
-class PresentationAdapter(val recipe: Recipe, val description: List<RecipeDescription>, val ingredients: List<RecipeIngredient>): RecyclerView.Adapter<PresentationAdapter.PresentationViewHolder>() {
+    class TabsAdapter(
+        fm: FragmentManager?,
+        description: List<RecipeDescription>,
+        ingredients: List<RecipeIngredient>
+    ) : FragmentStatePagerAdapter(fm!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    override fun getItemCount(): Int = description.count()+1
+        private val fragments = mutableListOf<Fragment>()
 
-    override fun onBindViewHolder(holder: PresentationViewHolder, position: Int) {
-        if(position == 0) {
+        init {
             var text = ""
-            for(el in ingredients) {
+            for (el in ingredients) {
                 text += "${el.count} ${el.unit} ${el.name} \n"
             }
-            holder.txt.text = text
-        } else {
-            holder.txt.text = description[position-1].description
+
+            fragments.add(
+                RecipePresentationStepFragment.with(text)
+            )
+
+            fragments.addAll(
+                description.map {
+                    RecipePresentationStepFragment.with(it.description)
+                }
+            )
+        }
+
+        override fun getCount(): Int = fragments.size
+
+        override fun getItem(position: Int): Fragment = fragments[position]
+
+        override fun getPageTitle(position: Int): CharSequence? =  when (position) {
+                0 -> "Zutaten"
+                else -> "Schritt $position"
+        }
+
+    }
+
+    private fun setupViewModel(){
+        viewModel = ViewModelProviders.of(this)[RecipePresentationViewModel::class.java]
+    }
+
+    private fun cookRecipe(){
+        recipe.notNull {
+            cookingAssistant.cookRecipe(it)
+            allowedToAutoStartCooking = false
+        }
+
+    }
+
+    private fun autoStartCookingIfRequested(savedInstanceState: Bundle?){
+
+        allowedToAutoStartCooking = if(savedInstanceState == null){
+            intent.getIntExtra(resources.getString(R.string.data_transfer_intent_recipe_cook_request),
+                -1) == REQUEST_CODE_COOK_RECIPE
+        } else{
+            savedInstanceState.getBoolean(
+                SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING)
+        }
+
+
+        if(allowedToAutoStartCooking){
+            cookRecipe()
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PresentationViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recipe_presentation_viewpager, parent, false))
-
-    class PresentationViewHolder(val view: View): RecyclerView.ViewHolder(view) {
-        val txt = view.findViewById<TextView>(R.id.recipe_pres_txtView)
-    }
 
 }
-

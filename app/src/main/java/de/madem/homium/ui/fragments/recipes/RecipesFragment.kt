@@ -19,13 +19,18 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
-import de.madem.homium.utilities.switchToActivity
+import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.switchToActivity
+import de.madem.homium.utilities.extensions.vibrate
 
 class RecipesFragment : Fragment() {
 
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var root: View
     private lateinit var db: AppDatabase
+    private lateinit var actionModeHandler: RecipeActionModeHandler
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -37,6 +42,14 @@ class RecipesFragment : Fragment() {
 
         //reload shopping items from database
         recipesViewModel.reloadRecipes()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (::actionModeHandler.isInitialized) {
+            actionModeHandler.finishActionMode()
+        }
     }
 
     override fun onCreateView(
@@ -51,20 +64,56 @@ class RecipesFragment : Fragment() {
         registerRecyclerView()
         registerFloatingActionButton()
         registerSwipeRefresh()
+        registerActionMode()
 
         return root
+    }
+
+    private fun registerActionMode() {
+        fun onDeleteButtonClicked(itemHolders: Collection<RecipeActionModeHandler.ItemHolder>) {
+            ConfirmDialog.show(context!!, R.string.recipe_actionmode_delete_question) {
+                onConfirm = {
+                    CoroutineBackgroundTask<Unit>()
+                        .executeInBackground {
+                            itemHolders.map { it.recipe }.forEach {
+                                db.recipeDao().deleteRecipe(it)
+                            }
+                        }
+                        .onDone {
+                            actionModeHandler.finishActionMode()
+                            recipesViewModel.reloadRecipes()
+                        }
+                        .start()
+                }
+            }
+        }
+
+        fun onEditButtonClicked(itemHolder: RecipeActionModeHandler.ItemHolder) {
+            Intent(activity, RecipeEditActivity::class.java)
+                .apply {
+                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+                        itemHolder.recipe.uid)
+                }
+                .also { startActivity(it) }
+        }
+
+        //init action mode
+        actionModeHandler = RecipeActionModeHandler(context!!)
+
+        //init action mode buttons
+        with(actionModeHandler) {
+            clickDeleteButtonHandler = ::onDeleteButtonClicked
+            clickEditButtonHandler = ::onEditButtonClicked
+        }
+
     }
 
     private fun registerSwipeRefresh() {
         val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_recipes)
         swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
         swipeRefresh.setOnRefreshListener {
-            swipeRefresh.isRefreshing = true
-            //TODO: Swipe Refresh implement something useful^
-            recipesViewModel.deleteAllRecipes {
-                swipeRefresh.isRefreshing = false
-                recipesViewModel.reloadRecipes()
-            }
+            swipeRefresh.isRefreshing = false
+            //TODO: Swipe Refresh implement something useful^^
         }
     }
 
@@ -91,21 +140,34 @@ class RecipesFragment : Fragment() {
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)
-            Intent(activity, RecipePresentationActivity::class.java)
-                .apply {
-                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
-                    , recipe.uid)
-                }
-                .also { startActivity(it)}
+
+            if (actionModeHandler.isActionModeActive()) {
+                //select item in action mode
+                actionModeHandler.clickItem(recipe, viewHolder)
+            } else {
+
+                //update check status
+                Intent(activity, RecipePresentationActivity::class.java)
+                    .apply {
+                        putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                            , recipe.uid)
+                    }
+                    .also { startActivity(it)}
+            }
+
+
         }
         adapter.longClickListener = {recipe, viewHolder ->
-            Intent(activity, RecipeEditActivity::class.java)
-                .apply {
-                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
-                    , recipe.uid)
-                }
-                .also { startActivity(it) }
-            false
+            //giving haptic feedback if allowed
+            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            if(vibrationAllowed){
+                vibrate()
+            }
+
+            //start action mode
+            actionModeHandler.startActionMode()
+            actionModeHandler.clickItem(recipe, viewHolder)
+            true
         }
     }
 

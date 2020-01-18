@@ -6,19 +6,18 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.NumberPicker
+import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.models.Product
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.finishWithResultData
-import de.madem.homium.utilities.notNull
-import de.madem.homium.utilities.showToastShort
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.finishWithResultData
+import de.madem.homium.utilities.extensions.hideKeyboard
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
 
 class IngredientEditActivity : AppCompatActivity() {
 
@@ -27,6 +26,9 @@ class IngredientEditActivity : AppCompatActivity() {
 
     private lateinit var valuesForCountPicker : List<String>
     private lateinit var valuesForUnitPicker : List<String>
+
+    private lateinit var bigUnits : Array<String>
+    private lateinit var smallUnits : Array<String>
 
     private var currentPickerCountMode = MODE_COUNT_VIA_PICKER
 
@@ -61,6 +63,10 @@ class IngredientEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ingredient_edit)
 
+        //setup big and small units
+        bigUnits = resources.getStringArray(R.array.big_units)
+        smallUnits = resources.getStringArray(R.array.small_units)
+
         //setup Actionbar
         setupActionbar()
 
@@ -71,8 +77,7 @@ class IngredientEditActivity : AppCompatActivity() {
         setupNameEditText()
         setupPickers(savedInstanceState?.getInt(INSTANCE_STATE_KEY_COUNT_PICKER_VALUE) ?: 0,
             savedInstanceState?.getInt(INSTANCE_STATE_KEY_UNIT_PICKER_VALUE) ?: 0,
-            savedInstanceState?.getStringArray(INSTANCE_STATE_KEY_COUNT_PICKER_DATA) ?: resources
-                .getStringArray(R.array.small_units))
+            savedInstanceState?.getStringArray(INSTANCE_STATE_KEY_COUNT_PICKER_DATA) ?: smallUnits)
         currentPickerCountMode = savedInstanceState?.getInt(INSTANCE_STATE_KEY_COUNT_PICKER_MODE) ?: currentPickerCountMode
         setupCountEditText(text = savedInstanceState?.getString(INSTANCE_STATE_KEY_COUNT_TXT_TEXT))
         setupDeleteButton()
@@ -128,6 +133,22 @@ class IngredientEditActivity : AppCompatActivity() {
     //setup functions
     private fun setupNameEditText(){
         txtIngredientName = findViewById(R.id.ingredient_edit_autoCmplTxt_name)
+
+        CoroutineBackgroundTask<List<Product>>()
+            .executeInBackground {
+                val result = AppDatabase.getInstance().itemDao().getAllProduct()
+                return@executeInBackground result
+            }.onDone {result ->
+                val productNameList = result.map { it.name }
+                txtIngredientName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
+
+            }.start()
+
+        txtIngredientName.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val selectedItem = parent.getItemAtPosition(position).toString()
+            setSpinnerDefaultValues(selectedItem)
+            hideKeyboard()
+        }
     }
 
     private fun setupActionbar(){
@@ -208,9 +229,9 @@ class IngredientEditActivity : AppCompatActivity() {
             val currentVal = pickerUnit.displayedValues[numberPicker.value]
 
             valuesForCountPicker = if(currentVal == Units.GRAM.getString(this) || currentVal == Units.MILLILITRE.getString(this)){
-                resources.getStringArray(R.array.big_units).toList()
+                bigUnits.toList()
             } else{
-                resources.getStringArray(R.array.small_units).toList()
+                smallUnits.toList()
             }
 
             pickerCount.displayedValues = valuesForCountPicker.toTypedArray()
@@ -269,7 +290,8 @@ class IngredientEditActivity : AppCompatActivity() {
     private fun getIngredientFromDatabase(id : Int){
 
         if(id >= 0){
-           CoroutineBackgroundTask<RecipeIngredient>().executeInBackground{
+           CoroutineBackgroundTask<RecipeIngredient>()
+               .executeInBackground{
                 dao.getIngredientById(id)
            }.onDone { result ->
                 result.notNull {
@@ -312,6 +334,52 @@ class IngredientEditActivity : AppCompatActivity() {
 
     private fun getUnit(): String {
         return Units.stringValueArray(this)[pickerUnit.value]
+    }
+
+    private fun setSpinnerDefaultValues(name: String) {
+        CoroutineBackgroundTask<Product>()
+            .executeInBackground { AppDatabase.getInstance().itemDao().getProductsByName(name)[0] }
+            .onDone {
+
+                //setting unit
+                pickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+
+                //setting amount
+                if(currentPickerCountMode == MODE_COUNT_VIA_TEXT){
+                    editTxtCount.text = Editable.Factory.getInstance().newEditable(it.amount)
+                }
+                else{
+                    setValuesForNumPickerCount(pickerUnit)
+
+                    if(pickerCount.displayedValues.contains(it.amount)){
+                        pickerCount.value = pickerCount.displayedValues.indexOf(it.amount)
+                    }
+                    else{
+                        changeCountMode(MODE_COUNT_VIA_TEXT,it.amount.toIntOrNull() ?: 1)
+                        //assignValueFromPickerToEditText(it.amount)
+                    }
+
+                }
+            }
+            .start()
+
+    }
+
+    private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker){
+        when(numberPickerUnit.value) {
+            1, 3 -> {
+                pickerCount.minValue = 0
+                pickerCount.maxValue = bigUnits.size-1
+                pickerCount.displayedValues = bigUnits
+                valuesForCountPicker = bigUnits.toList()
+            }
+            else -> {
+                pickerCount.displayedValues = smallUnits
+                pickerCount.minValue = 0
+                pickerCount.maxValue = smallUnits.size-1
+                valuesForCountPicker = smallUnits.toList()
+            }
+        }
     }
 
 

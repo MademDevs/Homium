@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.Recipe
-import de.madem.homium.utilities.setPictureFromPath
+import de.madem.homium.utilities.extensions.setPictureFromPath
 
 class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>)
     : RecyclerView.Adapter<RecipesListAdapter.RecipesViewHolder>() {

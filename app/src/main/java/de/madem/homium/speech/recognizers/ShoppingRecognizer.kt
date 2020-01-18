@@ -9,7 +9,12 @@ import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.speech.commandparser.ShoppingCommandParser
-import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.capitalizeEachWord
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
@@ -49,8 +54,9 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
 
 
     //functions for recognition
-    private fun matchAddShopping(command : String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground{
+    private fun matchAddShopping(command : String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground{
 
             val params : List<String> = ADD_SHOPPING_ITEM
                 .find(command)?.groupValues?.filter { it.isNotBlank() && it.isNotEmpty() }?.toMutableList()
@@ -95,7 +101,8 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     }
 
     private fun matchAddShoppingWithoutUnit(command : String) : CoroutineBackgroundTask<Boolean> {
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             //getting words
 
             val words = ADD_SHOPPING_ITEM_WITHOUT_UNIT.find(command)?.groupValues
@@ -133,8 +140,9 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }
     }
 
-    private fun matchAddShoppingWithoutUnitWithoutQuantity(command : String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddShoppingWithoutUnitWithoutQuantity(command : String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
 
             val name : String = ADD_SHOPPING_ITEM_WITHOUT_UNIT_WITHOUT_QUANTITY.find(command)?.groupValues
                 ?.filter { it.isNotBlank() && it.isNotEmpty() }?.toMutableList()
@@ -197,7 +205,10 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
 
         return if(shouldAskDeleteQuestion()){
 
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,getStringRessource(R.string.assistent_question_delete_all_shopping)).executeInBackground{
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                getStringRessource(R.string.assistent_question_delete_all_shopping)
+            ).executeInBackground{
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
@@ -205,7 +216,8 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
 
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground{
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground{
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
@@ -213,7 +225,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }
     }
 
-    private fun matchDeleteShoppingWithName(command : String) : CoroutineBackgroundTask<Boolean>{
+    private fun matchDeleteShoppingWithName(command : String) : CoroutineBackgroundTask<Boolean> {
 
         //getting data
         val words = DELETE_SHOPPING_WITH_NAME.find(command)?.groupValues
@@ -279,14 +291,18 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            ).executeInBackground {
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
             }
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground {
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
@@ -296,7 +312,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
 
     }
 
-    private fun matchDeleteShoppingWithAllParams(command: String) : CoroutineBackgroundTask<Boolean>{
+    private fun matchDeleteShoppingWithAllParams(command: String) : CoroutineBackgroundTask<Boolean> {
         val params =  DELETE_SHOPPING_WITH_ALL_PARAMS.find(command)?.groupValues?.filter{it.isNotBlank() && it.isNotEmpty()}?.map{it.trim()}?.toMutableList()?.apply{
             remove(command)
             removeAll { it == "heraus" }
@@ -345,7 +361,13 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef, getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace("#","\"$itemStr\""))
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                getStringRessource(R.string.assistent_question_delete_all_shopping_with_name).replace(
+                    "#",
+                    "\"$itemStr\""
+                )
+            )
                 .executeInBackground{
                     backgroundFunc.invoke()
                 }
@@ -407,8 +429,11 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
-                ?.replace("#","\"${pseudoOut}\"") ?: "")
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                contextRef.get()?.getString(R.string.assistent_question_delete_all_shopping_with_name)
+                    ?.replace("#", "\"${pseudoOut}\"") ?: ""
+            )
                 .executeInBackground {
                     backgroundFunc.invoke()
                 }

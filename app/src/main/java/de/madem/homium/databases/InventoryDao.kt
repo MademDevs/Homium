@@ -33,6 +33,9 @@ interface InventoryDao {
         """)
     fun updateInventoryItem(id: Int, name: String, count: Int, unit: String, location: String)
 
+    @Query("UPDATE inventoryItem SET count=:count, unit=:unit WHERE uid=:id")
+    fun updateQuantityOf(id: Int, count: Int, unit: String)
+
     @Query("SELECT COUNT(uid) FROM inventoryItem;")
     fun inventorySize() : Int
 
@@ -61,4 +64,12 @@ interface InventoryDao {
     @Query("DELETE FROM inventoryItem WHERE location LIKE :location")
     fun clearLocation(location: String)
 
+    @Query("SELECT SUM(count) FROM inventoryItem WHERE name LIKE :name AND unit LIKE :unit")
+    fun sumOfQuantityByNameUnit(name: String,unit: String): Int
+
+    @Query("SELECT uid FROM inventoryItem WHERE name LIKE :name AND unit LIKE :unit")
+    fun getUIdsByNameUnit(name: String,unit: String): List<Int>
+
+    @Query("SELECT * FROM inventoryItem WHERE name LIKE :name AND unit NOT IN (:forbiddenUnits)")
+    fun getInventoryItemWithNameWithoutForbiddenUnits(name : String, forbiddenUnits: List<String>) : List<InventoryItem>
 }

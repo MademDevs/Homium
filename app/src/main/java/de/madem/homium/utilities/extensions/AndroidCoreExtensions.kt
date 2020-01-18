@@ -1,4 +1,4 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.extensions
 
 import android.app.Activity
 import android.content.Context
@@ -6,6 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -14,7 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import de.madem.homium.R
+import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
@@ -224,3 +230,30 @@ private fun Context.vibrateInContext() {
     }
 }
 
+fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
+    //creating bundle
+    val bundle = bundleOf()
+    //adding data to bundle
+    bundle.putInt("id",value.id)
+    bundle.putString("name",value.name)
+    bundle.putInt("count",value.count)
+    bundle.putString("unit",value.unit)
+
+    //putting bundle
+    this.putBundle(key, bundle)
+}
+
+
+
+fun ViewGroup.inflater() = LayoutInflater.from(context)
+
+fun <T> LiveData<T>.observe(lifecycleOwner: LifecycleOwner?, onUpdate: (T) -> Unit) {
+    if (lifecycleOwner != null) {
+        observe(lifecycleOwner, Observer(onUpdate))
+    }
+}
+
+fun <T> LiveData<T>.applyAndObserver(lifecycleOwner: LifecycleOwner?, initialValue: T?, onUpdate: (T) -> Unit) {
+    initialValue?.let { onUpdate(initialValue) }
+    observe(lifecycleOwner, onUpdate)
+}

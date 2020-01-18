@@ -1,6 +1,6 @@
 package de.madem.homium.speech.recognizers
 
-import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 
 interface PatternRecognizer {
 

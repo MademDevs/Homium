@@ -9,7 +9,12 @@ import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 import de.madem.homium.speech.commandparser.InventoryCommandParser
-import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.capitalizeEachWord
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
 import java.lang.ref.WeakReference
 
 class InventoryRecognizer(private val contextRef : WeakReference<Context>) : PatternRecognizer{
@@ -57,8 +62,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
     }
 
-    private fun matchAddInventoryWithoutLocation(command : String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddInventoryWithoutLocation(command : String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
 
             val params = ADD_INVENTORY_ITEM_WITHOUT_LOCATION.find(command)?.groupValues
                 ?.asSequence()
@@ -103,8 +109,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
     }
 
-    private fun matchAddInventoryWithoutLocationUnit(command: String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddInventoryWithoutLocationUnit(command: String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             //getting params
             val params = ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT.find(command)?.groupValues
                 ?.asSequence()
@@ -143,8 +150,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
     }
 
-    private fun matchAddInventoryWithoutLocationUnitCount(command : String) :  CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddInventoryWithoutLocationUnitCount(command : String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             //getting params
             val params = ADD_INVENTORY_ITEM_WITHOUT_LOCATION_UNIT_COUNT.find(command)?.groupValues
                 ?.asSequence()
@@ -189,7 +197,8 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
     }
 
     private fun matchAddInventory(command: String) : CoroutineBackgroundTask<Boolean> {
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params = ADD_INVENTORY_ITEM.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}
@@ -214,8 +223,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
     }
 
-    private fun matchAddInventoryWithoutUnit(command: String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddInventoryWithoutUnit(command: String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params = ADD_INVENTORY_ITEM_WITHOUT_UNIT.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}
@@ -241,8 +251,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
     }
 
-    private fun matchAddInventoryWithoutUnitCount(command: String) : CoroutineBackgroundTask<Boolean>{
-        return CoroutineBackgroundTask<Boolean>().executeInBackground {
+    private fun matchAddInventoryWithoutUnitCount(command: String) : CoroutineBackgroundTask<Boolean> {
+        return CoroutineBackgroundTask<Boolean>()
+            .executeInBackground {
             val params = ADD_INVENTORY_ITEM_WITHOUT_UNIT_COUNT.find(command)?.groupValues
                 ?.asSequence()
                 ?.map{it.trim()}
@@ -271,7 +282,7 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
 
 
-    private fun matchClearInventory() : CoroutineBackgroundTask<Boolean>{
+    private fun matchClearInventory() : CoroutineBackgroundTask<Boolean> {
 
         //creating functions
         val backgroundFunc : () -> Boolean = {
@@ -304,14 +315,18 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
         //returning task
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,R.string.assistent_question_delete_all_inventory).executeInBackground {
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                R.string.assistent_question_delete_all_inventory
+            ).executeInBackground {
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
             }
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground {
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
                 backgroundFunc.invoke()
             }.onDone {success ->
                 onDoneFunc.invoke(success)
@@ -393,7 +408,10 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
         //returning right task
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            )
                 .executeInBackground {
                     backgroundFunc.invoke()
                 }.onDone {success ->
@@ -473,14 +491,18 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            ).executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)
             }
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground {
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)
@@ -548,7 +570,10 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
         //returning right task
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,createDeleteMessage(replacement = itemStr,withQutationMarks = true))
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                createDeleteMessage(replacement = itemStr, withQutationMarks = true)
+            )
                 .executeInBackground {
                     backgroundFunc()
                 }
@@ -644,7 +669,10 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
         //returning right task
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            )
                 .executeInBackground {
                     backgroundFunc.invoke()
                 }.onDone {success ->
@@ -721,14 +749,18 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg).executeInBackground {
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            ).executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)
             }
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground {
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)
@@ -800,7 +832,10 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
 
         //returning right task
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,msg)
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                msg
+            )
                 .executeInBackground {
                     backgroundFunc()
                 }
@@ -880,14 +915,18 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
         }
 
         return if(shouldAskDeleteQuestion()){
-            UserRequestedCoroutineBackgroundTask<Boolean>(contextRef,question).executeInBackground {
+            UserRequestedCoroutineBackgroundTask<Boolean>(
+                contextRef,
+                question
+            ).executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)
             }
         }
         else{
-            CoroutineBackgroundTask<Boolean>().executeInBackground {
+            CoroutineBackgroundTask<Boolean>()
+                .executeInBackground {
                 backgroundFunc()
             }.onDone { success ->
                 onDoneFunc(success)

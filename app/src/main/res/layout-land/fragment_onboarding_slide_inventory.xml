@@ -7,7 +7,7 @@
     android:background="@color/colorPrimary"
 
     android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"
-    tools:context=".ui.fragments.onboarding.OnboardingSlideShopping">
+    tools:context=".ui.fragments.onboarding.OnboardingSlideInventory">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -37,7 +37,7 @@
                     android:layout_marginBottom="10pt"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
-                    android:text="@string/onboarding_comingSoon_headline"
+                    android:text="@string/onboarding_inventory_headline"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                     android:textColor="#FFFFFF"
                     android:textSize="30sp" />
@@ -47,7 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
-                    android:src="@drawable/onboarding_comingsoon" />
+                    app:srcCompat="@drawable/inventory_svg" />
 
                 <TextView
                     android:id="@+id/text_slide1"
@@ -61,7 +61,7 @@
                     android:gravity="center"
                     android:isScrollContainer="false"
                     android:scrollbars="vertical"
-                    android:text="@string/onboarding_moreFeatures"
+                    android:text="@string/onboarding_inventory"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp" />

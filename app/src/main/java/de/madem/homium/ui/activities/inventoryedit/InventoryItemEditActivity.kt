@@ -14,7 +14,8 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.*
 
 class InventoryItemEditActivity : AppCompatActivity() {
 
@@ -58,14 +59,15 @@ class InventoryItemEditActivity : AppCompatActivity() {
         updateSpinnerOnItemSelected()
     }
 
-    private fun initActionbar() = withNotNull(supportActionBar) {
-        setDisplayHomeAsUpEnabled(true)
-        setHomeButtonEnabled(true)
-        setTitle(
-            if (itemid >= 0) R.string.screentitle_edit_inventoryitem_edit
-            else R.string.screentitle_edit_inventoryitem_add
-        )
-    }
+    private fun initActionbar() =
+        withNotNull(supportActionBar) {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeButtonEnabled(true)
+            setTitle(
+                if (itemid >= 0) R.string.screentitle_edit_inventoryitem_edit
+                else R.string.screentitle_edit_inventoryitem_add
+            )
+        }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -92,7 +94,10 @@ class InventoryItemEditActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.inventory_item_edit_actionbar_confirm -> addOrUpdateToDatabaseIfPossible()
-            android.R.id.home -> finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
+            android.R.id.home -> {
+                finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -198,7 +203,8 @@ class InventoryItemEditActivity : AppCompatActivity() {
         //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.inventory_item_edit_name)
 
-        CoroutineBackgroundTask<List<Product>>().executeInBackground {
+        CoroutineBackgroundTask<List<Product>>()
+            .executeInBackground {
             val result = db.itemDao().getAllProduct()
             return@executeInBackground result
         }.onDone { result ->
@@ -331,7 +337,8 @@ class InventoryItemEditActivity : AppCompatActivity() {
             //all input components are valid -> creating object and put it into database via coroutine
             val item = InventoryItem(title, amount, unit, location)
 
-            CoroutineBackgroundTask<Unit>().executeInBackground {
+            CoroutineBackgroundTask<Unit>()
+                .executeInBackground {
                 if (itemid >= 0) {
                     db.inventoryDao().updateInventoryItem(itemid, title, amount, unit, location)
                 } else {
