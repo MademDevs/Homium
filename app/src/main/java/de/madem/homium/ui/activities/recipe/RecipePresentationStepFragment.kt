@@ -11,8 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.databinding.FragmentPresentationStepBinding
 import de.madem.homium.databinding.FragmentPresentationStepCardBinding
-import de.madem.homium.utilities.applyAndObserver
-import de.madem.homium.utilities.inflater
+import de.madem.homium.utilities.extensions.applyAndObserver
+import de.madem.homium.utilities.extensions.inflater
 
 private typealias StepBinding = FragmentPresentationStepBinding
 private typealias StepCardBinding = FragmentPresentationStepCardBinding

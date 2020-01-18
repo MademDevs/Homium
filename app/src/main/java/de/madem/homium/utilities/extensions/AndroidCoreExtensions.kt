@@ -1,4 +1,4 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.extensions
 
 import android.app.Activity
 import android.content.Context
@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.madem.homium.R
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
+import de.madem.homium.utilities.BitmapUtil
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {

@@ -21,6 +21,28 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return values().map { it.getString(context) }.toTypedArray()
         }
 
+        fun convertibleUnits() : List<String>{
+            return values().filter{ it.isConvertible() }.map { it.getString() }.toList()
+        }
+
+        fun nonconvertibleUnits() : List<String>{
+            return values().filter { !(it.isConvertible()) }.map { it.getString() }
+        }
+
+        fun stringValueMap() : Map<Units,String>{
+            return values().toList().associateWith { it.getString() }
+        }
+
+        fun unitOf(str: String) : Units?{
+            values().forEach {
+                if(it.getString() == str){
+                    return it
+                }
+            }
+
+            return null
+        }
+
         fun asSpeechRecognitionPattern() : String{
             return values().map {
                 val str = it.getString()
@@ -65,6 +87,47 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
     //functions
     fun getString(context: Context = HomiumApplication.appContext!!) : String {
         return context.resources.getString(resourceId)
+    }
+
+    fun isConvertible() : Boolean{
+        return if(this == PACK || this == ITEM){
+            false
+        }
+        else{
+            return true
+        }
+    }
+
+    fun getAssociatedUnitInOtherScale() : Units{
+        return if(this.isConvertible()){
+            when(this){
+                GRAM -> KILOGRAM
+                KILOGRAM -> GRAM
+                LITRE -> MILLILITRE
+                MILLILITRE -> LITRE
+                else -> ITEM
+            }
+        }
+        else{
+             this
+        }
+    }
+
+    fun isBigUnit() : Boolean{
+        return this == KILOGRAM || this == LITRE
+    }
+
+    fun isSmallUnit() : Boolean{
+        return this == GRAM || this == MILLILITRE
+    }
+
+    fun getDownscaledUnit() : Units{
+        return if(isBigUnit()){
+            getAssociatedUnitInOtherScale()
+        }
+        else{
+            this
+        }
     }
 
 

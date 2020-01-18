@@ -16,10 +16,10 @@ import de.madem.homium.constants.REQUEST_CODE_INVENTORY
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.showToastShort
-import de.madem.homium.utilities.switchToActivityForResult
-import de.madem.homium.utilities.vibrate
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.extensions.switchToActivityForResult
+import de.madem.homium.utilities.extensions.vibrate
 
 class InventoryFragment : Fragment() {
 

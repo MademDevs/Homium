@@ -6,7 +6,7 @@ import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.ShoppingItem
-import de.madem.homium.utilities.getSetting
+import de.madem.homium.utilities.extensions.getSetting
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

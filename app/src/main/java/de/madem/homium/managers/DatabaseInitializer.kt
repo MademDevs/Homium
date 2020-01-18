@@ -3,12 +3,13 @@ package de.madem.homium.managers
 import android.content.Context
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
-import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 
 class DatabaseInitializer(private val context: Context, private val doneCallback: () -> Unit) {
 
     private val dao = AppDatabase.getInstance().itemDao()
-    private val backgroundTask = CoroutineBackgroundTask<Unit>()
+    private val backgroundTask =
+        CoroutineBackgroundTask<Unit>()
 
     init {
         with(backgroundTask) {

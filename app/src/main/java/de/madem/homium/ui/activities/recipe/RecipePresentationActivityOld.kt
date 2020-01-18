@@ -17,9 +17,9 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.setPictureFromPath
-import de.madem.homium.utilities.switchToActivityForResult
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.setPictureFromPath
+import de.madem.homium.utilities.extensions.switchToActivityForResult
 
 @Deprecated(message = "RecipePresentationActivity is a rewrite of RecipePresentationActivityOld")
 class RecipePresentationActivityOld : AppCompatActivity() {

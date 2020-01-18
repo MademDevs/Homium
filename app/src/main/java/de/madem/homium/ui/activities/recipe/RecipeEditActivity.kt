@@ -27,6 +27,8 @@ import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
 import de.madem.homium.utilities.*
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.*
 import kotlinx.android.synthetic.main.recipe_edit_description.*
 import java.io.File
 import java.io.IOException
@@ -288,53 +290,57 @@ class RecipeEditActivity : AppCompatActivity() {
         val name: String = title.text.toString()
         val descrLayout = findViewById<LinearLayout>(R.id.recipe_edit_layout_descr)
 
-            if (name.isNotBlank()) {
-                //all input components are valid -> creating object and put it into database via coroutine
-                val recipe = Recipe(name, currentPhotoPath)
-                CoroutineBackgroundTask<Unit>().executeInBackground {
-                    //Update method in Dao not working properly, so deleting first, then adding new
-                    if(recipeid > 0) {
-                        db.recipeDao().deleteRecipe(Recipe(recipe.name, recipe.image, recipeid))
-                        db.recipeDao().deleteDescriptionByRecipeId(recipeid)
-                        db.recipeDao().deleteIngredientByRecipeId(recipeid)
-                        ingredientsList.forEach {
-                            db.recipeDao().insertIngredient(RecipeIngredient(it.name, it.count, it.unit, recipeid))
-                        }
+        if (name.isNotBlank()) {
+            //all input components are valid -> creating object and put it into database via coroutine
+            val recipe = Recipe(name, currentPhotoPath)
+            CoroutineBackgroundTask<Unit>().executeInBackground {
+                //Update method in Dao not working properly, so deleting first, then adding new
+                if(recipeid > 0) {
+                    db.recipeDao().deleteRecipe(Recipe(recipe.name, recipe.image, recipeid))
+                    db.recipeDao().deleteDescriptionByRecipeId(recipeid)
+                    db.recipeDao().deleteIngredientByRecipeId(recipeid)
+                    ingredientsList.forEach {
+                        db.recipeDao().insertIngredient(RecipeIngredient(it.name, it.count, it.unit, recipeid))
                     }
-                    recipeid = db.recipeDao().insertRecipe(recipe).toInt()
-                    println("RecipeID add: $recipeid")
-                    //add newly added ingredients
-                    ingredients.forEach {
-                        db.recipeDao().insertIngredient(
-                            RecipeIngredient(
-                                it.name,
-                                it.count,
-                                it.unit,
-                                recipeid
-                            )
+                }
+                recipeid = db.recipeDao().insertRecipe(recipe).toInt()
+                println("RecipeID add: $recipeid")
+                //add newly added ingredients
+                ingredients.forEach {
+                    db.recipeDao().insertIngredient(
+                        RecipeIngredient(
+                            it.name,
+                            it.count,
+                            it.unit,
+                            recipeid
                         )
-                    }
-                    //add old ingredients (saved in list oncreateview)
+                    )
+                }
+                //add old ingredients (saved in list oncreateview)
 
-                    //description in edittext, so saving in 1 go
-                    for (el in descrLayout.children) {
-                        db.recipeDao().insertDescription(
-                            RecipeDescription(
-                                el.findViewById<EditText>(R.id.descr_editTxt).text.toString(),
-                                recipeid
-                            )
+                //description in edittext, so saving in 1 go
+                for (el in descrLayout.children) {
+                    db.recipeDao().insertDescription(
+                        RecipeDescription(
+                            el.findViewById<EditText>(R.id.descr_editTxt).text.toString(),
+                            recipeid
                         )
-                    }
-                }.onDone {
-                    println("recipeedit $recipeid")
-                    finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
-                }.start()
-            } else {
-                Toast.makeText(
-                    this, resources.getString(R.string.errormsg_invalid_parameters),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+                    )
+                }
+            }.onDone {
+                println("recipeedit $recipeid")
+                finishWithResultData(Activity.RESULT_OK){
+                    it.putExtra("dataChanged",true)
+                    it.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeid)
+                }
+                //finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
+            }.start()
+        } else {
+            Toast.makeText(
+                this, resources.getString(R.string.errormsg_invalid_parameters),
+                Toast.LENGTH_LONG
+            ).show()
+        }
 
     }
 

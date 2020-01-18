@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
 import de.madem.homium.databinding.FragmentSettingsBinding
-import de.madem.homium.utilities.getSetting
-import de.madem.homium.utilities.putSetting
+import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.putSetting
 
 class SettingsFragment : Fragment() {
     //viewmodel

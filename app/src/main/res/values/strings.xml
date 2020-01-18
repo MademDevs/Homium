@@ -127,6 +127,7 @@
     <string name="errormsg_delete_shopping_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Einkaufsliste etwas schiefgegangen.</string>
     <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte versuche es erneut oder überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
     <string name="errormsg_delete_inventory_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Inventarliste etwas schiefgegangen.</string>
+    <string name="errormsg_cooking_impossible">Die Kochfunktion ist momentan leider nicht verfügbar. Bitte versuche es erneut.</string>
 
     <!--Speech Assistent Feedback-->
     <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
@@ -153,6 +154,12 @@
     <string name="assistent_msg_recipe_not_found">Das Rezept konnte nicht gefunden werden. Bitte stelle sicher, dass es in der Rezeptverwaltung existiert oder wiederhole den Sprachbefehl.</string>
     <string name="assistent_question_show_recommended_recipe">Das Rezept # wurde ausgewählt. Soll es geöffnet werden?</string>
 
+    <!--cooking feedback-->
+    <string name="cooking_question_add_missing_shoppingitems">Das Rezept kann leider nicht gekocht werden. Es fehlen folgende Zutaten: #Sollen diese Zutaten auf die Einkaufsliste gesetzt werden?</string>
+    <string name="cooking_question_subtract_items_from_inventory">Das Rezept kann gekocht werden! Sollen die angegebenen Zutaten aus dem Inventar entfernt werden?</string>
+    <string name="cooking_error_failed_add_missing_shoppingitems">Ein Fehler ist aufgetreten. Die fehlenden Zutaten konnten nicht oder nur teilweise auf die Einkaufsliste gesetzt werden.</string>
+    <string name="cooking_notification_success_add_missing_shoppingitems">Die fehlenden Zutaten wurden erfolgreich auf die Einkaufsliste gesetzt.</string>
+    <string name="cooking_notification_success_subtract_from_inventory">Das Rezept wurde erfolgeich gekocht und die Zutaten in entsprechender Menge aus dem Inventar entfernt.</string>
 
     <!--strings for data transfer e.g. intent-->
     <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>

@@ -14,9 +14,9 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
-import de.madem.homium.utilities.CoroutineBackgroundTask
-import de.madem.homium.utilities.finishWithBooleanResult
-import de.madem.homium.utilities.hideKeyboard
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.finishWithBooleanResult
+import de.madem.homium.utilities.extensions.hideKeyboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -194,7 +194,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
 
-        CoroutineBackgroundTask<List<Product>>().executeInBackground {
+        CoroutineBackgroundTask<List<Product>>()
+            .executeInBackground {
             val result = db.itemDao().getAllProduct()
             return@executeInBackground result
         }.onDone {result ->
@@ -314,7 +315,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             //all input components are valid -> creating object and put it into database via coroutine
             val item = ShoppingItem(title, amount, unit)
 
-            CoroutineBackgroundTask<Unit>().executeInBackground {
+            CoroutineBackgroundTask<Unit>()
+                .executeInBackground {
                 if(itemid >= 0){
                     db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
                 }
