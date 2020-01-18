@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.madem.homium.R
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
+import de.madem.homium.utilities.BitmapUtil
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
@@ -230,6 +231,7 @@ private fun Context.vibrateInContext() {
     }
 }
 
+/*
 fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
     //creating bundle
     val bundle = bundleOf()
@@ -242,6 +244,8 @@ fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
     //putting bundle
     this.putBundle(key, bundle)
 }
+
+ */
 
 
 

@@ -22,10 +22,8 @@ import de.madem.homium.databinding.ActivityRecipeEditBinding
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
-import de.madem.homium.utilities.finishWithBooleanResult
-import de.madem.homium.utilities.notNull
-import de.madem.homium.utilities.setPictureFromPath
-import de.madem.homium.utilities.switchToActivityForResult
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -174,8 +172,20 @@ class RecipeEditActivity: AppCompatActivity() {
         when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> {
                 writeDescriptionAndRecipeTitleToViewModel()
-                recipeEditViewModel.addDataToDatabase()
-                finishWithBooleanResult("dataChanged", true, REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION)
+                CoroutineBackgroundTask<Unit>().executeInBackground {
+                    recipeEditViewModel.addDataToDatabase()
+                }.onDone {
+                    println("inserted reciped with ingredients and descriptions")
+                    finishWithResultData(Activity.RESULT_OK){intent ->
+                        with(intent){
+                            putExtra("dataChanged", true)
+                            putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
+                        }
+                    }
+                }.start()
+
+
+                //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }
             android.R.id.home -> {
                 finish()

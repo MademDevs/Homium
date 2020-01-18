@@ -8,7 +8,7 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.CoroutineBackgroundTask
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 
 class RecipeEditViewModelFactory(private val recipeId: Int?): ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -94,34 +94,32 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
         _descriptions.value?.get(index)?.description = name
     }
 
-    fun addDataToDatabase() {
-        CoroutineBackgroundTask<Unit>().executeInBackground {
-            if (recipeId == null) {
-                var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
-                changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
-                _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
-                _descriptions.value?.forEach {
-                    if(it.description.isNotEmpty() && it.description.isNotBlank()) {
-                        database.recipeDao().insertDescription(it)
-                    }
-                }
-            } else {
-                changeIngredientsAndDescriptionsRecipeId(recipeId)
-                database.recipeDao().deleteIngredientByRecipeId(recipeId)
-                database.recipeDao().deleteDescriptionByRecipeId(recipeId)
-                database.recipeDao().updateRecipe(_recipe.value!!)
-                _ingredients.value?.forEach {
-                    database.recipeDao().insertIngredient(it)
-                }
-                _descriptions.value?.forEach {
-                    if(it.description.isNotEmpty() && it.description.isNotBlank()) {
-                        database.recipeDao().insertDescription(it)
-                    }
+    //THIS FUNCTION SHOULD always be called from a Background Thread
+    suspend fun addDataToDatabase() {
+        if (recipeId == null) {
+            var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
+            changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
+            _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
+            _descriptions.value?.forEach {
+                if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                    database.recipeDao().insertDescription(it)
                 }
             }
-        }.onDone {
-            println("inserted reciped with ingredients and descriptions")
-        }.start()
+        } else {
+            changeIngredientsAndDescriptionsRecipeId(recipeId)
+            database.recipeDao().deleteIngredientByRecipeId(recipeId)
+            database.recipeDao().deleteDescriptionByRecipeId(recipeId)
+            database.recipeDao().updateRecipe(_recipe.value!!)
+            _ingredients.value?.forEach {
+                database.recipeDao().insertIngredient(it)
+            }
+            _descriptions.value?.forEach {
+                if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                    database.recipeDao().insertDescription(it)
+                }
+            }
+        }
+
     }
 
     private fun changeIngredientsAndDescriptionsRecipeId(id: Int) {

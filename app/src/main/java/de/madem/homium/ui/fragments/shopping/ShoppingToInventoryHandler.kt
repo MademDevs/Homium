@@ -43,12 +43,12 @@ class ShoppingToInventoryHandler(private val context: Context) {
     private fun openQuestionAlertDialog(shoppingCart: List<ShoppingItem>, callback: () -> Unit) {
         AlertDialog.Builder(context)
             .setMessage(R.string.setting_shopping_check_behaviour_question_alert_message)
-            .setPositiveButton(android.R.string.yes) { dialog, _ ->
+            .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                 putShoppingItemsIntoInventory(shoppingCart)
                 dialog.dismiss()
                 callback.invoke()
             }
-            .setNegativeButton(android.R.string.no) { dialog, _ ->
+            .setNegativeButton(R.string.answer_no) { dialog, _ ->
                 dialog.dismiss()
                 callback.invoke()
             }.show()
