@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
         <ImageView
             android:id="@+id/recipe_edit_imgView"
             android:layout_width="match_parent"
