@@ -231,6 +231,7 @@ private fun Context.vibrateInContext() {
     }
 }
 
+/*
 fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
     //creating bundle
     val bundle = bundleOf()
@@ -244,24 +245,9 @@ fun Bundle.putIngredient(key: String, value: RecipeEditActivity.Ingredient) {
     this.putBundle(key, bundle)
 }
 
-fun Bundle.getIngredient(key: String): RecipeEditActivity.Ingredient? {
-    val content = this.getBundle(key)
-    if(content != null) {
-        /*
-        val id: Int = content["id"]?.toString()?.toInt()!!
-        val count: Int = content["count"]?.toString()?.toInt()!!
-        val unit: String = content["unit"]?.toString()!!
-        val name: String = content["name"]?.toString()!!
+ */
 
-         */
-        val id = content.getInt("id")
-        val count = content.getInt("count")
-        val unit = content.getString("unit") ?: "ERROR"
-        val name = content.getString("name") ?: "ERROR"
-        return RecipeEditActivity.Ingredient(id, count, unit, name)
-    }
-    return null
-}
+
 
 fun ViewGroup.inflater() = LayoutInflater.from(context)
 

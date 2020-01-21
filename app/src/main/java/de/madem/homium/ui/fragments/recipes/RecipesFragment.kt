@@ -59,7 +59,7 @@ class RecipesFragment : Fragment() {
 
         registerRecyclerView()
         registerFloatingActionButton()
-        registerSwipeRefresh()
+        //registerSwipeRefresh()
         registerActionMode()
 
         return root
@@ -104,6 +104,7 @@ class RecipesFragment : Fragment() {
 
     }
 
+    /*
     private fun registerSwipeRefresh() {
         val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_recipes)
         swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
@@ -112,6 +113,8 @@ class RecipesFragment : Fragment() {
             //TODO: Swipe Refresh implement something useful^^
         }
     }
+
+     */
 
     private fun registerFloatingActionButton() {
         val btnAddRecipe = root.findViewById<FloatingActionButton>(

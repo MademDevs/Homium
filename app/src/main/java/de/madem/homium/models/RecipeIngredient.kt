@@ -9,6 +9,6 @@ data class RecipeIngredient(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "count") val count: Int,
     @ColumnInfo(name = "unit") val unit: String = "",
-    @ColumnInfo(name = "recipeId") val recipeId: Int,
+    @ColumnInfo(name = "recipeId") var recipeId: Int,
     @PrimaryKey(autoGenerate = true) val uid: Int = 0
 )

@@ -74,7 +74,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             }.onDone {success ->
                 if(success){
 
-                    context.switchToActivity(RecipeEditActivity::class){intent ->
+                    context.switchToActivity(RecipeEditActivity::class){ intent ->
                         if(name.isNotEmpty() && name.isNotBlank()){
                             intent.putExtra(context.resources.getString(R.string.data_transfer_intent_edit_recipe_name),
                                 name)
