@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
+import de.madem.homium.utilities.InventoryItemAmountClassifier
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -24,7 +25,12 @@ class InventoryViewModel : ViewModel() {
     //public methods
     fun reloadInventoryItems() {
         viewModelScope.launch(IO) {
+
             val items = dao.fetchAllInventoryItems()
+                .sortedWith(compareBy(
+                    { InventoryItemAmountClassifier.byInventoryItem(it).order }, { it.name }
+                ))
+
             _inventoryItems.postValue(items)
         }
     }
