@@ -52,11 +52,7 @@ class RecipesFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recipesViewModel =
             ViewModelProviders.of(this).get(RecipesViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_recipes, container, false)

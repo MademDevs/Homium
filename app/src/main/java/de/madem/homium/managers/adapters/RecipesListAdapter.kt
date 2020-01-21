@@ -1,5 +1,6 @@
 package de.madem.homium.managers.adapters
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.Recipe
+import de.madem.homium.utilities.BitmapUtil
+import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.setPictureFromPath
 
 class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>)
@@ -35,10 +38,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
         false
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): RecipesViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipesViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recipe_listitem, parent, false)
         return RecipesViewHolder(view)
     }
@@ -50,8 +50,18 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
 
         with(holder) {
             txtName.text = recipe.name
-            //set Image!!
-            image.setPictureFromPath(recipe.image)
+            //image.setPictureFromPath(recipe.image)
+            //set Image asynchronously!!
+            val path = recipe.image
+            if(path.isNotEmpty()) {
+                CoroutineBackgroundTask<Bitmap>().executeInBackground {
+                    BitmapUtil.loadBitmapFromPath(path)
+                }.onDone {bitmap ->
+                    image.setImageBitmap(bitmap)
+                }.start()
+            } else {
+                image.setImageResource(R.mipmap.empty_picture)
+            }
             itemView.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     shortClickListener(recipe, this)

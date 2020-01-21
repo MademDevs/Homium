@@ -108,8 +108,15 @@ class MainActivity : AppCompatActivity() {
             if(requestCode == REQUEST_CODE_SPEECH && data != null){
                 val resultOfSpeechRecognition = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
 
-                if(resultOfSpeechRecognition.isNotEmpty()){
-                    speechAssistent?.executeCommand(command = resultOfSpeechRecognition)
+                if(resultOfSpeechRecognition.isNotEmpty() && resultOfSpeechRecognition.isNotBlank()){
+                    //calling speech assistent in try catch to ensure that system does not crash no matter what happens
+                    try{
+                        speechAssistent?.executeCommand(command = resultOfSpeechRecognition)
+                    }
+                    catch(ex : Exception){
+                       ex.printStackTrace()
+                    }
+
                 }
             }
 

@@ -39,8 +39,8 @@
 
     <string name="onboarding_moreFeatures">Du kannst dich auf weitere Features wie eine Inventarliste, ein Bilanzbuch, uvm. freuen!</string>
 
-    <string name="onboarding_speachAssistant">Für eine intuitivere Bedienung ist der Homium-Sprachassistent eine Möglichkeit zum Steuern der App. Der Sprachassistenz selbst ruft nur Kommandos
-        ab, wenn er aufgerufen wird und sendet somit keine Daten ungewollt an Dritte weiter.</string>
+    <string name="onboarding_speachAssistant">Für eine intuitivere Bedienung ist der Homium-Sprachassistent eine Möglichkeit zum Steuern der App. Der Sprachassistent ruft nur Kommandos
+        ab, wenn er aufgerufen wird und bietet vielseitige Eingabemöglichkeiten.</string>
 
     <string name="onboarding_recipe">Verwalte deine Rezepte mit den entsprechenden Zutaten und erstelle Notizen zur Zubereitung. Verknüpfe die Rezeptverwaltung mit dem Inventar
         und erhalte einen Überblick, was du mit den vorhandenen Lebensmitteln kochen kannst.</string>
