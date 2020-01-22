@@ -171,18 +171,26 @@ class RecipeEditActivity: AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.recipe_edit_actionbar_confirm -> {
-                writeDescriptionAndRecipeTitleToViewModel()
-                CoroutineBackgroundTask<Unit>().executeInBackground {
-                    recipeEditViewModel.addDataToDatabase()
-                }.onDone {
-                    println("inserted reciped with ingredients and descriptions")
-                    finishWithResultData(Activity.RESULT_OK){intent ->
-                        with(intent){
-                            putExtra("dataChanged", true)
-                            putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
+                val nameText = binding.recipeEditTitleEditTxt.text.toString();
+                if(nameText.isNotEmpty() && nameText.isNotBlank()){
+                    writeDescriptionAndRecipeTitleToViewModel()
+                    CoroutineBackgroundTask<Unit>().executeInBackground {
+                        recipeEditViewModel.addDataToDatabase()
+                    }.onDone {
+                        println("inserted reciped with ingredients and descriptions")
+                        finishWithResultData(Activity.RESULT_OK){intent ->
+                            with(intent){
+                                putExtra("dataChanged", true)
+                                putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
+                            }
                         }
-                    }
-                }.start()
+                    }.start()
+                }
+                else{
+                    showToastLong(R.string.errormsg_invalid_recipe_title)
+                }
+
+
 
 
                 //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
