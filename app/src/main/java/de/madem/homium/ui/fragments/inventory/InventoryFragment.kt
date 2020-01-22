@@ -45,6 +45,14 @@ class InventoryFragment : Fragment() {
         registerFloatingActionButton()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        if (::actionModeHandler.isInitialized) {
+            actionModeHandler.finishActionMode()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
