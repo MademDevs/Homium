@@ -128,6 +128,7 @@
     <string name="errormsg_unknown_error_with_speech_assistent">Ein unerwarter Fehler mit der Spracheingabefunktion ist aufgetaucht. Bitte versuche es erneut oder überprüfe deine Einstellungen für die Spracheingabe des Systems.</string>
     <string name="errormsg_delete_inventory_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Inventarliste etwas schiefgegangen.</string>
     <string name="errormsg_cooking_impossible">Die Kochfunktion ist momentan leider nicht verfügbar. Bitte versuche es erneut.</string>
+    <string name="errormsg_invalid_recipe_title">Der Titel des Rezepts ist ungültig. das Rezept kann daher nicht gespeichert werden.</string>
 
     <!--Speech Assistent Feedback-->
     <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
