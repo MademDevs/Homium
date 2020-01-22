@@ -1,6 +1,5 @@
 package de.madem.homium.managers.adapters
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
-import de.madem.homium.application.HomiumApplication
 import de.madem.homium.models.InventoryItem
-import de.madem.homium.models.Units
+import de.madem.homium.utilities.InventoryItemAmountClassifier
 
 class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<List<InventoryItem>>)
     : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>() {
@@ -27,7 +25,6 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
         liveData.observe(owner, Observer { list ->
             data = list
             notifyDataSetChanged()
-            println("OBSERVER TRIGGERED")
         })
     }
 
@@ -61,25 +58,8 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
                 .replace("unit",inventoryItem.unit)
             txtLocation.text = inventoryItem.location
 
-
-            val unit = Units.getUnitForText(HomiumApplication.appContext!!, inventoryItem.unit)
-
-            if (unit != null) {
-                val min = unit.bounds.first
-                val max = unit.bounds.second
-
-                when {
-                    inventoryItem.count < min -> {
-                        viewStock.setBackgroundColor(Color.RED)
-                    }
-                    inventoryItem.count < max -> {
-                        viewStock.setBackgroundColor(Color.YELLOW)
-                    }
-                    else -> {
-                        viewStock.setBackgroundColor(Color.GREEN)
-                    }
-                }
-            }
+            val classifier = InventoryItemAmountClassifier.byInventoryItem(inventoryItem)
+            viewStock.setBackgroundColor(classifier.color)
 
             //set click handler
             itemView.setOnClickListener {

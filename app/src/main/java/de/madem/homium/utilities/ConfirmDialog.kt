@@ -2,6 +2,7 @@ package de.madem.homium.utilities
 
 import android.app.AlertDialog
 import android.content.Context
+import de.madem.homium.R
 
 class ConfirmDialog(context: Context, messageResource: Int) {
 
@@ -14,11 +15,11 @@ class ConfirmDialog(context: Context, messageResource: Int) {
     init {
         dialogBuilder
             .setMessage(messageResource)
-            .setPositiveButton(android.R.string.yes) { dialog, which ->
+            .setPositiveButton(R.string.answer_yes) { dialog, which ->
                 onConfirm.invoke()
                 dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.no) { dialog, which ->
+            .setNegativeButton(R.string.answer_no) { dialog, which ->
                 dialog.dismiss()
             }
     }

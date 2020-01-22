@@ -7,7 +7,7 @@ import de.madem.homium.application.HomiumApplication
 enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<Int,Int>) {
 
     //values
-    ITEM(R.string.data_units_item,"",Pair(10,30)),
+    ITEM(R.string.data_units_item,"",Pair(10,15)),
     GRAM(R.string.data_units_gram,"g",Pair(100,1000)),
     KILOGRAM(R.string.data_units_kilogram,"kg",Pair(2,5)),
     MILLILITRE(R.string.data_units_millilitre,"ml",Pair(100,1000)),
