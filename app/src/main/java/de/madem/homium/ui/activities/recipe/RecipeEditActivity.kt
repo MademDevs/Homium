@@ -98,6 +98,7 @@ class RecipeEditActivity: AppCompatActivity() {
 
     private fun initGuiComponents() {
         recipeEditViewModel.recipe.observe(this, Observer { newRecipe ->
+            println("image changed")
             binding.recipeEditTitleEditTxt.setText(newRecipe.name)
             binding.recipeEditImgView.setPictureFromPath(newRecipe.image, 400, 400)
         })
@@ -196,6 +197,7 @@ class RecipeEditActivity: AppCompatActivity() {
                 //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }
             android.R.id.home -> {
+                recipeEditViewModel.discardPictureChanges()
                 finish()
                 return true
             }

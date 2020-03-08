@@ -2,13 +2,22 @@ package de.madem.homium.utilities
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
+import java.io.File
 
 object BitmapUtil {
 
-    fun loadBitmapFromPath(path: String, reqWidth: Int = 400, reqHeight: Int = 400): Bitmap {
+    fun loadBitmapFromPath(path: String?, reqWidth: Int = 400, reqHeight: Int = 400): Bitmap {
 
-        if (path.isEmpty()) {
-            throw IllegalArgumentException("Path is null or empty!")
+        if (path.isNullOrEmpty()) {
+            return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
+        }
+
+        val imageFile = File(path)
+
+        if(!(imageFile).exists()){
+            return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
         }
 
         return BitmapFactory.Options().run {

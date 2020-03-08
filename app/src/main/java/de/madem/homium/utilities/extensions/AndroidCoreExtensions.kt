@@ -61,13 +61,13 @@ fun AppCompatActivity.hideKeyboard() {
     // }
 }
 
-fun ImageView.setPictureFromPath(path: String, reqWidth: Int = 400, reqHeight: Int = 400) {
-    if(path.isNotEmpty()) {
+fun ImageView.setPictureFromPath(path: String?, reqWidth: Int = 400, reqHeight: Int = 400) {
+    if(path.isNullOrEmpty()) {
+        setImageResource(R.mipmap.empty_picture)
+    } else {
         val bitmap = BitmapUtil.loadBitmapFromPath(path, reqWidth, reqHeight)
 
         setImageBitmap(bitmap)
-    } else {
-        setImageResource(R.mipmap.empty_picture)
     }
 }
 
