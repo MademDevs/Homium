@@ -179,6 +179,7 @@ class RecipeEditActivity: AppCompatActivity() {
                         recipeEditViewModel.addDataToDatabase()
                     }.onDone {
                         println("inserted reciped with ingredients and descriptions")
+                        recipeEditViewModel.shallDiscardPictureChanges = false
                         finishWithResultData(Activity.RESULT_OK){intent ->
                             with(intent){
                                 putExtra("dataChanged", true)
@@ -197,12 +198,22 @@ class RecipeEditActivity: AppCompatActivity() {
                 //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }
             android.R.id.home -> {
-                recipeEditViewModel.discardPictureChanges()
+                recipeEditViewModel.shallDiscardPictureChanges = true
                 finish()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        with(recipeEditViewModel){
+            if(shallDiscardPictureChanges){
+            discardPictureChanges()
+        }
+        }
     }
 
 }

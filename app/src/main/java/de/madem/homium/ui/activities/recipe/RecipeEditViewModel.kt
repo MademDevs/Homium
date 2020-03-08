@@ -40,6 +40,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     //handling image files
     private val oldImageFiles = mutableSetOf<File>()
     private var firstImagePath = ""
+    var shallDiscardPictureChanges = true
 
     init {
         if(recipeId == null) {
