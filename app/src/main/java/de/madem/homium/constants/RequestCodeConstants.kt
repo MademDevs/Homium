@@ -1,6 +1,7 @@
 package de.madem.homium.constants
 
 const val REQUEST_TAKE_PHOTO = 1
+const val REQUEST_GET_PHOTO_FROM_SRC = 2
 
 const val REQUEST_CODE_SHOPPING = 100
 const val REQUEST_CODE_RECIPES = 200

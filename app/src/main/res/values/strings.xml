@@ -227,4 +227,12 @@
     <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
     <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
     <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string>
+
+    <string-array name="recipes_photo_options">
+        <item>Bild aufnehmen</item>
+        <item>Bild aus der Galerie wählen</item>
+        <item>Bild entfernen</item>
+    </string-array>
+    <string name="dialog_choosePicture">Bild festlegen</string>
+    <string name="photo_loading_error">Das Bild konnte leider nicht geladen werden. Bitte versuche es erneut!</string>
 </resources>

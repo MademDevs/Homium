@@ -1,7 +1,10 @@
 package de.madem.homium.ui.activities.recipe
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -9,6 +12,7 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
@@ -16,7 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
-import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
+import de.madem.homium.constants.REQUEST_GET_PHOTO_FROM_SRC
 import de.madem.homium.constants.REQUEST_TAKE_PHOTO
 import de.madem.homium.databinding.ActivityRecipeEditBinding
 import de.madem.homium.models.RecipeDescription
@@ -24,6 +28,7 @@ import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.*
+import kotlinx.coroutines.async
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -112,7 +117,26 @@ class RecipeEditActivity: AppCompatActivity() {
                 binding.recipeEditLayoutIngr.addView(view)
             }
         })
-        binding.recipeEditImgView.setOnClickListener { dispatchTakePictureIntent() }
+        binding.recipeEditImgView.setOnClickListener {
+            AlertDialog.Builder(this).setSingleChoiceItems(R.array.recipes_photo_options,0,
+                DialogInterface.OnClickListener { dialog, position ->
+                    when(position){
+                        0 -> {
+                            dispatchTakePictureIntent()
+                            dialog.dismiss()
+                        }
+                        1 -> {
+                            dispatchImageSrcLoadingIntent()
+                            dialog.dismiss()
+                        }
+                        2 -> {
+                            recipeEditViewModel.editImagePath("")
+                            dialog.dismiss()
+                        }
+                    }
+                }).setTitle(R.string.dialog_choosePicture).show()
+
+        }
         binding.recipeEditAddIngredientBtn.setOnClickListener { switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class) }
         binding.recipeEditAddDescriptionBtn.setOnClickListener {
             addDescription = true
@@ -142,11 +166,27 @@ class RecipeEditActivity: AppCompatActivity() {
             .apply { picturePath = absolutePath }
     }
 
+    private fun dispatchImageSrcLoadingIntent(){
+        val photoPickIntent = Intent(Intent.ACTION_PICK)
+        photoPickIntent.type = "image/*"
+        startActivityForResult(photoPickIntent, REQUEST_GET_PHOTO_FROM_SRC)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_TAKE_PHOTO -> recipeEditViewModel.editImagePath(picturePath)
+                REQUEST_GET_PHOTO_FROM_SRC ->{
+
+                    if(data != null){
+                        loadImageFromSrc(data.data)
+                    }
+                    else{
+                        showPhotoLoadingError()
+                    }
+
+                }
                 REQUEST_CODE_ADD_INGREDIENT -> {
                     data.notNull { dataIntent ->
                         val ingrName = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name)) ?: ""
@@ -164,6 +204,43 @@ class RecipeEditActivity: AppCompatActivity() {
         }
     }
 
+    private fun loadImageFromSrc(uri : Uri?){
+        CoroutineBackgroundTask<String?>().executeInBackground {
+            try {
+                if(uri != null){
+                    val resultFileDeferred = async<File> {
+                        createImageFile()
+                    }
+
+                    val imageStream = contentResolver.openInputStream(uri)
+                    val bitmap = BitmapFactory.decodeStream(imageStream)
+
+                    val resultFile = resultFileDeferred.await()
+
+                    val success = bitmap.compress(Bitmap.CompressFormat.JPEG,85,resultFile.outputStream())
+
+                    if(success) resultFile.absolutePath else null
+
+                }
+                else{
+                    showPhotoLoadingError();
+                    null
+                }
+            }
+            catch (ex : Exception){
+                ex.printStackTrace()
+                showPhotoLoadingError()
+                null
+            }
+        }.onDone {
+            it.notNull {path ->
+                recipeEditViewModel.editImagePath(path)
+            }
+        }.start()
+    }
+
+    private fun showPhotoLoadingError() = Toast.makeText(this,R.string.photo_loading_error,Toast.LENGTH_SHORT).show()
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if(menu != null) { menuInflater.inflate(R.menu.recipe_edit_actionbar_menu,menu) }
         return super.onCreateOptionsMenu(menu)
@@ -179,7 +256,7 @@ class RecipeEditActivity: AppCompatActivity() {
                         recipeEditViewModel.addDataToDatabase()
                     }.onDone {
                         println("inserted reciped with ingredients and descriptions")
-                        recipeEditViewModel.shallDiscardPictureChanges = false
+                        //recipeEditViewModel.shallDiscardPictureChanges = false
                         finishWithResultData(Activity.RESULT_OK){intent ->
                             with(intent){
                                 putExtra("dataChanged", true)
@@ -191,14 +268,10 @@ class RecipeEditActivity: AppCompatActivity() {
                 else{
                     showToastLong(R.string.errormsg_invalid_recipe_title)
                 }
-
-
-
-
                 //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }
             android.R.id.home -> {
-                recipeEditViewModel.shallDiscardPictureChanges = true
+                recipeEditViewModel.discardPictureChanges()
                 finish()
                 return true
             }
@@ -206,14 +279,22 @@ class RecipeEditActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        recipeEditViewModel.discardPictureChanges()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-
+/*
         with(recipeEditViewModel){
             if(shallDiscardPictureChanges){
-            discardPictureChanges()
+                discardPictureChanges()
+            }
         }
-        }
+
+ */
     }
 
 }

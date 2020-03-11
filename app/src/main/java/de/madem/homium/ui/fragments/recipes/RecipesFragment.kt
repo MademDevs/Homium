@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
@@ -24,6 +25,9 @@ import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.vibrate
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
 
 class RecipesFragment : Fragment() {
 
@@ -73,6 +77,22 @@ class RecipesFragment : Fragment() {
                         .executeInBackground {
                             itemHolders.map { it.recipe }.forEach {
                                 db.recipeDao().deleteRecipe(it)
+                                GlobalScope.launch {
+                                   //deleting picture
+                                    File(it.image).let {file ->
+                                        if(file.exists()){
+                                            file.delete()
+
+                                            if(file.exists()){
+                                                file.canonicalFile.delete()
+
+                                                if(file.exists()){
+                                                    context?.deleteFile(file.name) ?: System.err.println("Failed Deleting picture")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         .onDone {

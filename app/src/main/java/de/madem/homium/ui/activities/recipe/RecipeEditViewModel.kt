@@ -40,7 +40,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     //handling image files
     private val oldImageFiles = mutableSetOf<File>()
     private var firstImagePath = ""
-    var shallDiscardPictureChanges = true
+    //var shallDiscardPictureChanges = true
 
     init {
         if(recipeId == null) {
@@ -83,10 +83,10 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editImagePath(path: String) {
-        val recipe = _recipe.value
+        val recipe : Recipe = _recipe.value ?: return
 
         //marking old file if possible
-        val oldPath = recipe?.image ?: ""
+        val oldPath = recipe.image ?: ""
         if(oldPath.isNotEmpty() && oldPath.isNotBlank()){
             val oldFile = File(oldPath)
             if(oldFile.exists()){
@@ -94,7 +94,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
             }
         }
 
-        recipe?.image = path
+        recipe.image = path
         _recipe.value = recipe
     }
 
