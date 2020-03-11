@@ -1,4 +1,4 @@
-package de.madem.homium.utilities
+package de.madem.homium.utilities.pictures
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -7,6 +7,8 @@ import de.madem.homium.application.HomiumApplication
 import java.io.File
 
 object BitmapUtil {
+
+    val imageCache : ImageCache = ImageCache(HomiumApplication.getAvailableApplicationMemory()/8)
 
     fun loadBitmapFromPath(path: String?, reqWidth: Int = 400, reqHeight: Int = 400): Bitmap {
 
@@ -26,7 +28,12 @@ object BitmapUtil {
             BitmapFactory.decodeFile(path, this)
 
             // Calculate inSampleSize
-            inSampleSize = calculateInSampleSize(this, reqWidth, reqHeight)
+            inSampleSize =
+                calculateInSampleSize(
+                    this,
+                    reqWidth,
+                    reqHeight
+                )
 
             // Decode bitmap with inSampleSize set
             inJustDecodeBounds = false
