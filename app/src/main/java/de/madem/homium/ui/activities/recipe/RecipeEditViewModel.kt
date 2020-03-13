@@ -58,6 +58,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     private fun getRecipeFromDatabaseAndSetValues() {
+        println("getRecipeFromDatabaseAndSetValues() called")
         CoroutineBackgroundTask<Recipe>()
             .executeInBackground { database.recipeDao().getRecipeById(recipeId!!) }
             .onDone { _recipe.value = it; firstImagePath = it.image }
@@ -111,6 +112,9 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editDescription(index: Int, name: String) {
+        val descriptions = _descriptions.value ?: return
+        if(index >= descriptions.size) return
+
         _descriptions.value?.get(index)?.description = name
     }
 

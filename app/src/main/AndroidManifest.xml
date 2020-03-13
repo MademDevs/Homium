@@ -63,6 +63,7 @@
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
             android:name=".ui.activities.recipe.RecipeEditActivity"
+            android:screenOrientation="locked"
             android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity android:name=".ui.activities.test.TestActivity" />
         <activity
