@@ -44,6 +44,33 @@ class RecipeEditActivity: AppCompatActivity() {
     private var editTextList = mutableListOf<EditText>()
     private var addDescription = false
 
+    private val descriptionObserver = Observer<MutableList<RecipeDescription>> { newDescription ->
+        if(newDescription.isNotEmpty()) {
+            if(addDescription) {
+                with(newDescription.last()) {
+                    val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+                    view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.count())}"
+                    val editText = view.findViewById<EditText>(R.id.descr_editTxt)
+                    editText.setText(this.description)
+                    binding.recipeEditLayoutDescr.addView(view)
+                    editTextList.add(editText)
+                }
+                addDescription = false
+            } else {
+                binding.recipeEditLayoutDescr.removeAllViews()
+                var cnt = 1
+                for(el in newDescription) {
+                    val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
+                    view.findViewById<TextView>(R.id.descr_count).text = cnt++.toString()
+                    val editText = view.findViewById<EditText>(R.id.descr_editTxt)
+                    editText.setText(el.description)
+                    binding.recipeEditLayoutDescr.addView(view)
+                    editTextList.add(editText)
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_recipe_edit)
@@ -61,39 +88,13 @@ class RecipeEditActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        println("ON Resume")
-        editTextList = mutableListOf()/*
-        recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
-            println("DESCRIPTION OBSERVER TRIGGERED $newDescription")
-            if(newDescription.isNotEmpty()) {
-                if(addDescription) {
-                    with(newDescription.last()) {
-                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                        view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.count())}"
-                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                        editText.setText(this.description)
-                        binding.recipeEditLayoutDescr.addView(view)
-                        editTextList.add(editText)
-                    }
-                    addDescription = false
-                } else {
-                    binding.recipeEditLayoutDescr.removeAllViews()
-                    var cnt = 1
-                    for(el in newDescription) {
-                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                        view.findViewById<TextView>(R.id.descr_count).text = cnt++.toString()
-                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                        editText.setText(el.description)
-                        binding.recipeEditLayoutDescr.addView(view)
-                        editTextList.add(editText)
-                    }
-                }
-            }
-        })*/
+        editTextList = mutableListOf()
+        recipeEditViewModel.descriptions.observe(this,descriptionObserver)
     }
 
     override fun onPause() {
         super.onPause()
+        recipeEditViewModel.descriptions.removeObserver(descriptionObserver)
         writeDescriptionAndRecipeTitleToViewModel()
     }
 
@@ -106,44 +107,9 @@ class RecipeEditActivity: AppCompatActivity() {
 
     private fun initGuiComponents() {
         recipeEditViewModel.recipe.observe(this, Observer { newRecipe ->
-            println("image changed")
             binding.recipeEditTitleEditTxt.setText(newRecipe.name)
             binding.recipeEditImgView.setPictureFromPath(newRecipe.image, 400, 400)
         })
-
-        //test
-        recipeEditViewModel.descriptions.observe(this, Observer { newDescription ->
-            println("DESCRIPTION OBSERVER TRIGGERED $newDescription")
-            if(true) {
-                if(addDescription) {
-                    with(newDescription.last()) {
-                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                        view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.count())}"
-                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                        editText.setText(this.description)
-                        binding.recipeEditLayoutDescr.addView(view)
-                        editTextList.add(editText)
-                    }
-                    addDescription = false
-                } else {
-
-
-                    binding.recipeEditLayoutDescr.removeAllViews()
-                    var cnt = 1
-                    for(el in newDescription) {
-                        val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                        view.findViewById<TextView>(R.id.descr_count).text = cnt++.toString()
-                        val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                        println("Description: ${el.description}")
-                        editText.setText(el.description)
-                        binding.recipeEditLayoutDescr.addView(view)
-                        editTextList.add(editText)
-                    }
-                }
-            }
-        })
-
-
 
         recipeEditViewModel.ingredients.observe(this, Observer { newIngredient ->
             binding.recipeEditLayoutIngr.removeAllViews()
