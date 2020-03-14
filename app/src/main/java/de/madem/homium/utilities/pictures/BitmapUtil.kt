@@ -11,35 +11,40 @@ object BitmapUtil {
     val imageCache : ImageCache = ImageCache(HomiumApplication.getAvailableApplicationMemory()/8)
 
     fun loadBitmapFromPath(path: String?, reqWidth: Int = 400, reqHeight: Int = 400): Bitmap {
+        try {
+            if (path.isNullOrEmpty()) {
+                return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
+            }
 
-        if (path.isNullOrEmpty()) {
+            val imageFile = File(path)
+
+            if(!(imageFile).exists()){
+                return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
+            }
+
+            return BitmapFactory.Options().run {
+
+                inJustDecodeBounds = true
+                BitmapFactory.decodeFile(path, this)
+
+                // Calculate inSampleSize
+                inSampleSize =
+                    calculateInSampleSize(
+                        this,
+                        reqWidth,
+                        reqHeight
+                    )
+
+                // Decode bitmap with inSampleSize set
+                inJustDecodeBounds = false
+
+                BitmapFactory.decodeFile(path, this)
+            }
+        }
+        catch (ex : Exception){
             return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
         }
 
-        val imageFile = File(path)
-
-        if(!(imageFile).exists()){
-            return BitmapFactory.decodeResource(HomiumApplication.appContext!!.resources,R.mipmap.empty_picture)
-        }
-
-        return BitmapFactory.Options().run {
-
-            inJustDecodeBounds = true
-            BitmapFactory.decodeFile(path, this)
-
-            // Calculate inSampleSize
-            inSampleSize =
-                calculateInSampleSize(
-                    this,
-                    reqWidth,
-                    reqHeight
-                )
-
-            // Decode bitmap with inSampleSize set
-            inJustDecodeBounds = false
-
-            BitmapFactory.decodeFile(path, this)
-        }
     }
 
     private fun calculateInSampleSize(

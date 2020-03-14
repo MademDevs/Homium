@@ -275,7 +275,6 @@ class RecipeEditActivity: AppCompatActivity() {
                 else{
                     showToastLong(R.string.errormsg_invalid_recipe_title)
                 }
-                //finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
             }
             android.R.id.home -> {
                 recipeEditViewModel.discardPictureChanges()
@@ -290,6 +289,7 @@ class RecipeEditActivity: AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         recipeEditViewModel.discardPictureChanges()
+        finish()
     }
 
     override fun onDestroy() {
