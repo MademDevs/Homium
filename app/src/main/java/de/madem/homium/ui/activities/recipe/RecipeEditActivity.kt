@@ -94,7 +94,10 @@ class RecipeEditActivity: AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        recipeEditViewModel.descriptions.removeObserver(descriptionObserver)
+        if(recipeEditViewModel.descriptions.hasObservers()){
+            recipeEditViewModel.descriptions.removeObserver(descriptionObserver)
+        }
+
         writeDescriptionAndRecipeTitleToViewModel()
     }
 
@@ -122,7 +125,7 @@ class RecipeEditActivity: AppCompatActivity() {
             }
         })
         binding.recipeEditImgView.setOnClickListener {
-            AlertDialog.Builder(this).setSingleChoiceItems(R.array.recipes_photo_options,0,
+            AlertDialog.Builder(this).setItems(R.array.recipes_photo_options,
                 DialogInterface.OnClickListener { dialog, position ->
                     when(position){
                         0 -> {
