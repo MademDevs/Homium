@@ -22,7 +22,7 @@ import androidx.lifecycle.Observer
 import de.madem.homium.R
 import de.madem.homium.constants.SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
-import de.madem.homium.utilities.BitmapUtil
+import de.madem.homium.utilities.pictures.BitmapUtil
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
@@ -62,13 +62,13 @@ fun AppCompatActivity.hideKeyboard() {
     // }
 }
 
-fun ImageView.setPictureFromPath(path: String, reqWidth: Int = 400, reqHeight: Int = 400) {
-    if(path.isNotEmpty()) {
+fun ImageView.setPictureFromPath(path: String?, reqWidth: Int = 400, reqHeight: Int = 400) {
+    if(path.isNullOrEmpty()) {
+        setImageResource(R.mipmap.empty_picture)
+    } else {
         val bitmap = BitmapUtil.loadBitmapFromPath(path, reqWidth, reqHeight)
 
         setImageBitmap(bitmap)
-    } else {
-        setImageResource(R.mipmap.empty_picture)
     }
 }
 

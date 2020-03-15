@@ -18,6 +18,7 @@ import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
@@ -27,6 +28,9 @@ import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.vibrate
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
 
 class RecipesFragment : Fragment() {
 
@@ -76,6 +80,22 @@ class RecipesFragment : Fragment() {
                         .executeInBackground {
                             itemHolders.map { it.recipe }.forEach {
                                 db.recipeDao().deleteRecipe(it)
+                                GlobalScope.launch {
+                                   //deleting picture
+                                    File(it.image).let {file ->
+                                        if(file.exists()){
+                                            file.delete()
+
+                                            if(file.exists()){
+                                                file.canonicalFile.delete()
+
+                                                if(file.exists()){
+                                                    context?.deleteFile(file.name) ?: System.err.println("Failed Deleting picture")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         .onDone {

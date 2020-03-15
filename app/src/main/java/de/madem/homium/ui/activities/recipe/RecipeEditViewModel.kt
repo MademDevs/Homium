@@ -4,11 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.extensions.notNull
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import java.io.File
 
 class RecipeEditViewModelFactory(private val recipeId: Int?): ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -32,6 +37,11 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
         get() = _descriptions
     private val database = AppDatabase.getInstance()
 
+    //handling image files
+    private val oldImageFiles = mutableSetOf<File>()
+    private var firstImagePath = ""
+    //var shallDiscardPictureChanges = true
+
     init {
         if(recipeId == null) {
             _recipe.value = Recipe("", "", 0)
@@ -48,9 +58,10 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     private fun getRecipeFromDatabaseAndSetValues() {
+        println("getRecipeFromDatabaseAndSetValues() called")
         CoroutineBackgroundTask<Recipe>()
             .executeInBackground { database.recipeDao().getRecipeById(recipeId!!) }
-            .onDone { _recipe.value = it }
+            .onDone { _recipe.value = it; firstImagePath = it.image }
             .start()
         CoroutineBackgroundTask<List<RecipeIngredient>>()
             .executeInBackground { database.recipeDao().getIngredientByRecipeId(recipeId!!) }
@@ -73,8 +84,18 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editImagePath(path: String) {
-        val recipe = _recipe.value
-        recipe?.image = path
+        val recipe : Recipe = _recipe.value ?: return
+
+        //marking old file if possible
+        val oldPath = recipe.image ?: ""
+        if(oldPath.isNotEmpty() && oldPath.isNotBlank()){
+            val oldFile = File(oldPath)
+            if(oldFile.exists()){
+                oldImageFiles.add(oldFile)
+            }
+        }
+
+        recipe.image = path
         _recipe.value = recipe
     }
 
@@ -91,11 +112,20 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editDescription(index: Int, name: String) {
+        val descriptions = _descriptions.value ?: return
+        if(index >= descriptions.size) return
+
         _descriptions.value?.get(index)?.description = name
     }
 
     //THIS FUNCTION SHOULD always be called from a Background Thread
-    suspend fun addDataToDatabase() {
+    suspend fun addDataToDatabase() = coroutineScope {
+        launch {
+            oldImageFiles.forEach{
+                deleteImageFile(it)
+            }
+        }
+
         if (recipeId == null) {
             var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
             changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
@@ -122,9 +152,48 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
 
     }
 
+    fun discardPictureChanges(){
+        _recipe.value.notNull { recipe ->
+            if(firstImagePath != recipe.image){
+                //if picture is another than original then add current to old ones and remove original from old ones
+                val path = recipe.image
+                if(path.isNotEmpty() && path.isNotBlank()){
+                    val oldFile = File(path)
+                    if(oldFile.exists()){
+                        oldImageFiles.add(oldFile)
+                    }
+                }
+
+                val originalFile = File(firstImagePath)
+                oldImageFiles.remove(originalFile)
+
+                //deleting all other files
+                CoroutineBackgroundTask<Unit>().executeInBackground {
+                    oldImageFiles.forEach{
+                        deleteImageFile(it)
+                    }
+                }.start()
+            }
+        }
+
+
+    }
+
     private fun changeIngredientsAndDescriptionsRecipeId(id: Int) {
         _ingredients.value?.forEach { it.recipeId = id }
         _descriptions.value?.forEach { it.recipeID = id }
+    }
+
+    private fun deleteImageFile(file: File){
+        file.delete()
+
+        if(file.exists()){
+            file.canonicalFile.delete()
+
+            if(file.exists()){
+                HomiumApplication.appContext?.deleteFile(file.name)
+            }
+        }
     }
 
 }

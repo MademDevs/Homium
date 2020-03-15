@@ -1,7 +1,9 @@
 package de.madem.homium.application
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import kotlinx.coroutines.withContext
 
 class HomiumApplication : Application() {
 
@@ -12,6 +14,15 @@ class HomiumApplication : Application() {
                     field = value
                 }
             }
+
+
+        fun getAvailableApplicationMemory(context: Context = appContext!!) : Int{
+            return with(context){
+                val activityManager : ActivityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+                activityManager.memoryClass * 1024 * 1024
+            }
+        }
     }
 
     override fun onCreate() {
@@ -20,4 +31,6 @@ class HomiumApplication : Application() {
         HomiumSettings.initialize(applicationContext);
         super.onCreate()
     }
+
+
 }

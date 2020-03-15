@@ -162,16 +162,6 @@
     <string name="cooking_notification_success_add_missing_shoppingitems">Die fehlenden Zutaten wurden erfolgreich auf die Einkaufsliste gesetzt.</string>
     <string name="cooking_notification_success_subtract_from_inventory">Das Rezept wurde erfolgeich gekocht und die Zutaten in entsprechender Menge aus dem Inventar entfernt.</string>
 
-    <!--strings for data transfer e.g. intent
-    <string name="data_transfer_intent_edit_shoppingitem">shoppingitemedit</string>
-    <string name="data_transfer_intent_edit_ingredient_name">ingredientname</string>
-    <string name="data_transfer_intent_edit_ingredient_unit">ingredientunit</string>
-    <string name="data_transfer_intent_edit_ingredient_count">ingredientcount</string>
-    <string name="data_transfer_intent_edit_ingredient_id">ingredientid</string>
-    <string name="data_transfer_intent_edit_recipe_name">recipename</string>
-    <string name="data_transfer_intent_edit_recipe_id">recipeid</string>
-    <string name="data_transfer_intent_recipe_cook_request">cookrequest</string>-->
-
     <!--data for units-->
     <string name="data_units_item">Stück</string>
     <string name="data_units_gram">Gramm</string>
@@ -189,49 +179,11 @@
         <item>Speisekeller</item>
     </string-array>
 
-    <!--<string-array name="small_units">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
+    <string-array name="recipes_photo_options">
+        <item>Bild aufnehmen</item>
+        <item>Bild aus der Galerie wählen</item>
+        <item>Bild entfernen</item>
     </string-array>
-
-    <string-array name="big_units">
-        <item>50</item>
-        <item>100</item>
-        <item>150</item>
-        <item>200</item>
-        <item>250</item>
-        <item>300</item>
-        <item>350</item>
-        <item>400</item>
-        <item>450</item>
-        <item>500</item>
-        <item>600</item>
-        <item>700</item>
-        <item>800</item>
-        <item>900</item>
-        <item>1000</item>
-    </string-array>-->
-
-
-    <!--shared preferences keys
-    <string name="sharedprefernce_namespacekey_settings">Settings</string>
-    <string name="sharedpreference_settings_preferencekey_databaseInitialized">databaseInizialized</string>
-    <string name="sharedpreference_settings_preferencekey_onboardingCompleted">onboardingCompleted</string>
-    <string name="sharedpreference_settings_preferencekey_vibrationEnabled">vibrationEnabled</string>
-    <string name="sharedpreference_settings_preferencekey_sortedShoppingRadioId">sortedShoppingRadioId</string>
-    <string name="sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed">deleteQuestionSpeechAssistent</string>
-    <string name="sharedpreference_settings_preferencekey_shoppingToInventory">shoppingToInventory</string> -->
+    <string name="dialog_choosePicture">Bild festlegen</string>
+    <string name="photo_loading_error">Das Bild konnte leider nicht geladen werden. Bitte versuche es erneut!</string>
 </resources>
