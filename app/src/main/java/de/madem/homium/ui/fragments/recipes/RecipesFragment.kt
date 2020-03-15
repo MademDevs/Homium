@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
@@ -87,7 +90,8 @@ class RecipesFragment : Fragment() {
         fun onEditButtonClicked(itemHolder: RecipeActionModeHandler.ItemHolder) {
             Intent(activity, RecipeEditActivity::class.java)
                 .apply {
-                    putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+                    putExtra(
+                        INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,
                         itemHolder.recipe.uid)
                 }
                 .also { startActivity(it) }
@@ -148,7 +152,8 @@ class RecipesFragment : Fragment() {
                 //update check status
                 Intent(activity, RecipePresentationActivity::class.java)
                     .apply {
-                        putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id)
+                        putExtra(
+                            INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
                             , recipe.uid)
                     }
                     .also { startActivity(it)}
@@ -158,7 +163,8 @@ class RecipesFragment : Fragment() {
         }
         adapter.longClickListener = {recipe, viewHolder ->
             //giving haptic feedback if allowed
-            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
+                //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
             if(vibrationAllowed){
                 vibrate()
             }

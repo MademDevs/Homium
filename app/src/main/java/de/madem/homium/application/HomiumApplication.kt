@@ -17,6 +17,7 @@ class HomiumApplication : Application() {
     override fun onCreate() {
         println("APPLICATION: CREATING HOMIUM-APPLICATION")
         appContext = applicationContext
+        HomiumSettings.initialize(applicationContext);
         super.onCreate()
     }
 }

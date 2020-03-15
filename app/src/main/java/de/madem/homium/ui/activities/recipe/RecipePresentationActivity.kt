@@ -14,6 +14,8 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
@@ -58,7 +60,7 @@ class RecipePresentationActivity : AppCompatActivity() {
 
         //getting id right
         val intentId = intent.getIntExtra(
-            resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
+            INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, -1)
 
         //end activity if there is no valid id in intent
         if(intentId < 0){
@@ -134,7 +136,7 @@ class RecipePresentationActivity : AppCompatActivity() {
                 REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
                 RecipeEditActivity::class
             ) {
-                it.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), recipeid)
+                it.putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, recipeid)
             }
             return true
         }
@@ -158,7 +160,7 @@ class RecipePresentationActivity : AppCompatActivity() {
                     REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION -> {
                         val dataChanged = intent.getBooleanExtra("dataChanged",false)
                         if(dataChanged){
-                            val id = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),-1)
+                            val id = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,-1)
                             viewModel.updateRecipeId(id)
                             recipeid = id
                             loadRecipe()
@@ -230,7 +232,8 @@ class RecipePresentationActivity : AppCompatActivity() {
     private fun autoStartCookingIfRequested(savedInstanceState: Bundle?){
 
         allowedToAutoStartCooking = if(savedInstanceState == null){
-            intent.getIntExtra(resources.getString(R.string.data_transfer_intent_recipe_cook_request),
+            intent.getIntExtra(
+                INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST,
                 -1) == REQUEST_CODE_COOK_RECIPE
         } else{
             savedInstanceState.getBoolean(

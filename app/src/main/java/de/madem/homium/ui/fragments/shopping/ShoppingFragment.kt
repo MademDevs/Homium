@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
-import de.madem.homium.constants.REQUEST_CODE_SHOPPING
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.*
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.ViewRefresher
@@ -99,9 +100,9 @@ class ShoppingFragment : Fragment() {
     }
 
     private fun refreshViewModelData(){
-        val sorting = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),Int::class) ?: R.id.radio_sort_normal
+        val sorting = HomiumSettings.shoppingSort//getSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,String::class) ?: SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
 
-        if(sorting == R.id.radio_sort_reversed){
+        if(sorting == SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED){
             shoppingViewModel.reloadShoppingItems(true)
         }
         else{
@@ -147,7 +148,8 @@ class ShoppingFragment : Fragment() {
 
         adapter.longClickListener = {shoppingItem, viewHolder ->
             //giving haptic feedback if allowed
-            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
+                //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
             if(vibrationAllowed){
                 vibrate()
             }
