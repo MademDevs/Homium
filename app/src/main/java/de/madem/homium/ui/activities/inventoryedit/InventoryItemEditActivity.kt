@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import de.madem.homium.R
+import de.madem.homium.constants.BIG_UNITS_VALUES
+import de.madem.homium.constants.SMALL_UNITS_VALUES
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
@@ -34,14 +36,20 @@ class InventoryItemEditActivity : AppCompatActivity() {
     private lateinit var smallUnits: Array<String>
     private var itemid: Int = -1
 
+    companion object{
+        private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index";
+        private const val SAVEINSTANCESTATE_COUNT = "sist_count";
+
+    }
+
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inventory_item_edit)
 
         //getting data from ressources
-        bigUnits = resources.getStringArray(R.array.big_units)
-        smallUnits = resources.getStringArray(R.array.small_units)
+        bigUnits = BIG_UNITS_VALUES
+        smallUnits = SMALL_UNITS_VALUES
 
         //init action bar
         initActionbar()
@@ -71,15 +79,41 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("unit", numPickerUnit.value)
-        outState.putInt("count", numPickerCount.value)
+        //unit index
+        outState.putInt(SAVEINSTANCESTATE_UNIT_INDEX, numPickerUnit.value)
+
+        //count value
+        if(numPickerCount.isVisible){
+            outState.putString(SAVEINSTANCESTATE_COUNT, numPickerCount.displayedValues[numPickerCount.value])
+        }
+        else{
+            outState.putString(SAVEINSTANCESTATE_COUNT, editTextCount.text.toString())
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        numPickerCount.value = savedInstanceState.getInt("count")
-        numPickerUnit.value = savedInstanceState.getInt("unit")
+        //unit value
+        numPickerUnit.value = savedInstanceState.getInt(SAVEINSTANCESTATE_UNIT_INDEX)
+
+        //count value
+        val countValue = savedInstanceState.getString(SAVEINSTANCESTATE_COUNT) ?: smallUnits[0]
+
+        if(bigUnits.contains(countValue)){
+            numPickerCount.displayedValues = bigUnits
+            numPickerCount.value = bigUnits.indexOf(countValue)
+        }
+        else if(smallUnits.contains(countValue)){
+            numPickerCount.displayedValues = smallUnits
+            numPickerCount.value = smallUnits.indexOf(countValue)
+        }
+        else{
+            numPickerCount.isVisible = false
+            editTextCount.setText(countValue)
+            editTextCount.isVisible = true;
+        }
+
     }
 
     //optionsMenu
@@ -220,7 +254,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
         }.start()
 
         //init location
-        val locations = arrayOf("Kühlschrank", "Speisekeller", "Gefrierschrank")
+        val locations = resources.getStringArray(R.array.inventory_locations)
 
         autoCmplTxtLocation = findViewById(R.id.inventory_item_edit_location)
         autoCmplTxtLocation.setAdapter(

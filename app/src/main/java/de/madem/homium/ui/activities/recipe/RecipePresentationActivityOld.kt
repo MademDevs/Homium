@@ -12,6 +12,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import de.madem.homium.R
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
@@ -32,7 +33,7 @@ class RecipePresentationActivityOld : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_presentation_old)
-        recipeid = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
+        recipeid = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, -1)
         if(recipeid > 0) {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
 

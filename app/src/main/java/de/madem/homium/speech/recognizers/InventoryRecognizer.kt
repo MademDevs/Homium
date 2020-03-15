@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.InventoryItem
@@ -947,7 +949,9 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
     }
 
     private fun shouldAskDeleteQuestion() : Boolean{
-        return contextRef.get()?.getSetting(getStringResource(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),Boolean::class) ?: true
+        return HomiumSettings.speechAssistantDeleteQuestion//contextRef.get()?.getSetting(
+            //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,Boolean::class) ?: true
+
     }
 
     private fun createDeleteMessage(replacement : String, baseID : Int = R.string.assistent_question_delete_all_inventory_with_name, withQutationMarks : Boolean = false) : String{

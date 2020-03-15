@@ -3,6 +3,8 @@ package de.madem.homium.ui.fragments.shopping
 import android.app.AlertDialog
 import android.content.Context
 import de.madem.homium.R
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.ShoppingItem
@@ -14,10 +16,10 @@ import kotlinx.coroutines.launch
 class ShoppingToInventoryHandler(private val context: Context) {
 
     private fun getCheckedRadio(): Int {
-        var checkedRadioId: Int = context.getSetting(
-            context.resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
+        var checkedRadioId: Int = HomiumSettings.shoppingToInventory/*context.getSetting(
+            SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,
             Int::class
-        ) ?: 0
+        ) ?: 0*/
 
         if (checkedRadioId == 0) {
             checkedRadioId = R.id.radio_check_question

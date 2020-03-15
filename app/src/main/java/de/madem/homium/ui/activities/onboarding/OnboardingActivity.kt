@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
 import de.madem.homium.R
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.*
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.fragments.onboarding.*
@@ -19,14 +21,16 @@ class OnboardingActivity : AppIntro() {
         super.onCreate(savedInstanceState)
 
         //not initialized database = app runs for the first time
-        val dataBaseInitialized : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),Boolean::class) ?: false
-        val onBoardingCompleted : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),Boolean::class) ?: false
+        val dataBaseInitialized : Boolean = getSetting<Boolean>(
+            SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DATABASE_INITIALIZED,Boolean::class) ?: false
+        val onBoardingCompleted : Boolean = getSetting<Boolean>(
+            SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_ONBOARDING_COMPLETED,Boolean::class) ?: false
 
         if(!dataBaseInitialized){
             //init database
             DatabaseInitializer(applicationContext) {
                 println("INFO FOR DEVELOPPERS: DATABASE INITIALIZED!")
-                putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_databaseInitialized),true)
+                putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DATABASE_INITIALIZED,true)
             }
 
             initAppSettings()
@@ -68,13 +72,13 @@ class OnboardingActivity : AppIntro() {
 
     override fun onSkipPressed(currentFragment: Fragment?) {
         super.onSkipPressed(currentFragment)
-        putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),true)
+        putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_ONBOARDING_COMPLETED,true)
         goToMain()
     }
 
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
-        putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),true)
+        putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_ONBOARDING_COMPLETED,true)
         goToMain()
     }
 
@@ -83,10 +87,19 @@ class OnboardingActivity : AppIntro() {
         //TODO: maybe later taking application context for this but i am not sure, because last time there were some stackoverflowerrors xD
         CoroutineBackgroundTask<Unit>()
             .executeInBackground {
-            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),true)
-            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),R.id.radio_sort_normal)
-            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),true)
-            this@OnboardingActivity.putSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),R.id.radio_check_question)
+            this@OnboardingActivity.putSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,true)
+                HomiumSettings.vibrationEnabled = true
+            this@OnboardingActivity.putSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,
+                SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL)
+                HomiumSettings.shoppingSort = SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
+            this@OnboardingActivity.putSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,true)
+                HomiumSettings.speechAssistantDeleteQuestion = true
+            this@OnboardingActivity.putSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,R.id.radio_check_question)
+                HomiumSettings.shoppingToInventory = R.id.radio_check_question
         }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }

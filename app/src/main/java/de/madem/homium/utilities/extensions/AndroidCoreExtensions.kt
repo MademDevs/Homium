@@ -3,6 +3,7 @@ package de.madem.homium.utilities.extensions
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.LayoutInflater
@@ -13,11 +14,14 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.madem.homium.R
+import de.madem.homium.constants.SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS
+import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.utilities.pictures.BitmapUtil
 import kotlin.reflect.KClass
 
@@ -100,7 +104,7 @@ private fun Context?.showToast(duration: Int, resource: Int, vararg arguments: A
 fun <T : Any> Context.getSetting(key: String, type: KClass<T>): T? {
     //getting shared preferences
     val prefs = this.getSharedPreferences(
-        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS,
         Context.MODE_PRIVATE
     )
 
@@ -119,7 +123,7 @@ fun <T : Any> Context.getSetting(key: String, type: KClass<T>): T? {
 fun <T : Any> Context.putSetting(key: String, value: T): Boolean {
     //getting shared preferences
     val prefs = this.getSharedPreferences(
-        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS,
         Context.MODE_PRIVATE
     )
 
