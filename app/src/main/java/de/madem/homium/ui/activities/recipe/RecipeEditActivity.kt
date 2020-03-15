@@ -15,9 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
-import de.madem.homium.constants.REQUEST_CODE_ADD_INGREDIENT
-import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
-import de.madem.homium.constants.REQUEST_TAKE_PHOTO
+import de.madem.homium.constants.*
 import de.madem.homium.databinding.ActivityRecipeEditBinding
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -45,8 +43,8 @@ class RecipeEditActivity: AppCompatActivity() {
         binding.lifecycleOwner = this
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = resources.getString(R.string.recipeEdit_title_add)
-        if(intent.hasExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id))) {
-            recipeId = intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id), -1)
+        if(intent.hasExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID)) {
+            recipeId = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, -1)
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
         }
         recipeEditViewModelFactory = RecipeEditViewModelFactory(recipeId)
@@ -148,9 +146,12 @@ class RecipeEditActivity: AppCompatActivity() {
                 REQUEST_TAKE_PHOTO -> recipeEditViewModel.editImagePath(picturePath)
                 REQUEST_CODE_ADD_INGREDIENT -> {
                     data.notNull { dataIntent ->
-                        val ingrName = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name)) ?: ""
-                        val ingrCount = dataIntent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_count), 0)
-                        val ingrUnit = dataIntent.getStringExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_unit)) ?: ""
+                        val ingrName = dataIntent.getStringExtra(
+                            INTENT_DATA_TRANSFER_EDIT_INGREDIENT_NAME) ?: ""
+                        val ingrCount = dataIntent.getIntExtra(
+                            INTENT_DATA_TRANSFER_EDIT_INGREDIENT_COUNT, 0)
+                        val ingrUnit = dataIntent.getStringExtra(
+                            INTENT_DATA_TRANSFER_EDIT_INGREDIENT_UNIT) ?: ""
                         if(ingrName != "" && ingrCount != 0 && ingrUnit != "") {
                             val ingredient = RecipeIngredient(ingrName, ingrCount, ingrUnit, 0)
                             recipeEditViewModel.addIngredient(ingredient)
@@ -181,7 +182,7 @@ class RecipeEditActivity: AppCompatActivity() {
                         finishWithResultData(Activity.RESULT_OK){intent ->
                             with(intent){
                                 putExtra("dataChanged", true)
-                                putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
+                                putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,recipeId)
                             }
                         }
                     }.start()

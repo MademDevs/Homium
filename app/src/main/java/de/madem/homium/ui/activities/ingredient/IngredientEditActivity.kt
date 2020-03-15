@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.core.view.isVisible
 import de.madem.homium.R
+import de.madem.homium.constants.*
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
 import de.madem.homium.models.RecipeIngredient
@@ -64,14 +65,14 @@ class IngredientEditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_ingredient_edit)
 
         //setup big and small units
-        bigUnits = resources.getStringArray(R.array.big_units)
-        smallUnits = resources.getStringArray(R.array.small_units)
+        bigUnits = BIG_UNITS_VALUES
+        smallUnits = SMALL_UNITS_VALUES
 
         //setup Actionbar
         setupActionbar()
 
         //getting Ingredient
-        getIngredientFromDatabase(intent.getIntExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_id),-1))
+        getIngredientFromDatabase(intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_INGREDIENT_ID,-1))
 
         //setup other layout components
         setupNameEditText()
@@ -99,9 +100,9 @@ class IngredientEditActivity : AppCompatActivity() {
                 if(validInput != null){
                     finishWithResultData(Activity.RESULT_OK){intent ->
                         with(intent){
-                            putExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_name),validInput.first)
-                            putExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_count),validInput.second)
-                            putExtra(resources.getString(R.string.data_transfer_intent_edit_ingredient_unit),validInput.third)
+                            putExtra(INTENT_DATA_TRANSFER_EDIT_INGREDIENT_NAME,validInput.first)
+                            putExtra(INTENT_DATA_TRANSFER_EDIT_INGREDIENT_COUNT,validInput.second)
+                            putExtra(INTENT_DATA_TRANSFER_EDIT_INGREDIENT_UNIT,validInput.third)
                         }
                     }
                     true

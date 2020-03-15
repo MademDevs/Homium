@@ -9,6 +9,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
+import de.madem.homium.application.HomiumApplication
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.*
 import de.madem.homium.databinding.FragmentSettingsBinding
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
@@ -69,19 +72,21 @@ class SettingsFragment : Fragment() {
 
         CoroutineBackgroundTask<Boolean>().executeInBackground {
 
-            contextRef.get()?.getSetting(
-                resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
+            /*contextRef.get()?.getSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,
                 Boolean::class
-            ) ?: true
+            ) ?: true*/
+            HomiumSettings.vibrationEnabled
         }.onDone {
             binding.vibrationAllowed = it
 
             with(binding.vibrationSwitch) {
                 setOnCheckedChangeListener { compoundButton, checked ->
-                    putSetting(
-                        resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),
+                    /*putSetting(
+                        SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,
                         checked
-                    )
+                    )*/
+                    HomiumSettings.vibrationEnabled = checked
                 }
             }
         }.start()
@@ -99,19 +104,33 @@ class SettingsFragment : Fragment() {
 
     private fun setupShoppingSortRadios() {
         CoroutineBackgroundTask<Int>().executeInBackground {
-            contextRef.get()?.getSetting(
-                resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
-                Int::class
-            ) ?: R.id.radio_sort_normal
+            /*val setting = contextRef.get()?.getSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,
+                String::class
+            ) ?: SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL*/
+            val setting = HomiumSettings.shoppingSort
+
+            return@executeInBackground if(setting == SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED)
+                R.id.radio_sort_reversed
+            else
+                R.id.radio_sort_normal
         }.onDone {
             binding.shoppinglistSortId = it
             with(binding.radioGroupSortShopping) {
 
                 setOnCheckedChangeListener { _, id ->
-                    putSetting(
-                        resources.getString(R.string.sharedpreference_settings_preferencekey_sortedShoppingRadioId),
-                        id
+
+                    val sortVal = if(id == R.id.radio_sort_reversed)
+                        SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
+                    else
+                        SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
+
+                    /*putSetting(
+                        SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,
+                        sortVal
                     )
+                     */
+                    HomiumSettings.shoppingSort = sortVal
                 }
             }
         }.start()
@@ -122,10 +141,11 @@ class SettingsFragment : Fragment() {
 
     private fun setupShoppingToInventoryRadios() {
         CoroutineBackgroundTask<Int>().executeInBackground {
-            contextRef.get()?.getSetting(
-                resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
+            /*contextRef.get()?.getSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,
                 Int::class
-            ) ?: R.id.radio_check_question
+            ) ?: R.id.radio_check_question*/
+            HomiumSettings.shoppingToInventory
         }.onDone {
             binding.inventoryBehaviourQuestionId = it
 
@@ -133,10 +153,11 @@ class SettingsFragment : Fragment() {
                 //check(checkedRadioId)
 
                 setOnCheckedChangeListener { radioGroup, i ->
-                    putSetting(
-                        resources.getString(R.string.sharedpreference_settings_preferencekey_shoppingToInventory),
+                    /*putSetting(
+                        SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,
                         checkedRadioButtonId
-                    )
+                    )*/
+                    HomiumSettings.shoppingToInventory = checkedRadioButtonId
                 }
             }
         }.start()
@@ -150,22 +171,29 @@ class SettingsFragment : Fragment() {
 
     private fun setupDeleteQuestionCheck() {
         CoroutineBackgroundTask<Boolean>().executeInBackground {
-            contextRef.get()?.getSetting(
-                resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
+            /*contextRef.get()?.getSetting(
+                SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,
                 Boolean::class
-            ) ?: true
+            ) ?: true*/
+            HomiumSettings.speechAssistantDeleteQuestion
         }.onDone {
             binding.deleteQuestionAllowed = it
 
             with(binding.checkboxDeletequestionSpeech) {
                 setOnCheckedChangeListener { _, isChecked ->
-                    putSetting(
-                        resources.getString(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),
+                    /*putSetting(
+                        SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,
                         isChecked
-                    )
+                    )*/
+                    HomiumSettings.speechAssistantDeleteQuestion = isChecked
                 }
             }
         }.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        HomiumSettings.saveSettings(context ?: HomiumApplication.appContext)
     }
 
 }

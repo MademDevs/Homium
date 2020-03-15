@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.madem.homium.R
+import de.madem.homium.constants.SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.utilities.BitmapUtil
 import kotlin.reflect.KClass
@@ -103,7 +104,7 @@ private fun Context?.showToast(duration: Int, resource: Int, vararg arguments: A
 fun <T : Any> Context.getSetting(key: String, type: KClass<T>): T? {
     //getting shared preferences
     val prefs = this.getSharedPreferences(
-        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS,
         Context.MODE_PRIVATE
     )
 
@@ -122,7 +123,7 @@ fun <T : Any> Context.getSetting(key: String, type: KClass<T>): T? {
 fun <T : Any> Context.putSetting(key: String, value: T): Boolean {
     //getting shared preferences
     val prefs = this.getSharedPreferences(
-        resources.getString(R.string.sharedprefernce_namespacekey_settings),
+        SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS,
         Context.MODE_PRIVATE
     )
 

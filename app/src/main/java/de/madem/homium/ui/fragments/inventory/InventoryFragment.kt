@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.madem.homium.R
+import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.REQUEST_CODE_INVENTORY
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
@@ -116,7 +118,8 @@ class InventoryFragment : Fragment() {
         //on long click
         inventoryAdapter.longClickListener = { item, viewHolder ->
             //giving haptic feedback if allowed
-            val vibrationAllowed = getSetting(resources.getString(R.string.sharedpreference_settings_preferencekey_vibrationEnabled),Boolean::class) ?: true
+            val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
+                //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
             if(vibrationAllowed){
                 vibrate()
             }

@@ -3,6 +3,9 @@ package de.madem.homium.speech.recognizers
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import de.madem.homium.R
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_NAME
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
@@ -76,7 +79,8 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
 
                     context.switchToActivity(RecipeEditActivity::class){ intent ->
                         if(name.isNotEmpty() && name.isNotBlank()){
-                            intent.putExtra(context.resources.getString(R.string.data_transfer_intent_edit_recipe_name),
+                            intent.putExtra(
+                                INTENT_DATA_TRANSFER_EDIT_RECIPE_NAME,
                                 name)
                         }
                     }
@@ -176,7 +180,8 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
                             .setMessage(message)
                             .setPositiveButton(resources.getString(R.string.answer_yes)) { dialog, _ ->
                                 switchToActivity(RecipePresentationActivity::class){ intent ->
-                                    intent.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),
+                                    intent.putExtra(
+                                        INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,
                                         randomRecipe?.uid ?: 0)
                                 }
                             }
@@ -226,8 +231,9 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
                     with(context){
                         //switch Screen
                         switchToActivity(RecipePresentationActivity::class){ intent ->
-                            intent.putExtra(resources.getString(R.string.data_transfer_intent_edit_recipe_id),recipeId)
-                            intent.putExtra(resources.getString(R.string.data_transfer_intent_recipe_cook_request),
+                            intent.putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,recipeId)
+                            intent.putExtra(
+                                INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST,
                                 REQUEST_CODE_COOK_RECIPE)
                         }
                     }
@@ -256,7 +262,7 @@ class RecipeRecognizer(private val contextReference : WeakReference<Context>) : 
             withContext(Dispatchers.Main){
                 contextReference.get().notNull {
                     it.switchToActivity(clazz){intent ->
-                        intent.putExtra(it.resources.getString(R.string.data_transfer_intent_edit_recipe_id),id)
+                        intent.putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID,id)
                     }
                 }
             }

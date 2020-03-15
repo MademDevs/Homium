@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
+import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
@@ -459,7 +461,8 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : Patte
     }
 
     private fun shouldAskDeleteQuestion() : Boolean{
-        return contextRef.get()?.getSetting(getStringRessource(R.string.sharedpreference_settings_preferencekey_deleteQuestionSpeechAssistentAllowed),Boolean::class) ?: true
+        return HomiumSettings.speechAssistantDeleteQuestion//contextRef.get()?.getSetting(
+            //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,Boolean::class) ?: true
     }
 
     // saying Sorry if somthing failed

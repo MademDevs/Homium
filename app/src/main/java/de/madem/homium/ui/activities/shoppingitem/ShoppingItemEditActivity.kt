@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import de.madem.homium.R
+import de.madem.homium.constants.BIG_UNITS_VALUES
+import de.madem.homium.constants.SMALL_UNITS_VALUES
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
@@ -36,6 +38,12 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     private lateinit var smallUnits : Array<String>
     private var itemid: Int = -1
 
+    companion object{
+        private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index";
+        private const val SAVEINSTANCESTATE_COUNT = "sist_count";
+
+    }
+
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +51,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
 
         //getting data from ressources
-        bigUnits = resources.getStringArray(R.array.big_units)
-        smallUnits = resources.getStringArray(R.array.small_units)
+        bigUnits = BIG_UNITS_VALUES
+        smallUnits = SMALL_UNITS_VALUES
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -67,14 +75,41 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("unit", numPickerUnit.value)
-        outState.putInt("count", numPickerCount.value)
+        //unit index
+        outState.putInt(SAVEINSTANCESTATE_UNIT_INDEX, numPickerUnit.value)
+
+        //count value
+        if(numPickerCount.isVisible){
+            outState.putString(SAVEINSTANCESTATE_COUNT, numPickerCount.displayedValues[numPickerCount.value])
+        }
+        else{
+            outState.putString(SAVEINSTANCESTATE_COUNT, editTextCount.text.toString())
+        }
+
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        numPickerCount.value = savedInstanceState.getInt("count")
-        numPickerUnit.value = savedInstanceState.getInt("unit")
+        //unit value
+        numPickerUnit.value = savedInstanceState.getInt(SAVEINSTANCESTATE_UNIT_INDEX)
+
+        //count value
+        val countValue = savedInstanceState.getString(SAVEINSTANCESTATE_COUNT) ?: smallUnits[0]
+
+        if(bigUnits.contains(countValue)){
+            numPickerCount.displayedValues = bigUnits
+            numPickerCount.value = bigUnits.indexOf(countValue)
+        }
+        else if(smallUnits.contains(countValue)){
+            numPickerCount.displayedValues = smallUnits
+            numPickerCount.value = smallUnits.indexOf(countValue)
+        }
+        else{
+            numPickerCount.isVisible = false
+            editTextCount.setText(countValue)
+            editTextCount.isVisible = true;
+        }
+
     }
 
     //optionsMenu
@@ -220,8 +255,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         numPickerCount = findViewById<NumberPicker>(R.id.shopping_item_edit_numPick_count)
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             //getting data for picker
-
-
             numPickerCount.isSaveFromParentEnabled = false
             numPickerCount.isSaveEnabled = false
             numPickerCount.minValue = 0
@@ -232,8 +265,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 assignValueFromPickerToEditText(numPickerCount.displayedValues[numPickerCount.value])
 
             }
-
-
 
             numPickerUnit.setOnValueChangedListener { npUnit, i, i2 ->
                 println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")

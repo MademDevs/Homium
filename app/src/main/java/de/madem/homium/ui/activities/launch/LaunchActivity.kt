@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import de.madem.homium.R
+import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_ONBOARDING_COMPLETED
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.activities.onboarding.OnboardingActivity
 import de.madem.homium.utilities.extensions.getSetting
@@ -15,7 +16,8 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val onBoardingCompleted : Boolean = getSetting<Boolean>(resources.getString(R.string.sharedpreference_settings_preferencekey_onboardingCompleted),Boolean::class) ?: false
+        val onBoardingCompleted : Boolean = getSetting<Boolean>(
+            SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_ONBOARDING_COMPLETED,Boolean::class) ?: false
         val target = if(onBoardingCompleted) MainActivity::class.java else OnboardingActivity::class.java
 
 
