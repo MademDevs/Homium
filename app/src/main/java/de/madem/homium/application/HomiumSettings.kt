@@ -45,4 +45,11 @@ object HomiumSettings {
             }
         }
     }
+
+    override fun toString(): String {
+        return "HOMIUM SETTINGS:\nvibration enabled:$vibrationEnabled" +
+                "\nShopping Sort: $shoppingSort\nshoppingToInventory$shoppingToInventory\n" +
+                "speech assistent delete question allowed: $speechAssistantDeleteQuestion"
+
+    }
 }

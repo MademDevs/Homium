@@ -47,7 +47,7 @@ class SettingsFragment : Fragment() {
 
         binding.lifecycleOwner = this@SettingsFragment
 
-        contextRef = WeakReference<Context>(this.context)
+        contextRef = WeakReference<Context>(this.context?: HomiumApplication.appContext!!)
         //setup general settings
         setupGeneralSettings()
 

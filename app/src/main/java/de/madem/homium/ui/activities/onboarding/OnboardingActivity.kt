@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
 import de.madem.homium.R
+import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.*
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
@@ -88,13 +89,17 @@ class OnboardingActivity : AppIntro() {
             .executeInBackground {
             this@OnboardingActivity.putSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,true)
+                HomiumSettings.vibrationEnabled = true
             this@OnboardingActivity.putSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,
                 SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL)
+                HomiumSettings.shoppingSort = SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
             this@OnboardingActivity.putSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,true)
+                HomiumSettings.speechAssistantDeleteQuestion = true
             this@OnboardingActivity.putSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,R.id.radio_check_question)
+                HomiumSettings.shoppingToInventory = R.id.radio_check_question
         }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }
