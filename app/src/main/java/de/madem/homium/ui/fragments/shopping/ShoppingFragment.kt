@@ -4,9 +4,8 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -42,6 +41,9 @@ class ShoppingFragment : Fragment() {
     private lateinit var actionModeHandler: ShoppingActionModeHandler
     private lateinit var databaseDao: ItemDao
 
+    //GUI
+    private lateinit var recyclerViewAdapter : ShoppingItemListAdapter
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         databaseDao = AppDatabase.getInstance().itemDao()
@@ -61,6 +63,30 @@ class ShoppingFragment : Fragment() {
         if (::actionModeHandler.isInitialized) {
             actionModeHandler.finishActionMode()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.shopping_fragment_actionbar_menu,menu)
+
+        val searchView = menu.findItem(R.id.search_shopping).actionView as? SearchView ?: return
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                recyclerViewAdapter.filter.filter(newText)
+                return false
+            }
+
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+
     }
 
 
@@ -130,11 +156,11 @@ class ShoppingFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         //init adapter
-        val adapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
-        recyclerView.adapter = adapter
+        recyclerViewAdapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
+        recyclerView.adapter = recyclerViewAdapter
 
         //on click listener
-        adapter.shortClickListener = {shoppingItem, viewHolder ->
+        recyclerViewAdapter.shortClickListener = {shoppingItem, viewHolder ->
 
             if (actionModeHandler.isActionModeActive()) {
                 //select item in action mode
@@ -146,7 +172,7 @@ class ShoppingFragment : Fragment() {
             }
         }
 
-        adapter.longClickListener = {shoppingItem, viewHolder ->
+        recyclerViewAdapter.longClickListener = {shoppingItem, viewHolder ->
             //giving haptic feedback if allowed
             val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
                 //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
