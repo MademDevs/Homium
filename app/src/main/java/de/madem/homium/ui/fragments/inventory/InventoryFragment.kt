@@ -2,10 +2,10 @@ package de.madem.homium.ui.fragments.inventory
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +30,8 @@ class InventoryFragment : Fragment() {
     private lateinit var inventoryViewModel: InventoryViewModel
     private lateinit var root: View
 
+    private lateinit var inventoryAdapter : InventoryItemListAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,6 +55,30 @@ class InventoryFragment : Fragment() {
         if (::actionModeHandler.isInitialized) {
             actionModeHandler.finishActionMode()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.inventory_fragment_actionbar_menu,menu)
+
+        val searchView = menu.findItem(R.id.search_inventory).actionView as? SearchView ?: return
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                inventoryAdapter.filter.filter(newText)
+                return false
+            }
+
+        })
     }
 
     override fun onResume() {
@@ -94,7 +120,7 @@ class InventoryFragment : Fragment() {
         val recyclerView = root.findViewById<RecyclerView>(R.id.rv_inventory)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val inventoryAdapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
+        inventoryAdapter = InventoryItemListAdapter(this, inventoryViewModel.inventoryItems)
 
         //on click listener
         inventoryAdapter.shortClickListener = { item, holder ->

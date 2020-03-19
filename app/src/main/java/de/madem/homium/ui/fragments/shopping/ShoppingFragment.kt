@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -74,6 +75,7 @@ class ShoppingFragment : Fragment() {
         inflater.inflate(R.menu.shopping_fragment_actionbar_menu,menu)
 
         val searchView = menu.findItem(R.id.search_shopping).actionView as? SearchView ?: return
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
