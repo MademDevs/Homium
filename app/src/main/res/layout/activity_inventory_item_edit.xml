@@ -24,7 +24,7 @@
             android:fontFamily="sans-serif-medium"
             android:text="@string/inventory_edit_title_name"
             android:textSize="18sp"
-            android:textColor="@color/colorPrimaryDark">
+            android:textColor="@color/colorAccent">
 
         </TextView>
 
@@ -75,7 +75,7 @@
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/question_amount"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/colorAccent"
             android:textSize="18sp" />
 
         <LinearLayout

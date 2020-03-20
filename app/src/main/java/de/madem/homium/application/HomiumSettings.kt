@@ -1,6 +1,7 @@
 package de.madem.homium.application
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import de.madem.homium.R
 import de.madem.homium.constants.*
 import de.madem.homium.utilities.extensions.getSetting
@@ -12,6 +13,7 @@ object HomiumSettings {
     var shoppingSort = SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
     var shoppingToInventory = R.id.radio_check_question
     var speechAssistantDeleteQuestion = true
+    var appTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 
     fun initialize(context: Context){
         with(context){
@@ -26,6 +28,13 @@ object HomiumSettings {
 
             speechAssistantDeleteQuestion = getSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED, Boolean::class) ?: true
+
+            appTheme = getSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_APP_THEME,Int::class)
+                ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+
+            if(appTheme == 0){
+                appTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
         }
     }
 
@@ -42,6 +51,8 @@ object HomiumSettings {
                 putSetting(
                     SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED,
                     speechAssistantDeleteQuestion)
+
+                putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_APP_THEME, appTheme)
             }
         }
     }
@@ -49,7 +60,8 @@ object HomiumSettings {
     override fun toString(): String {
         return "HOMIUM SETTINGS:\nvibration enabled:$vibrationEnabled" +
                 "\nShopping Sort: $shoppingSort\nshoppingToInventory$shoppingToInventory\n" +
-                "speech assistent delete question allowed: $speechAssistantDeleteQuestion"
+                "speech assistent delete question allowed: $speechAssistantDeleteQuestion"+
+                "\nTheme_ID: $appTheme"
 
     }
 }

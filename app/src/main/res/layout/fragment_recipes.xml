@@ -17,7 +17,7 @@
             android:layout_marginRight="80dp"
             android:layout_marginBottom="20dp"
             android:alpha="0.05"
-            android:tint="@android:color/black"
+            android:tint="@color/colorBackgroundIcon"
             app:layout_constraintBottom_toBottomOf="@+id/recyclerView_recipes"
             app:layout_constraintEnd_toEndOf="@+id/recyclerView_recipes"
             app:layout_constraintStart_toStartOf="parent"

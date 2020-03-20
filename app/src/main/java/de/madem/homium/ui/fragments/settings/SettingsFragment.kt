@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -54,6 +55,9 @@ class SettingsFragment : Fragment() {
         //setup shopping settings
         setupShoppingSettings()
 
+        //setup general settings
+        setupInventorySettings()
+
         //setup speech assistent settings
         setupSpeechAssistentSettings()
 
@@ -64,12 +68,11 @@ class SettingsFragment : Fragment() {
     //setup functions for general settings
     private fun setupGeneralSettings() {
         setupVibrationSwitch()
+        setupAppTheme()
     }
 
     private fun setupVibrationSwitch() {
         //setup switch
-
-
         CoroutineBackgroundTask<Boolean>().executeInBackground {
 
             /*contextRef.get()?.getSetting(
@@ -90,16 +93,41 @@ class SettingsFragment : Fragment() {
                 }
             }
         }.start()
+    }
 
+    private fun setupAppTheme(){
+        CoroutineBackgroundTask<Pair<Int,Int>>().executeInBackground {
+            val id = when(HomiumSettings.appTheme){
+                AppCompatDelegate.MODE_NIGHT_NO -> R.id.radio_app_theme_light
+                AppCompatDelegate.MODE_NIGHT_YES -> R.id.radio_app_theme_dark
+                else -> R.id.radio_app_theme_system
+            }
 
+            return@executeInBackground Pair<Int,Int>(HomiumSettings.appTheme,id)
+        }.onDone {
+          with(binding.radioGroupAppTheme){
+              binding.appThemeRadioId = it.second
 
+              setOnCheckedChangeListener { _, checkedId ->
+                  val theme = when(checkedId){
+                      R.id.radio_app_theme_light -> AppCompatDelegate.MODE_NIGHT_NO
+                      R.id.radio_app_theme_dark -> AppCompatDelegate.MODE_NIGHT_YES
+                      else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                  }
+
+                  if(HomiumSettings.appTheme != theme){
+                      AppCompatDelegate.setDefaultNightMode(theme)
+                      HomiumSettings.appTheme = theme
+                  }
+              }
+          }
+        }.start()
     }
 
 
     //setup functions for shopping settings
     private fun setupShoppingSettings() {
         setupShoppingSortRadios()
-        setupShoppingToInventoryRadios()
     }
 
     private fun setupShoppingSortRadios() {
@@ -137,6 +165,11 @@ class SettingsFragment : Fragment() {
 
 
 
+    }
+
+    //setup for inventory settings
+    private fun setupInventorySettings(){
+        setupShoppingToInventoryRadios()
     }
 
     private fun setupShoppingToInventoryRadios() {

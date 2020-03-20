@@ -2,5 +2,10 @@
 <resources>
     <color name="colorPrimary">#176A93</color>
     <color name="colorPrimaryDark">#0E435A</color>
-    <color name="colorAccent">#39648D</color>
+    <color name="colorAccent">#345B80</color>
+    <color name="colorBackgroundIcon">#000000</color>
+    <color name="listCardItemBackground">#FBFBFB</color>
+    <color name="listCardItemBackgroundSelected">#B7B7B7</color>
+    <color name="bottomNavigationItemUnselected">#0E435A</color>
+    <color name="bottomNavigationItemSelected">@android:color/white</color>
 </resources>

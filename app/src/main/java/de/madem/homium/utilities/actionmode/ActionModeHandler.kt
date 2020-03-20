@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
+import de.madem.homium.R
 import de.madem.homium.utilities.extensions.applyNotNull
 
 abstract class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context: Context){
@@ -30,8 +32,8 @@ abstract class ActionModeHandler<ItemHolder : ActionModeItemHolder>(val context:
     var onStopActionMode = listOf<() -> Unit>()
 
     //private functions
-    private fun View.select() = setBackgroundColor(Color.LTGRAY)
-    private fun View.deselect() = setBackgroundColor(Color.WHITE)
+    private fun View.select() = setBackgroundColor(ContextCompat.getColor(activity, R.color.listCardItemBackgroundSelected))
+    private fun View.deselect() = setBackgroundColor(ContextCompat.getColor(activity, R.color.listCardItemBackground))
 
     //abstract functions
     protected abstract fun onMenuItemClicked(item: MenuItem): Boolean

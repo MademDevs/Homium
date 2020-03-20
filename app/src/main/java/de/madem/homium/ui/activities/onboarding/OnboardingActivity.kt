@@ -2,6 +2,7 @@ package de.madem.homium.ui.activities.onboarding
 
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
 import de.madem.homium.R
@@ -100,6 +101,9 @@ class OnboardingActivity : AppIntro() {
             this@OnboardingActivity.putSetting(
                 SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,R.id.radio_check_question)
                 HomiumSettings.shoppingToInventory = R.id.radio_check_question
+
+            this@OnboardingActivity.putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_APP_THEME,AppCompatDelegate.getDefaultNightMode())
+                HomiumSettings.appTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }.onDone { println("SETTINGS INITIALIZED") }.start()
     }
 }
