@@ -74,7 +74,9 @@ class InventoryFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                inventoryAdapter.filter.filter(newText)
+                if(inventoryAdapter.isReadyForFiltering){
+                    inventoryAdapter.filter.filter(newText)
+                }
                 return false
             }
 

@@ -82,7 +82,9 @@ class ShoppingFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                recyclerViewAdapter.filter.filter(newText)
+                if(recyclerViewAdapter.isReadyForFiltering){
+                    recyclerViewAdapter.filter.filter(newText)
+                }
                 return false
             }
 

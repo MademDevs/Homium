@@ -21,6 +21,11 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
         private const val quantityUnitTemplate = "quantity unit"
     }
 
+    var isReadyForFiltering = false
+        private set(value) {
+            field = value
+        }
+
     var data = liveData.value?.toMutableList() ?: mutableListOf()
     private var dataBackup = MutableList(data.size){data[it]}
 
@@ -97,6 +102,11 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
 
     }
 
+    override fun onViewAttachedToWindow(holder: InventoryItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        isReadyForFiltering = true
+    }
+
     //filter
     private val filter = object: Filter(){
         override fun performFiltering(constraint: CharSequence?): FilterResults {
@@ -139,6 +149,8 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
             notifyDataSetChanged()
         }
     }
+
+
 
     override fun getFilter(): Filter {
         return filter

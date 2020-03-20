@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,8 @@ class RecipesFragment : Fragment() {
     private lateinit var db: AppDatabase
     private lateinit var actionModeHandler: RecipeActionModeHandler
 
+    private lateinit var adapter : RecipesListAdapter
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         db = AppDatabase.getInstance()
@@ -65,10 +68,13 @@ class RecipesFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.recipes_fragment_actionbar_menu,menu)
 
-        val searchView = menu.findItem(R.id.search_recipes) as? SearchView ?: return
+
+        val searchView = menu.findItem(R.id.search_recipes).actionView as? SearchView ?: kotlin.run {
+            println("Searchview is null")
+            return
+        }
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
@@ -77,15 +83,20 @@ class RecipesFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                //TODO: Implement search action
+                if(adapter.isReadyForFiltering){
+                    adapter.filter.filter(newText)
+                }
+
                 return false
             }
         })
+
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recipesViewModel =
-            ViewModelProviders.of(this).get(RecipesViewModel::class.java)
+            ViewModelProvider(this).get(RecipesViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_recipes, container, false)
 
         registerRecyclerView()
@@ -183,7 +194,7 @@ class RecipesFragment : Fragment() {
         } else {
             recyclerView.layoutManager = GridLayoutManager(context, 3)
         }
-        val adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
+        adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)

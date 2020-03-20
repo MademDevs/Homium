@@ -21,6 +21,8 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
         private const val quantityUnitTemplate = "quantity unit"
     }
 
+
+
     //data
     var data = liveData.value?.toMutableList() ?: mutableListOf()
     private var dataBackup = MutableList(data.size){ data[it] }
@@ -67,11 +69,16 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
             notifyDataSetChanged()
         }
     }
+    var isReadyForFiltering = false
+        private set(value) {
+            field = value
+        }
 
 
 
     init {
         liveData.observe(owner, Observer { list ->
+            isReadyForFiltering = false
             data = list.toMutableList()
             dataBackup = MutableList(data.size){ data[it] }
             notifyDataSetChanged()
@@ -144,6 +151,11 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
             paintFlags = if(isChecked){ Paint.STRIKE_THRU_TEXT_FLAG } else{ 1 }
         }
 
+    }
+
+    override fun onViewAttachedToWindow(holder: ShoppingItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        isReadyForFiltering = true
     }
 
     //interface functions
