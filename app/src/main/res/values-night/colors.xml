@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#232323</color>
+    <color name="colorPrimaryDark">#171717</color>
+    <color name="colorAccent">#6B9BB3</color>
+    <color name="colorBackgroundIcon">#B5B5B5</color>
+    <color name="listCardItemBackground">#3F3F3F</color>
+    <color name="listCardItemBackgroundSelected">#6D6D6D</color>
+    <color name="bottomNavigationItemUnselected">@color/listCardItemBackground</color>
+    <color name="bottomNavigationItemSelected">@android:color/white</color>
+</resources>

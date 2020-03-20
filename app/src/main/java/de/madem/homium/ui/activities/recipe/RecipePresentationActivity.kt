@@ -52,7 +52,7 @@ class RecipePresentationActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(
             this, R.layout.activity_recipe_presentation
         )
-
+        supportActionBar?.title = resources.getString(R.string.screentitle_recipe_presentation)
         cookingAssistant = CookingAssistant(WeakReference<Context>(this))
 
         //setup viewModel

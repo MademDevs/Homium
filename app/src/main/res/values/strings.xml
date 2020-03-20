@@ -16,6 +16,10 @@
     <string name="setting_shopping_check_behaviour_never">Nie</string>
     <string name="setting_shopping_check_behaviour_question">Jedes Mal Fragen</string>
     <string name="setting_shopping_check_behaviour_question_alert_message">Sollen die abgehakte Items in die Inventarliste verschoben werden?</string>
+    <string name="setting_app_theme">Design</string>
+    <string name="setting_app_theme_light_mode">Helles Design</string>
+    <string name="setting_app_theme_dark_mode">Dunkles Design</string>
+    <string name="setting_app_theme_system">Systemdesign</string>
 
     <string name="setting_speech_assistent_delete_question">Sicherheitsfrage vor Löschaktionen</string>
 
@@ -54,6 +58,7 @@
     <string name="screentitle_edit_ingredient_edit">Zutat bearbeiten</string>
     <string name="screentitle_edit_inventoryitem_add">Produkt hinzufügen</string>
     <string name="screentitle_edit_inventoryitem_edit">Produkt bearbeiten</string>
+    <string name="screentitle_recipe_presentation">Rezept</string>
 
     <!--normal headlines-->
     <string name="head_general_settings">Allgemeine Einstellungen</string>
@@ -179,6 +184,7 @@
         <item>Speisekeller</item>
     </string-array>
 
+    <!--pictures-->
     <string-array name="recipes_photo_options">
         <item>Bild aufnehmen</item>
         <item>Bild aus der Galerie wählen</item>

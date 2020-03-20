@@ -3,6 +3,7 @@ package de.madem.homium.ui.activities.test
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
@@ -62,6 +63,16 @@ class TestActivity : AppCompatActivity() {
         txtTextSpeechAssistent = findViewById(R.id.txt_TestSpeechAssistent)
 
          */
+
+        findViewById<Button>(R.id.button_test_darkmode).setOnClickListener {
+            val mode = AppCompatDelegate.getDefaultNightMode();
+            if(mode == AppCompatDelegate.MODE_NIGHT_NO){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
     }
 
 
