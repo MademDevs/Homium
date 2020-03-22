@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
-import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.pictures.BitmapUtil
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
@@ -122,10 +121,11 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                     resultList.addAll(dataBackup)
                 }
                 else{
-                    val filterArgs = searchText.toString().toLowerCase().trim().split(" ")
+
+                    val filterArg = searchText.toString().toLowerCase().trim()
                     dataBackup.forEach {rec ->
                         val name = rec.name.toLowerCase()
-                        var nameMatches = searchInName(filterArgs, name)
+                        val nameMatches = name.contains(filterArg)
 
 
                         if(nameMatches){
@@ -135,7 +135,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                             val dao = AppDatabase.getInstance().recipeDao()
                             val ingredients = dao.getIngredientByRecipeId(rec.uid)
 
-                            val ingredientSucess = searchInIngredients(filterArgs, ingredients)
+                            val ingredientSucess = searchInIngredients(filterArg, ingredients)
                             if(ingredientSucess){
                                 resultList.add(rec)
                             }
@@ -157,39 +157,9 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
             }
 
             //help functions
-            private fun searchInName(filterArgs : List<String>, name : String) : Boolean{
-                for(arg in filterArgs){
-                    if(name.contains(arg)){
-                        return true
-                    }
-                }
-
-                return false
-            }
-
-            private fun searchInIngredients(filterArgs : List<String>, ingredients: List<RecipeIngredient>) : Boolean{
-                /*for(ingr in ingredients){
-                    val name = ingr.name.trim().toLowerCase()
-                    //val unit = ingr.unit.trim().toLowerCase()
-                    //val cnt = ingr.count.toString()
-                    for(arg in filterArgs){
-                        if(name.contains(arg)){
-                            return true
-                        }
-                    }
-                }*/
-
-                for (arg in filterArgs){
-                    val idx = ingredients.map { it.name }.binarySearch {
-                        if(it.contains(arg)){
-                            return@binarySearch 0
-                        }
-                        else{
-                            return@binarySearch it.compareTo(arg)
-                        }
-                    }
-
-                    if(idx != -1){
+            private fun searchInIngredients(filterArg : String, ingredients: List<RecipeIngredient>) : Boolean{
+                ingredients.map { it.name.toLowerCase() }.forEach {
+                    if(it.contains(filterArg)){
                         return true
                     }
                 }
