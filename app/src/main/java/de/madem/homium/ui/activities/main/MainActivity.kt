@@ -22,6 +22,7 @@ import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
+import de.madem.homium.utilities.extensions.whenSearchViewHandler
 import java.lang.Exception
 import java.util.*
 
@@ -73,7 +74,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
+        //close search view
+        closeSearchViewIfExisting()
+        //handle item
         return when(item.itemId){
             R.id.main_actionbar_testezone -> {
                 switchToActivity(TestActivity::class)
@@ -81,7 +84,6 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.main_actionbar_speech_assistent -> {
                 try {
-                    //speechAssistent?.executeCommand("Lege 2 Bananen in die Gefriertruhe")
                     startSpeechRecognition(REQUEST_CODE_SPEECH, Locale.GERMAN)
                 }
                 catch (ex : SpeechRecognitionException){
@@ -123,6 +125,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun closeSearchViewIfExisting(){
+        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.childFragmentManager?.primaryNavigationFragment.whenSearchViewHandler {
+            it.closeSearchView()
+        }
+    }
 
 
 

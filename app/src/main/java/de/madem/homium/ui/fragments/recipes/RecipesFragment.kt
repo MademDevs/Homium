@@ -25,15 +25,17 @@ import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
+import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.vibrate
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class RecipesFragment : Fragment() {
+class RecipesFragment : Fragment(), SearchViewHandler {
 
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var root: View
@@ -41,6 +43,8 @@ class RecipesFragment : Fragment() {
     private lateinit var actionModeHandler: RecipeActionModeHandler
 
     private lateinit var adapter : RecipesListAdapter
+    private var searchViewUtil : Pair<SearchView,MenuItem>? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,11 +74,9 @@ class RecipesFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.recipes_fragment_actionbar_menu,menu)
 
-
-        val searchView = menu.findItem(R.id.search_recipes).actionView as? SearchView ?: kotlin.run {
-            println("Searchview is null")
-            return
-        }
+        //searchview
+        val searchItem = menu.findItem(R.id.search_recipes)
+        val searchView = searchItem.actionView as? SearchView ?: return
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
@@ -90,6 +92,7 @@ class RecipesFragment : Fragment() {
                 return false
             }
         })
+        searchViewUtil = Pair(searchView,searchItem)
 
         super.onCreateOptionsMenu(menu, inflater)
     }
@@ -181,6 +184,8 @@ class RecipesFragment : Fragment() {
         )
 
         btnAddRecipe.setOnClickListener {
+            //close search view
+            closeSearchView()
             //implementing simple navigation to shopping item edit screen via intent
             //switchToActivityForResult(REQUEST_CODE_SHOPPING, RecipeEditActivity::class)
             switchToActivity(RecipeEditActivity::class)
@@ -231,4 +236,13 @@ class RecipesFragment : Fragment() {
         }
     }
 
+
+
+    //searchViewHandler
+    override fun closeSearchView() {
+        searchViewUtil.notNull {
+            it.first.isIconified = true
+            it.second.collapseActionView()
+        }
+    }
 }

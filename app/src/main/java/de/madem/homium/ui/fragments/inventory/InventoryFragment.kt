@@ -18,12 +18,10 @@ import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATI
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
-import de.madem.homium.utilities.extensions.getSetting
-import de.madem.homium.utilities.extensions.showToastShort
-import de.madem.homium.utilities.extensions.switchToActivityForResult
-import de.madem.homium.utilities.extensions.vibrate
+import de.madem.homium.utilities.android_utilities.SearchViewHandler
+import de.madem.homium.utilities.extensions.*
 
-class InventoryFragment : Fragment() {
+class InventoryFragment : Fragment(), SearchViewHandler {
 
     //private lateinit var binding: ResultPro
     private lateinit var actionModeHandler: InventoryActionModeHandler
@@ -31,6 +29,7 @@ class InventoryFragment : Fragment() {
     private lateinit var root: View
 
     private lateinit var inventoryAdapter : InventoryItemListAdapter
+    private var searchViewUtil : Pair<SearchView,MenuItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,7 +65,9 @@ class InventoryFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.inventory_fragment_actionbar_menu,menu)
 
-        val searchView = menu.findItem(R.id.search_inventory).actionView as? SearchView ?: return
+        //handling searchview
+        val searchItem = menu.findItem(R.id.search_inventory)
+        val searchView = searchItem.actionView as? SearchView ?: return
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -81,6 +82,7 @@ class InventoryFragment : Fragment() {
             }
 
         })
+        searchViewUtil = Pair(searchView,searchItem)
     }
 
     override fun onResume() {
@@ -168,10 +170,18 @@ class InventoryFragment : Fragment() {
         val btnAddShoppingItem = root.findViewById<FloatingActionButton>(R.id.fab_add_inventory)
 
         btnAddShoppingItem.setOnClickListener {
+            //close search view
+            closeSearchView()
             //implementing simple navigation to inventory item edit screen via intent
             switchToActivityForResult(0, InventoryItemEditActivity::class)
         }
     }
 
-
+    //searchViewHandler
+    override fun closeSearchView() {
+        searchViewUtil.notNull {
+            it.first.isIconified = true
+            it.second.collapseActionView()
+        }
+    }
 }
