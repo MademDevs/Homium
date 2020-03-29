@@ -11,6 +11,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,9 +20,11 @@ import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import de.madem.homium.R
 import de.madem.homium.constants.*
 import de.madem.homium.databinding.ActivityRecipeEditBinding
+import de.madem.homium.managers.adapters.IngredientsAdapter
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
@@ -111,7 +115,7 @@ class RecipeEditActivity: AppCompatActivity() {
             binding.recipeEditTitleEditTxt.setText(newRecipe.name)
             binding.recipeEditImgView.setPictureFromPath(newRecipe.image, 400, 400)
         })
-
+        /*
         recipeEditViewModel.ingredients.observe(this, Observer { newIngredients ->
             binding.recipeEditLayoutIngr.removeAllViews()
             for(i in newIngredients.indices) {
@@ -126,7 +130,23 @@ class RecipeEditActivity: AppCompatActivity() {
                 }
                 binding.recipeEditLayoutIngr.addView(view)
             }
+        })*/
+
+        //binding.recyclerviewEditIngredients.layoutManager = LinearLayoutManager(this)
+        val ingrAdapter = IngredientsAdapter(this,recipeEditViewModel
+            .ingredients.value ?: mutableListOf<RecipeIngredient>()).apply {
+            deleteButtonClickListener = {position ->
+                recipeEditViewModel.ingredients.value?.removeAt(position)
+            }
+        }
+        binding.recyclerviewEditIngredients.adapter = ingrAdapter
+        binding.recyclerviewEditIngredients.layoutManager = LinearLayoutManager(this)
+        recipeEditViewModel.ingredients.observe(this, Observer {newIngredients ->
+            ingrAdapter.setData(newIngredients)
         })
+
+
+
         binding.recipeEditImgView.setOnClickListener {
             AlertDialog.Builder(this).setItems(R.array.recipes_photo_options,
                 DialogInterface.OnClickListener { dialog, position ->
