@@ -25,6 +25,7 @@ import de.madem.homium.R
 import de.madem.homium.constants.*
 import de.madem.homium.databinding.ActivityRecipeEditBinding
 import de.madem.homium.managers.adapters.IngredientsAdapter
+import de.madem.homium.managers.adapters.RecipeDescriptionAdapter
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.ui.activities.ingredient.IngredientEditActivity
@@ -43,35 +44,9 @@ class RecipeEditActivity: AppCompatActivity() {
     private lateinit var binding: ActivityRecipeEditBinding
     private var recipeId: Int? = null
     private var picturePath = ""
-    private var editTextList = mutableListOf<EditText>()
-    private var addDescription = false
 
-    private val descriptionObserver = Observer<MutableList<RecipeDescription>> { newDescription ->
-        if(newDescription.isNotEmpty()) {
-            if(addDescription) {
-                with(newDescription.last()) {
-                    val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                    view.findViewById<TextView>(R.id.descr_count).text = "${(newDescription.count())}"
-                    val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                    editText.setText(this.description)
-                    binding.recipeEditLayoutDescr.addView(view)
-                    editTextList.add(editText)
-                }
-                addDescription = false
-            } else {
-                binding.recipeEditLayoutDescr.removeAllViews()
-                var cnt = 1
-                for(el in newDescription) {
-                    val view = layoutInflater.inflate(R.layout.recipe_edit_description, null)
-                    view.findViewById<TextView>(R.id.descr_count).text = cnt++.toString()
-                    val editText = view.findViewById<EditText>(R.id.descr_editTxt)
-                    editText.setText(el.description)
-                    binding.recipeEditLayoutDescr.addView(view)
-                    editTextList.add(editText)
-                }
-            }
-        }
-    }
+    private var descriptionAdapter : RecipeDescriptionAdapter? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,26 +63,22 @@ class RecipeEditActivity: AppCompatActivity() {
         initGuiComponents()
     }
 
-    override fun onResume() {
-        super.onResume()
-        editTextList = mutableListOf()
-        recipeEditViewModel.descriptions.observe(this,descriptionObserver)
-    }
-
     override fun onPause() {
         super.onPause()
-        if(recipeEditViewModel.descriptions.hasObservers()){
-            recipeEditViewModel.descriptions.removeObserver(descriptionObserver)
-        }
-
         writeDescriptionAndRecipeTitleToViewModel()
     }
 
     private fun writeDescriptionAndRecipeTitleToViewModel() {
         recipeEditViewModel.editRecipeName(binding.recipeEditTitleEditTxt.text.toString())
-        editTextList.forEach {
-            recipeEditViewModel.editDescription(editTextList.indexOf(it), it.text.toString())
+
+        with(descriptionAdapter?.descriptionTexts()){
+            this.notNull {
+                for(idx in it.indices){
+                    recipeEditViewModel.editDescription(idx,it[idx])
+                }
+            }
         }
+
     }
 
     private fun initGuiComponents() {
@@ -116,6 +87,7 @@ class RecipeEditActivity: AppCompatActivity() {
             binding.recipeEditImgView.setPictureFromPath(newRecipe.image, 400, 400)
         })
 
+        //ingredients
         val ingrAdapter = IngredientsAdapter(this,recipeEditViewModel
             .ingredients.value ?: mutableListOf<RecipeIngredient>()).apply {
             deleteButtonClickListener = {position ->
@@ -129,6 +101,24 @@ class RecipeEditActivity: AppCompatActivity() {
         })
 
 
+        binding.recipeEditAddIngredientBtn.setOnClickListener { switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class) }
+
+        //descriptions
+        descriptionAdapter = RecipeDescriptionAdapter(this,
+            recipeEditViewModel.descriptions.value ?: listOf())
+
+        recipeEditViewModel.descriptions.observe(this, Observer {newDescriptions ->
+            descriptionAdapter?.setData(newDescriptions)
+        })
+
+        binding.recyclerviewEditDescriptions.adapter = descriptionAdapter
+        binding.recyclerviewEditDescriptions.layoutManager = LinearLayoutManager(this)
+        binding.recipeEditAddDescriptionBtn.setOnClickListener {
+            //addDescription = true
+            recipeEditViewModel.addDescription(RecipeDescription("", 0))
+        }
+
+        //imageview
         binding.recipeEditImgView.setOnClickListener {
             AlertDialog.Builder(this).setItems(R.array.recipes_photo_options,
                 DialogInterface.OnClickListener { dialog, position ->
@@ -149,11 +139,7 @@ class RecipeEditActivity: AppCompatActivity() {
                 }).setTitle(R.string.dialog_choosePicture).show()
 
         }
-        binding.recipeEditAddIngredientBtn.setOnClickListener { switchToActivityForResult(REQUEST_CODE_ADD_INGREDIENT,IngredientEditActivity::class) }
-        binding.recipeEditAddDescriptionBtn.setOnClickListener {
-            addDescription = true
-            recipeEditViewModel.addDescription(RecipeDescription("", 0))
-        }
+
     }
 
     private fun dispatchTakePictureIntent() {
@@ -293,23 +279,10 @@ class RecipeEditActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
     override fun onBackPressed() {
         super.onBackPressed()
         recipeEditViewModel.discardPictureChanges()
         finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-/*
-        with(recipeEditViewModel){
-            if(shallDiscardPictureChanges){
-                discardPictureChanges()
-            }
-        }
-
- */
     }
 
 }

@@ -95,14 +95,24 @@
             android:textColor="@color/colorAccent"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <!--<LinearLayout
             android:id="@+id/recipe_edit_layout_descr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:orientation="vertical">
 
-        </LinearLayout>
+        </LinearLayout>-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_edit_descriptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp" />
 
         <ImageButton
             android:id="@+id/recipe_edit_addDescription_btn"
