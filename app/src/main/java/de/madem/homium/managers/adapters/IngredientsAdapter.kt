@@ -29,8 +29,8 @@ class IngredientsAdapter(private val cntxt : Context, private var data : Mutable
         holder.amount.text = element.count.toString()
         holder.unit.text = element.unit
         holder.deleteBtn.setOnClickListener {
-            deleteButtonClickListener.invoke(position)
-            notifyDataSetChanged()
+            deleteButtonClickListener.invoke(holder.adapterPosition)
+            notifyItemRemoved(holder.adapterPosition)
         }
 
     }
