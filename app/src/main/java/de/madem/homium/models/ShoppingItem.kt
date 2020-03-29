@@ -18,4 +18,8 @@ data class ShoppingItem(
         return name == other.name && count == other.count && unit == other.unit
     }
 
+    override fun toString(): String {
+        return "$count $unit $name"
+    }
+
 }

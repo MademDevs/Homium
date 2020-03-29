@@ -193,4 +193,9 @@
     </string-array>
     <string name="dialog_choosePicture">Bild festlegen</string>
     <string name="photo_loading_error">Das Bild konnte leider nicht geladen werden. Bitte versuche es erneut!</string>
+
+    <!--sharing data-->
+    <string name="share_shoppinglist">Einkaufsliste teilen</string>
+    <string name="share_recipe">Rezept teilen</string>
+    <string name="share_text_shopping">Das ist meine Einkaufsliste:</string>
 </resources>
