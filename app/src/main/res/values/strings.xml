@@ -113,6 +113,10 @@
     <string name="recipe_description">Beschreibung</string>
     <string name="recipe_ingredients">Zutaten</string>
 
+    <!--recipe presentation texts-->
+    <string name="recipe_presentation_edit">Rezept bearbeiten</string>
+    <string name="recipe_presentation_cook">Rezept kochen</string>
+
     <!-- inventory edit -->
     <string name="inventory_edit_title_name">Was möchtest du verwalten?</string>
     <string name="inventory_edit_button_delete_text">Inventarelement löschen</string>
