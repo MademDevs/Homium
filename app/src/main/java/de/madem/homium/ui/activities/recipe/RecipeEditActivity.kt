@@ -115,24 +115,7 @@ class RecipeEditActivity: AppCompatActivity() {
             binding.recipeEditTitleEditTxt.setText(newRecipe.name)
             binding.recipeEditImgView.setPictureFromPath(newRecipe.image, 400, 400)
         })
-        /*
-        recipeEditViewModel.ingredients.observe(this, Observer { newIngredients ->
-            binding.recipeEditLayoutIngr.removeAllViews()
-            for(i in newIngredients.indices) {
-                val el = newIngredients[i]
-                val view = layoutInflater.inflate(R.layout.recipe_edit_ingredient, null)
-                view.findViewById<TextView>(R.id.ingredient_amount_txt).text = "${el.count}"
-                view.findViewById<TextView>(R.id.ingredient_unit_txt).setText(el.unit)
-                view.findViewById<TextView>(R.id.ingredient_name_txt).setText(el.name)
-                view.findViewById<ImageButton>(R.id.ingredient_btn_delete).setOnClickListener {
-                    recipeEditViewModel.ingredients.value?.removeAt(i)
-                    recreate()
-                }
-                binding.recipeEditLayoutIngr.addView(view)
-            }
-        })*/
 
-        //binding.recyclerviewEditIngredients.layoutManager = LinearLayoutManager(this)
         val ingrAdapter = IngredientsAdapter(this,recipeEditViewModel
             .ingredients.value ?: mutableListOf<RecipeIngredient>()).apply {
             deleteButtonClickListener = {position ->
@@ -144,7 +127,6 @@ class RecipeEditActivity: AppCompatActivity() {
         recipeEditViewModel.ingredients.observe(this, Observer {newIngredients ->
             ingrAdapter.setData(newIngredients)
         })
-
 
 
         binding.recipeEditImgView.setOnClickListener {

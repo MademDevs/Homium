@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.RecipeIngredient
-import java.util.*
 
 class IngredientsAdapter(private val cntxt : Context, private var data : MutableList<RecipeIngredient>)
     : RecyclerView.Adapter<IngredientsAdapter.IngredientViewHolder>() {
@@ -30,8 +29,8 @@ class IngredientsAdapter(private val cntxt : Context, private var data : Mutable
         holder.amount.text = element.count.toString()
         holder.unit.text = element.unit
         holder.deleteBtn.setOnClickListener {
-            deleteButtonClickListener.invoke(holder.adapterPosition)
-            notifyItemRemoved(position)
+            deleteButtonClickListener.invoke(position)
+            notifyDataSetChanged()
         }
 
     }
