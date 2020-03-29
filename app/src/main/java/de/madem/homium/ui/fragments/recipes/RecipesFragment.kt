@@ -4,11 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,20 +25,26 @@ import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.utilities.*
+import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
+import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.vibrate
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class RecipesFragment : Fragment() {
+class RecipesFragment : Fragment(), SearchViewHandler {
 
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var root: View
     private lateinit var db: AppDatabase
     private lateinit var actionModeHandler: RecipeActionModeHandler
+
+    private lateinit var adapter : RecipesListAdapter
+    private var searchViewUtil : Pair<SearchView,MenuItem>? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -59,9 +66,40 @@ class RecipesFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.recipes_fragment_actionbar_menu,menu)
+
+        //searchview
+        val searchItem = menu.findItem(R.id.search_recipes)
+        val searchView = searchItem.actionView as? SearchView ?: return
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if(adapter.isReadyForFiltering){
+                    adapter.filter.filter(newText)
+                }
+
+                return false
+            }
+        })
+        searchViewUtil = Pair(searchView,searchItem)
+
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recipesViewModel =
-            ViewModelProviders.of(this).get(RecipesViewModel::class.java)
+            ViewModelProvider(this).get(RecipesViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_recipes, container, false)
 
         registerRecyclerView()
@@ -146,6 +184,8 @@ class RecipesFragment : Fragment() {
         )
 
         btnAddRecipe.setOnClickListener {
+            //close search view
+            closeSearchView()
             //implementing simple navigation to shopping item edit screen via intent
             //switchToActivityForResult(REQUEST_CODE_SHOPPING, RecipeEditActivity::class)
             switchToActivity(RecipeEditActivity::class)
@@ -159,7 +199,7 @@ class RecipesFragment : Fragment() {
         } else {
             recyclerView.layoutManager = GridLayoutManager(context, 3)
         }
-        val adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
+        adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)
@@ -196,4 +236,13 @@ class RecipesFragment : Fragment() {
         }
     }
 
+
+
+    //searchViewHandler
+    override fun closeSearchView() {
+        searchViewUtil.notNull {
+            it.first.isIconified = true
+            it.second.collapseActionView()
+        }
+    }
 }
