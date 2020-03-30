@@ -23,6 +23,7 @@ import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATI
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.constants.IMPORT_RECIPE_DIALOG_TAG
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
@@ -59,6 +60,9 @@ class RecipesFragment : Fragment(), SearchViewHandler{
         super.onResume()
 
         //reload shopping items from database
+        ViewRefresher.recipeViewRefresher = {
+            recipesViewModel.reloadRecipes()
+        }
         recipesViewModel.reloadRecipes()
     }
 
