@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +21,7 @@ import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.ui.dialogs.RecipeImportDialogListener
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.whenSearchViewHandler
@@ -27,7 +29,7 @@ import java.lang.Exception
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecipeImportDialogListener {
 
     //fields
     private var speechAssistent : SpeechAssistent? = null
@@ -130,6 +132,12 @@ class MainActivity : AppCompatActivity() {
             ?.childFragmentManager?.primaryNavigationFragment.whenSearchViewHandler {
             it.closeSearchView()
         }
+    }
+
+    //Recipe Import functions
+    override fun importRecipe(message: String) {
+        Toast.makeText(this,message, Toast.LENGTH_SHORT).show()
+        //TODO: IMPLEMENT CODE FOR import a Recipe
     }
 
 

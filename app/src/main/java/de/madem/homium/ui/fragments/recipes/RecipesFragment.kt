@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,10 +21,13 @@ import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
 import de.madem.homium.application.HomiumApplication
+import de.madem.homium.constants.IMPORT_RECIPE_DIALOG_TAG
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
+import de.madem.homium.ui.dialogs.RecipeImportDialog
+import de.madem.homium.ui.dialogs.RecipeImportDialogListener
 import de.madem.homium.utilities.*
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
@@ -35,7 +39,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class RecipesFragment : Fragment(), SearchViewHandler {
+class RecipesFragment : Fragment(), SearchViewHandler{
 
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var root: View
@@ -95,6 +99,13 @@ class RecipesFragment : Fragment(), SearchViewHandler {
         searchViewUtil = Pair(searchView,searchItem)
 
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.import_recipes -> {importRecipe(); true}
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -236,7 +247,12 @@ class RecipesFragment : Fragment(), SearchViewHandler {
         }
     }
 
-
+    //import recipe
+    private fun importRecipe(){
+        activity.notNull {
+            RecipeImportDialog().show(it.supportFragmentManager, IMPORT_RECIPE_DIALOG_TAG)
+        }
+    }
 
     //searchViewHandler
     override fun closeSearchView() {
@@ -245,4 +261,5 @@ class RecipesFragment : Fragment(), SearchViewHandler {
             it.second.collapseActionView()
         }
     }
+
 }
