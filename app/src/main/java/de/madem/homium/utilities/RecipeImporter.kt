@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class RecipeImporter : RecipeImportDialogListener {
     companion object{
         private const val EMPTY = ""
-        private val recognitionPattern = Regex("[\\n\\t ]*([0-9a-zA-ZäöüÄÖÜ]+)[:]?[\\n]*Zutat(en)?[:]?[\\n]*((- [1-9]* (${Units.asSpeechRecognitionPattern()}) [a-zA-ZäöüÄÖÜ]+[\\n]?)*)[\\n]*Beschreibung(en)?[:]?[\\n]*(([1-9]*\\) [0-9a-zA-ZäöüÄÖÜ]+[\\n]*)*)")
+        private val recognitionPattern = Regex("[\\n\\t ]*([0-9a-zA-ZäöüÄÖÜ\\- ]+)[:]?[\\n]*(Zutat(en)?)?[:]?[\\n]*((- [1-9]* (${Units.asSpeechRecognitionPattern()}) [a-zA-ZäöüÄÖÜ\\- ]+[\\n]?)*)[\\n]*(Beschreibung(en)?)?[:]?[\\n]*(([1-9]*\\) [0-9a-zA-ZäöüÄÖÜ\\- ]+[\\n]*)*)")
     }
 
     init {
@@ -44,11 +44,13 @@ class RecipeImporter : RecipeImportDialogListener {
             ?.map{it.trim()}
             ?.filter{it.isNotEmpty() && it.isNotBlank() && it != message }
             ?.filter{!(it.matches(Regex("(en)?")))}
+            ?.filter{!(it.matches(Regex("Zutat(en)?|Beschreibung(en)?")))}
             ?.filter { !(it.matches(Regex(Units.asSpeechRecognitionPattern()))) }
             ?.filterIndexed { index, _ -> index == 0 || index % 2 != 0}
-            ?.toList() ?: listOf()
+            ?.toList()?.takeIf { it.size == 3 } ?: return null
 
-        if(args.size != 3){
+        if(args.first().isEmpty() || args.first().isBlank() ||
+            args.first().matches(Regex("([\n]*- [0-9]* (${Units.asSpeechRecognitionPattern()}) [a-zA-Z0-9äöüÄÖÜ\\-]*)*"))){
             return null
         }
 

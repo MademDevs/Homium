@@ -11,5 +11,5 @@
         android:id="@+id/share_shopping"
         android:title="@string/share_shoppinglist"
         android:icon="@drawable/ic_share"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 </menu>
