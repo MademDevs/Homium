@@ -216,15 +216,15 @@
 
     <!--about-->
     <string name="about_headline_general">Allgemeine Informationen</string>
-    <string name="about_general">Vielen Dank für den Download von Homium, einer Haushaltsapp zur Verwaltung von Einkaufsliste, Inventar und Rezepten.
-    Als vereinfachte Eingabe steht ein Sprachassistent zur Verfügung. Die Entwicklung dieser App fand im Rahmen einer Studienarbeit
-    an der Hochschule Hof statt. Es findet damit auch vorerst keine Kommerzialisierung statt.</string>
+    <string name="about_general">Vielen Dank für den Download von Homium, einer Haushaltsapp zur Verwaltung von Einkaufsliste, Inventar und Rezepten mit
+    integriertem Sprachassistenten. Die Entwicklung dieser App fand im Rahmen einer Studienarbeit
+    an der Hochschule Hof statt. Folglich ist vorerst auch keine Kommerzialisierung vorgesehen.</string>
     <string name="about_headline_data_privacy">Datenschutz</string>
-    <string name="about_data_privacy">Sämtliche Daten, welche vom Nutzer in schriftlicher Form eingegeben wurden werden lokal in der App gespeichert und nicht nach außen weitergegeben,
+    <string name="about_data_privacy">Sämtliche Daten, welche vom Nutzer in schriftlicher Form eingegeben wurden, werden lokal in der App gespeichert und nicht nach außen weitergegeben,
     es sei denn, der Nutzer veranlasst dies explizit über die "Teilen"-Funktionen der App. Für den Sprachassistent wird eine Google-Schnittstelle genutzt.
     Mit Nutzung dieser Funktion erklärt sich der Nutzer mit den Datenschutzbedingungen von Google und deren Spracherkennungsschnittstelle einverstanden.
     Die Entwickler von Homium übernehmen keine Verantwortung für eventuelle Datenweitergabe über die Google-Spracherkennungsschnittstelle.</string>
     <string name="about_headline_contact">Kontakt</string>
-    <string name="about_contact">Bei Fragen, Anmerkungen oder Feedback ist das Entwicklerteam von Homium erreichbar unter folgender E-Mail Adresse:</string>
+    <string name="about_contact">Bei Fragen, Anmerkungen oder Feedback ist das Entwicklerteam von Homium unter folgender E-Mail Adresse erreichbar:</string>
     <string name="about_contact_mail">madem.dev@gmail.com</string>
 </resources>
