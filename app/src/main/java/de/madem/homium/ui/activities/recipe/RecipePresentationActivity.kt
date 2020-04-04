@@ -156,7 +156,6 @@ class RecipePresentationActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
