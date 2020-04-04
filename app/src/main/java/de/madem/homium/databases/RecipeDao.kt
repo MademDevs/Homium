@@ -24,7 +24,7 @@ interface RecipeDao {
     @Query("SELECT * FROM recipe WHERE uid = :id")
     fun getRecipeById(id: Int): Recipe
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIngredient(vararg item: RecipeIngredient)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
