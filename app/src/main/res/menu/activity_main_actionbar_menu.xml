@@ -9,7 +9,9 @@
     <item
         android:title="@string/actionbar_main_testzone"
         android:id="@+id/main_actionbar_testezone"
-        app:showAsAction="never">
-
-    </item>
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/main_actionbar_about"
+        app:showAsAction="never"
+        android:title="@string/actionbar_main_about"/>
 </menu>

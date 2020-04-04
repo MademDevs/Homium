@@ -20,6 +20,7 @@ import de.madem.homium.constants.REQUEST_CODE_SPEECH
 import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
+import de.madem.homium.ui.activities.about.AboutActivity
 import de.madem.homium.ui.activities.test.TestActivity
 import de.madem.homium.ui.dialogs.RecipeImportDialogListener
 import de.madem.homium.utilities.RecipeImporter
@@ -99,6 +100,10 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeIm
                 catch(ex : Exception){
                     showToastLong(R.string.errormsg_unknown_error_with_speech_assistent)
                 }
+                true
+            }
+            R.id.main_actionbar_about -> {
+                switchToActivity(AboutActivity::class)
                 false
             }
             else -> super.onOptionsItemSelected(item)
