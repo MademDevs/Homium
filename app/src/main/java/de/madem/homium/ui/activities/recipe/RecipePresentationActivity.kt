@@ -69,13 +69,12 @@ class RecipePresentationActivity : AppCompatActivity() {
         }
         else{
             val vMiD : Int = viewModel.recipeId
-            if(vMiD < 0){
+            recipeid = if(vMiD < 0){
                 //live data in viewmodel is not initialized
                 viewModel.updateRecipeId(intentId)
-                recipeid = intentId
-            }
-            else{
-                recipeid = vMiD
+                intentId
+            } else{
+                vMiD
             }
 
         }
@@ -132,24 +131,31 @@ class RecipePresentationActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if (id == R.id.presentation_toolbar_edit) {
-            switchToActivityForResult(
-                REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
-                RecipeEditActivity::class
-            ) {
-                it.putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, recipeid)
+        return when(item.itemId){
+            R.id.presentation_toolbar_edit -> {
+                switchToActivityForResult(
+                    REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION,
+                    RecipeEditActivity::class
+                ) {
+                    it.putExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, recipeid)
+                }
+
+                true
             }
-            return true
+            R.id.presentation_toolbar_cook -> {
+                cookRecipe()
+                true
+            }
+            R.id.recipe_presentation_share -> {
+                shareRecipe()
+                true
+            }
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        if (id == R.id.presentation_toolbar_cook) {
-            cookRecipe()
-            return true
-        }
-        if (id == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -244,6 +250,28 @@ class RecipePresentationActivity : AppCompatActivity() {
         if(allowedToAutoStartCooking){
             cookRecipe()
         }
+    }
+
+    private fun shareRecipe(){
+        CoroutineBackgroundTask<String>().executeInBackground {
+            val rec = recipe
+            return@executeInBackground if(rec == null){
+                ""
+            }
+            else{
+                "${rec.name}:\n\n${resources.getString(R.string.recipe_ingredients)}:\n- ${ingredients
+                    .joinToString("\n- ") { it.toString() }}\n\n${resources.getString(R.string.recipe_description)}:\n" +
+                        description.mapIndexed { index, description -> "${index+1}) ${description.description}"}.joinToString("\n")
+            }
+        }.onDone {result ->
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT,result)
+
+            if(shareIntent.resolveActivity(packageManager) != null){
+                startActivity(shareIntent)
+            }
+        }.start()
     }
 
 

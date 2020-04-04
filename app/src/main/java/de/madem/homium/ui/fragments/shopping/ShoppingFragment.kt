@@ -97,6 +97,13 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.share_shopping -> {shareShoppingList(); true}
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     //on create view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -303,6 +310,25 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             it.first.isIconified = true
             it.second.collapseActionView()
         }
+    }
+
+    //functions for sharing shopping list
+    private fun shareShoppingList(){
+        CoroutineBackgroundTask<String>().executeInBackground {
+            val shoppingList = shoppingViewModel.shoppingItemList.value ?: listOf()
+            return@executeInBackground "${resources.getString(R.string.share_text_shopping)} \n- ${shoppingList.joinToString(
+                "\n- ") { it.toString() }}"
+        }.onDone {result ->
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT,result)
+
+            this.activity?.notNull {
+                if(shareIntent.resolveActivity(it.packageManager) != null){
+                    startActivity(shareIntent)
+                }
+            }
+        }.start()
     }
 
 }

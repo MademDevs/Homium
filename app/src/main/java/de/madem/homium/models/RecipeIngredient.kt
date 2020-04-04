@@ -11,4 +11,8 @@ data class RecipeIngredient(
     @ColumnInfo(name = "unit") val unit: String = "",
     @ColumnInfo(name = "recipeId") var recipeId: Int,
     @PrimaryKey(autoGenerate = true) val uid: Int = 0
-)
+){
+    override fun toString(): String {
+        return "$count $unit $name"
+    }
+}

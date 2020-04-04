@@ -7,4 +7,9 @@
         android:icon="@drawable/ic_search"
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+    <item
+        android:id="@+id/import_recipes"
+        android:icon="@drawable/ic_arrow_downward"
+        app:showAsAction="never"
+        android:title="@string/recipe_import"/>
 </menu>

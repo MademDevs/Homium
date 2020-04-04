@@ -6,6 +6,8 @@
     <string name="error">Fehler</string>
     <string name="search">Suche</string>
     <string name="dummy">{0}</string>
+    <string name="abort">Abbrechen</string>
+    <string name="import_cmd">Importieren</string>
 
     <!--settings-->
     <string name="setting_vibration">Vibration</string>
@@ -107,11 +109,19 @@
     <string name="recipeEdit_title_add">Rezept hinzufügen</string>
     <string name="recipeEdit_title_edit">Rezept bearbeiten</string>
     <string name="recipe_actionmode_delete_question">Sollen die ausgewählten Rezepte wirklich gelöscht werden?</string>
+    <string name="recipe_import">Rezept importieren</string>
+    <string name="recipe_import_text">Hast du ein Homium-Rezept als Text geschickt bekommen? Dann füge es hier ein und übernehme es in deine Rezeptverwaltung.</string>
+    <string name="recipe_import_hint">Hier den Nachrichtentext einfügen...</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>
     <string name="recipe_description">Beschreibung</string>
     <string name="recipe_ingredients">Zutaten</string>
+
+
+    <!--recipe presentation texts-->
+    <string name="recipe_presentation_edit">Rezept bearbeiten</string>
+    <string name="recipe_presentation_cook">Rezept kochen</string>
 
     <!-- inventory edit -->
     <string name="inventory_edit_title_name">Was möchtest du verwalten?</string>
@@ -128,6 +138,7 @@
     <string name="notification_remove_bought_shoppingitems">Alle ausgewählten Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="notification_remove_all_shoppingitems">Alle Elemente der Einkaufsliste wurden gelöscht.</string>
     <string name="notification_remove_all_inventoryitems">Das gesamte Inventar wurde erfolgreich gelöscht.</string>
+    <string name="notification_recipe_import_success">Das Rezept wurde erfolgreich importiert</string>
     <string name="errormsg_invalid_parameters">Fehler: Anscheinend liegt eine ungültige Eingabe vor. Bitte überprüfe die Eingabeelemente und versuche es erneut.</string>
     <string name="errormsg_insert_shoppingitem_failed">Fehler: Das Einkaufselement konnte nicht hinzugefügt werden. Bitte versuche es erneut.</string>
     <string name="errormsg_delete_shopping_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Einkaufsliste etwas schiefgegangen.</string>
@@ -135,6 +146,8 @@
     <string name="errormsg_delete_inventory_failed">Fehler: Anscheinend ist beim Löschvorgang aus der Inventarliste etwas schiefgegangen.</string>
     <string name="errormsg_cooking_impossible">Die Kochfunktion ist momentan leider nicht verfügbar. Bitte versuche es erneut.</string>
     <string name="errormsg_invalid_recipe_title">Der Titel des Rezepts ist ungültig. das Rezept kann daher nicht gespeichert werden.</string>
+    <string name="error_msg_recipe_import_failed">Das Rezept konnte nicht importiert werden. Womöglich liegt ein Fehler in der Formatierung vor.</string>
+    <string name="errormsg_recipe_adding_failed">Bei Einfügen des Rezeptes ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
 
     <!--Speech Assistent Feedback-->
     <string name="assistent_msg_sorry">Leider wurde kein passender Befehl gefunden oder es wurden ungültige Werte angegeben. Bitte versuche es erneut</string>
@@ -193,4 +206,9 @@
     </string-array>
     <string name="dialog_choosePicture">Bild festlegen</string>
     <string name="photo_loading_error">Das Bild konnte leider nicht geladen werden. Bitte versuche es erneut!</string>
+
+    <!--sharing data-->
+    <string name="share_shoppinglist">Einkaufsliste teilen</string>
+    <string name="share_recipe">Rezept teilen</string>
+    <string name="share_text_shopping">Das ist meine Einkaufsliste:</string>
 </resources>

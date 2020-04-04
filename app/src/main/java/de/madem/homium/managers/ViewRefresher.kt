@@ -5,7 +5,11 @@ object ViewRefresher {
         //nothing to do here :D
     }
 
-    var inventoryRefresher: () -> Unit ={
+    var inventoryRefresher: () -> Unit = {
+        //nothing to do here :D
+    }
+
+    var recipeViewRefresher: () -> Unit = {
         //nothing to do here :D
     }
 }

@@ -3,14 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="presentationEdit"
+        android:title="@string/share_recipe"
+        android:id="@+id/recipe_presentation_share"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_share"/>
+
+    <item
+        android:title="@string/recipe_presentation_edit"
         android:id="@+id/presentation_toolbar_edit"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_edit">
     </item>
 
     <item
-        android:title="presentationCook"
+        android:title="@string/recipe_presentation_cook"
         android:id="@+id/presentation_toolbar_cook"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_cooking_pot">

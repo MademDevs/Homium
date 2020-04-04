@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +21,8 @@ import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistent
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.test.TestActivity
+import de.madem.homium.ui.dialogs.RecipeImportDialogListener
+import de.madem.homium.utilities.RecipeImporter
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.whenSearchViewHandler
@@ -27,7 +30,7 @@ import java.lang.Exception
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeImporter() {
 
     //fields
     private var speechAssistent : SpeechAssistent? = null
@@ -131,8 +134,4 @@ class MainActivity : AppCompatActivity() {
             it.closeSearchView()
         }
     }
-
-
-
-
 }
