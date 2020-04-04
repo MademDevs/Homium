@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeIm
                 catch(ex : Exception){
                     showToastLong(R.string.errormsg_unknown_error_with_speech_assistent)
                 }
-                true
+                false
             }
             R.id.main_actionbar_about -> {
                 switchToActivity(AboutActivity::class)
