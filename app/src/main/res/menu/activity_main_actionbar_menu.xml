@@ -5,7 +5,7 @@
         android:title="@string/actionbar_main_speech_assistent"
         android:id="@+id/main_actionbar_speech_assistent"
         android:icon="@drawable/ic_mic"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
     <item
         android:title="@string/actionbar_main_testzone"
         android:id="@+id/main_actionbar_testezone"

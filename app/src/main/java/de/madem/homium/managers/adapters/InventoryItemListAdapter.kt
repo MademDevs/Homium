@@ -3,6 +3,8 @@ package de.madem.homium.managers.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -13,17 +15,26 @@ import de.madem.homium.models.InventoryItem
 import de.madem.homium.utilities.InventoryItemAmountClassifier
 
 class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<List<InventoryItem>>)
-    : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>() {
+    : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>(), Filterable {
 
     companion object {
         private const val quantityUnitTemplate = "quantity unit"
     }
 
-    var data = liveData.value ?: listOf()
+    var isReadyForFiltering = false
+        private set(value) {
+            field = value
+        }
+
+    var data = liveData.value?.toMutableList() ?: mutableListOf()
+    private var dataBackup = MutableList(data.size){data[it]}
+
+
 
     init {
         liveData.observe(owner, Observer { list ->
-            data = list
+            data = list.toMutableList()
+            dataBackup = list.toMutableList()
             notifyDataSetChanged()
         })
     }
@@ -89,5 +100,59 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
         val txtLocation : TextView = itemView.findViewById(R.id.tv_location)
         val viewStock: View = itemView.findViewById(R.id.view_stock)
 
+    }
+
+    override fun onViewAttachedToWindow(holder: InventoryItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        isReadyForFiltering = true
+    }
+
+    //filter
+    private val filter = object: Filter(){
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val resultList = mutableListOf<InventoryItem>()
+
+            if(constraint == null || constraint.isEmpty() || constraint.isBlank()){
+                resultList.addAll(dataBackup)
+            }
+            else{
+                val filterArgs = constraint.toString().toLowerCase().trim().split(" ")
+                dataBackup.forEach { item ->
+                    val name = item.name.trim().toLowerCase()
+                    val unit = item.unit.trim().toLowerCase()
+                    val cnt = item.count.toString()
+                    var matches = true
+                    for(arg in filterArgs) {
+                        if(!(name.contains(arg)
+                                    || unit.contains(arg)
+                                    || arg == cnt)){
+                            matches = false
+                            break
+                        }
+                    }
+                    if(matches){
+                        resultList.add(item)
+                    }
+
+                }
+            }
+
+            return FilterResults().apply {
+                values = resultList
+            }
+        }
+
+        override fun publishResults(constraint: CharSequence?, filterResult: FilterResults?) {
+            data.clear()
+            val resultData = filterResult?.values as? List<InventoryItem> ?: listOf()
+            data.addAll(resultData)
+            notifyDataSetChanged()
+        }
+    }
+
+
+
+    override fun getFilter(): Filter {
+        return filter
     }
 }

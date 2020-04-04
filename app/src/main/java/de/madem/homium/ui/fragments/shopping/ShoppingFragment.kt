@@ -4,9 +4,9 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -24,23 +24,26 @@ import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
+import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.getSetting
-import de.madem.homium.utilities.extensions.showToastShort
-import de.madem.homium.utilities.extensions.switchToActivityForResult
-import de.madem.homium.utilities.extensions.vibrate
+import de.madem.homium.utilities.extensions.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ShoppingFragment : Fragment() {
+class ShoppingFragment : Fragment(), SearchViewHandler {
 
     //fields
     private lateinit var shoppingViewModel: ShoppingViewModel
     private lateinit var root: View
     private lateinit var actionModeHandler: ShoppingActionModeHandler
     private lateinit var databaseDao: ItemDao
+
+    private var searchViewUtil : Pair<SearchView,MenuItem>? = null
+
+    //GUI
+    private lateinit var recyclerViewAdapter : ShoppingItemListAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,6 +64,37 @@ class ShoppingFragment : Fragment() {
         if (::actionModeHandler.isInitialized) {
             actionModeHandler.finishActionMode()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.shopping_fragment_actionbar_menu,menu)
+
+        //handling searchview
+        val searchItem = menu.findItem(R.id.search_shopping)
+        val searchView = searchItem.actionView as? SearchView ?: return
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if(recyclerViewAdapter.isReadyForFiltering){
+                    recyclerViewAdapter.filter.filter(newText)
+                }
+                return false
+            }
+
+        })
+
+        searchViewUtil = Pair(searchView,searchItem)
+        super.onCreateOptionsMenu(menu, inflater)
+
     }
 
 
@@ -130,11 +164,11 @@ class ShoppingFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         //init adapter
-        val adapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
-        recyclerView.adapter = adapter
+        recyclerViewAdapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
+        recyclerView.adapter = recyclerViewAdapter
 
         //on click listener
-        adapter.shortClickListener = {shoppingItem, viewHolder ->
+        recyclerViewAdapter.shortClickListener = {shoppingItem, viewHolder ->
 
             if (actionModeHandler.isActionModeActive()) {
                 //select item in action mode
@@ -146,7 +180,7 @@ class ShoppingFragment : Fragment() {
             }
         }
 
-        adapter.longClickListener = {shoppingItem, viewHolder ->
+        recyclerViewAdapter.longClickListener = {shoppingItem, viewHolder ->
             //giving haptic feedback if allowed
             val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
                 //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
@@ -256,8 +290,18 @@ class ShoppingFragment : Fragment() {
         )
 
         btnAddShoppingItem.setOnClickListener {
+            //close search view
+            closeSearchView()
             //implementing simple navigation to shopping item edit screen via intent
             switchToActivityForResult(REQUEST_CODE_SHOPPING,ShoppingItemEditActivity::class)
+        }
+    }
+
+    //functions for searchviewhandler
+    override fun closeSearchView() {
+        searchViewUtil.notNull {
+            it.first.isIconified = true
+            it.second.collapseActionView()
         }
     }
 

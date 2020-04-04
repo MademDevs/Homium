@@ -4,6 +4,8 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -13,19 +15,73 @@ import de.madem.homium.R
 import de.madem.homium.models.ShoppingItem
 
 class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<ShoppingItem>>)
-    : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>() {
+    : RecyclerView.Adapter<ShoppingItemListAdapter.ShoppingItemViewHolder>(), Filterable {
 
     companion object {
         private const val quantityUnitTemplate = "quantity unit"
     }
 
-    var data = liveData.value ?: listOf()
+
+
+    //data
+    var data = liveData.value?.toMutableList() ?: mutableListOf()
+    private var dataBackup = MutableList(data.size){ data[it] }
+
+    //filter
+    private val filter = object : Filter(){
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val resultList = mutableListOf<ShoppingItem>()
+
+            if(constraint == null || constraint.isEmpty() || constraint.isBlank()){
+                resultList.addAll(dataBackup)
+            }
+            else{
+                val filterArgs = constraint.toString().toLowerCase().trim().split(" ")
+                dataBackup.forEach { item ->
+                    val name = item.name.trim().toLowerCase()
+                    val unit = item.unit.trim().toLowerCase()
+                    val cnt = item.count.toString()
+                    var matches = true
+                    for(arg in filterArgs) {
+                        if(!(name.contains(arg)
+                            || unit.contains(arg)
+                            || arg == cnt)){
+                            matches = false
+                            break
+                        }
+                    }
+                    if(matches){
+                        resultList.add(item)
+                    }
+
+                }
+            }
+
+            return FilterResults().apply {
+                values = resultList
+            }
+        }
+
+        override fun publishResults(constraint: CharSequence?, result: FilterResults?) {
+            data.clear()
+            val displayedItems : List<ShoppingItem> = result?.values as? List<ShoppingItem> ?: listOf()
+            data.addAll(displayedItems)
+            notifyDataSetChanged()
+        }
+    }
+    var isReadyForFiltering = false
+        private set(value) {
+            field = value
+        }
+
+
 
     init {
         liveData.observe(owner, Observer { list ->
-            data = list
+            isReadyForFiltering = false
+            data = list.toMutableList()
+            dataBackup = MutableList(data.size){ data[it] }
             notifyDataSetChanged()
-            println("OBSERVER TRIGGERED")
         })
     }
 
@@ -95,5 +151,15 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
             paintFlags = if(isChecked){ Paint.STRIKE_THRU_TEXT_FLAG } else{ 1 }
         }
 
+    }
+
+    override fun onViewAttachedToWindow(holder: ShoppingItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        isReadyForFiltering = true
+    }
+
+    //interface functions
+    override fun getFilter(): Filter {
+        return filter
     }
 }
