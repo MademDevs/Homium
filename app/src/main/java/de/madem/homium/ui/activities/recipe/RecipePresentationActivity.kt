@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST
@@ -126,6 +127,8 @@ class RecipePresentationActivity : AppCompatActivity() {
         return true
     }
 
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         return when(item.itemId){
@@ -153,8 +156,7 @@ class RecipePresentationActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-
-
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -223,7 +225,7 @@ class RecipePresentationActivity : AppCompatActivity() {
     }
 
     private fun setupViewModel(){
-        viewModel = ViewModelProviders.of(this)[RecipePresentationViewModel::class.java]
+        viewModel = ViewModelProvider(this)[RecipePresentationViewModel::class.java]
     }
 
     private fun cookRecipe(){
