@@ -9,7 +9,7 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".application.HomiumApplication"
@@ -20,10 +20,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.activities.about.AboutActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.activities.main.MainActivity"/>
+        <activity
             android:name=".ui.activities.ingredient.IngredientEditActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.recipe.RecipeEditActivity"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:parentActivityName=".ui.activities.recipe.RecipeEditActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.android.fileprovider"
@@ -31,7 +36,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity
@@ -65,8 +70,9 @@
             android:name=".ui.activities.recipe.RecipeEditActivity"
             android:exported="false"
             android:parentActivityName=".ui.activities.main.MainActivity" />
-        <activity android:name=".ui.activities.test.TestActivity"
-            android:theme="@style/NoActionBarTheme"/>
+        <activity
+            android:name=".ui.activities.test.TestActivity"
+            android:theme="@style/NoActionBarTheme" />
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:exported="false"
@@ -79,11 +85,11 @@
         <activity
             android:name=".ui.activities.inventoryedit.InventoryItemEditActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.main.MainActivity">
-        </activity>
-        <activity android:name=".ui.activities.recipe.RecipePresentationActivity"
+            android:parentActivityName=".ui.activities.main.MainActivity"></activity>
+        <activity
+            android:name=".ui.activities.recipe.RecipePresentationActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.main.MainActivity">
-        </activity>
+            android:parentActivityName=".ui.activities.main.MainActivity"></activity>
     </application>
+
 </manifest>

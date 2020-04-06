@@ -72,6 +72,7 @@
     <string name="actionbar_main_actionmode_delete">Löschen</string>
     <string name="actionbar_main_actionmode_edit">Bearbeiten</string>
     <string name="actionbar_main_actionmode_check">Auswählen</string>
+    <string name="actionbar_main_about">Über Homium</string>
 
     <!--bottom navigation items titles-->
     <string name="title_shopping">Einkaufen</string>
@@ -211,4 +212,19 @@
     <string name="share_shoppinglist">Einkaufsliste teilen</string>
     <string name="share_recipe">Rezept teilen</string>
     <string name="share_text_shopping">Das ist meine Einkaufsliste:</string>
+
+
+    <!--about-->
+    <string name="about_headline_general">Allgemeine Informationen</string>
+    <string name="about_general">Vielen Dank für den Download von Homium, einer Haushaltsapp zur Verwaltung von Einkaufsliste, Inventar und Rezepten mit
+    integriertem Sprachassistenten. Die Entwicklung dieser App fand im Rahmen einer Studienarbeit
+    an der Hochschule Hof statt. Folglich ist vorerst auch keine Kommerzialisierung vorgesehen.</string>
+    <string name="about_headline_data_privacy">Datenschutz</string>
+    <string name="about_data_privacy">Sämtliche Daten, welche vom Nutzer in schriftlicher Form eingegeben wurden, werden lokal in der App gespeichert und nicht nach außen weitergegeben,
+    es sei denn, der Nutzer veranlasst dies explizit über die "Teilen"-Funktionen der App. Für den Sprachassistent wird eine Google-Schnittstelle genutzt.
+    Mit Nutzung dieser Funktion erklärt sich der Nutzer mit den Datenschutzbedingungen von Google und deren Spracherkennungsschnittstelle einverstanden.
+    Die Entwickler von Homium übernehmen keine Verantwortung für eventuelle Datenweitergabe über die Google-Spracherkennungsschnittstelle.</string>
+    <string name="about_headline_contact">Kontakt</string>
+    <string name="about_contact">Bei Fragen, Anmerkungen oder Feedback ist das Entwicklerteam von Homium unter folgender E-Mail Adresse erreichbar:</string>
+    <string name="about_contact_mail">madem.dev@gmail.com</string>
 </resources>
