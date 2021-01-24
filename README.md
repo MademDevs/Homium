@@ -4,5 +4,4 @@ Homium is a Housekeeping-App specialized for food with an integrated Voice assis
 - 
 
 ![Logo of Homium](https://play-lh.googleusercontent.com/znWdrHL5LpMcy-NwwbhQsnDeuK5FxJLl1J17atxnOzXa-hN6vGcZATeLH7jAPnwjzA=s180)
-
-https://play.google.com/store/apps/details?id=de.madem.homium
+Have fun with using Homium. You can download it in the Playstore [here](https://play.google.com/store/apps/details?id=de.madem.homium).
