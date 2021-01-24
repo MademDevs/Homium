@@ -15,7 +15,7 @@ Homium is a Housekeeping-App for Android, specialized for food with an integrate
 - Import Recipes sent by another person via text message (BETA)
 
 ## Notes
-Homium was developed in context of a Study-Project at the [University of Applied Sciences Hof](https://www.hof-university.de/). Homium is only available in german language at the moment.
+Homium was developed in context of a Study-Project at the [University of Applied Sciences Hof](https://www.hof-university.de/) and is available in german language only at the moment.
 
 ## Download
 ![Logo of Homium](https://play-lh.googleusercontent.com/znWdrHL5LpMcy-NwwbhQsnDeuK5FxJLl1J17atxnOzXa-hN6vGcZATeLH7jAPnwjzA=s180)
