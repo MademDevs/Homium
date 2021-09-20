@@ -8,4 +8,5 @@
     <color name="listCardItemBackgroundSelected">#B7B7B7</color>
     <color name="bottomNavigationItemUnselected">#0E435A</color>
     <color name="bottomNavigationItemSelected">@android:color/white</color>
+    <color name="colorDisabled">#BDBDBD</color>
 </resources>

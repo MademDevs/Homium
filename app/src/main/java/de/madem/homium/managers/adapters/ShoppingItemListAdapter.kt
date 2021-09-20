@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -141,14 +142,11 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
         //fields
         val txtTitle : TextView = itemView.findViewById(R.id.txtView_shoppingitemList_title)
         val txtQuantityUnit : TextView = itemView.findViewById(R.id.txtView_shoppingitemList_quantity_unit)
+        private val imgViewIcon : ImageView = itemView.findViewById(R.id.imgView_shoppingitemList_icon)
 
         fun applyCheck(isChecked: Boolean) {
-            txtTitle.applyCheck(isChecked)
-            txtQuantityUnit.applyCheck(isChecked)
-        }
-
-        private fun TextView.applyCheck(isChecked: Boolean) {
-            paintFlags = if(isChecked){ Paint.STRIKE_THRU_TEXT_FLAG } else{ 1 }
+            val resId = if(isChecked) R.drawable.ic_check_circle_green else R.drawable.ic_circle
+            imgViewIcon.setImageResource(resId)
         }
 
     }
