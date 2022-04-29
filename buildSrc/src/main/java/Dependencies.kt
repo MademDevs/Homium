@@ -1,9 +1,11 @@
 import AppDependencyVersions.androidXNavigation
+import AppDependencyVersions.room
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 
 
 object AppDependencyVersions {
     const val androidXNavigation = "2.3.5"
+    const val room = "2.3.0"
 }
 
 class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
@@ -41,8 +43,8 @@ class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
     }
 
     fun installRoomLibraries() = with(scope) {
-        implementation("androidx.room:room-runtime:2.3.0")
-        kapt("androidx.room:room-compiler:2.3.0")
+        implementation("androidx.room:room-runtime:$room")
+        kapt("androidx.room:room-compiler:$room")
     }
 
     fun installSplashscreenLibraries() = with(scope) {
