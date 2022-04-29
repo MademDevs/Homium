@@ -1,0 +1,7 @@
+object Dependencies {
+
+    fun androidxNavigation() {
+
+    }
+
+}
