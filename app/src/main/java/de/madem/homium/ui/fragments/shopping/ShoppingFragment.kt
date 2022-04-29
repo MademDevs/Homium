@@ -2,7 +2,9 @@ package de.madem.homium.ui.fragments.shopping
 
 import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -27,6 +30,7 @@ import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.*
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
@@ -201,13 +205,82 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             true
         }
 
+        //item touch helper
+        val itemTouchHelper = ItemTouchHelper(
+            object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
+        ){
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+
+                val swipesToLeft = dX < 0
+                val colorRes = if(swipesToLeft) android.R.color.holo_red_dark else R.color.colorAccent
+                val iconRes = if(swipesToLeft) R.drawable.ic_delete else R.drawable.ic_edit
+
+                RecyclerViewSwipeDecorator
+                    .Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
+                    .addActionIcon(iconRes)
+                    .create()
+                    .decorate()
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                println("onchild draw")
+            }
+
+
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean  = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                if (direction == ItemTouchHelper.LEFT){
+                    showDeleteActionDialog(
+                    context = requireContext(),
+                    onYes = { dialog ->
+                            CoroutineBackgroundTask<Unit>()
+                                .executeInBackground {
+                                    databaseDao.deleteShoppingItemById(
+                                        recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition].uid
+                                    )
+                                }
+                                .onDone {
+                                    refreshViewModelData()
+                                    dialog.dismiss()
+                                }
+                                .start()
+                        },
+                        onNo = { dialog ->
+                            dialog.dismiss()
+                            //TODO: change to more efficent implementation
+                            refreshViewModelData()
+                        }
+                    )
+                }
+                else if (direction == ItemTouchHelper.RIGHT){
+                    showShoppingItemEditScreen(recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition].uid)
+                }
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
     }
 
     private fun registerSwipeRefresh() {
         //swipe refresh layout
         val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
 
-        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.context!!,R.color.colorPrimaryDark))
+        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.requireContext(),R.color.colorPrimaryDark))
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = true
 
@@ -218,7 +291,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                 GlobalScope.launch(Main) {
 
                     //handle shopping to inventory handler
-                    ShoppingToInventoryHandler(context!!).handleShoppingItems(checkedItems) {
+                    ShoppingToInventoryHandler(requireContext()).handleShoppingItems(checkedItems) {
 
                         //delete checked items
                         shoppingViewModel.deleteAllCheckedItems {
@@ -245,21 +318,19 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     }
 
     private fun registerActionMode() {
-        actionModeHandler = ShoppingActionModeHandler(context!!)
+        actionModeHandler = ShoppingActionModeHandler(requireContext())
 
         with(actionModeHandler) {
 
             clickEditButtonHandler = { itemHolder ->
                 finishActionMode()
-                Intent(activity, ShoppingItemEditActivity::class.java)
-                    .apply {putExtra("item", itemHolder.shoppingItem.uid) }
-                    .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
+                showShoppingItemEditScreen(itemHolder.shoppingItem.uid)
             }
 
             clickDeleteButtonHandler = { itemHolders ->
-                AlertDialog.Builder(context)
-                    .setMessage(R.string.shopping_list_delete_question)
-                    .setPositiveButton(R.string.answer_yes) { dialog, _ ->
+                showDeleteActionDialog(
+                    context = context,
+                    onYes = { dialog ->
                         CoroutineBackgroundTask<Unit>()
                             .executeInBackground {
                                 val shoppingCart = itemHolders.map { it.shoppingItem }
@@ -274,11 +345,12 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                                 dialog.dismiss()
                             }
                             .start()
-                    }
-                    .setNegativeButton(R.string.answer_no) { dialog, _ ->
+                    },
+                    onNo = { dialog ->
                         finishActionMode()
                         dialog.dismiss()
-                    }.show()
+                    }
+                )
             }
 
             clickCheckButtonHandler = { itemHolders ->
@@ -302,6 +374,28 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             //implementing simple navigation to shopping item edit screen via intent
             switchToActivityForResult(REQUEST_CODE_SHOPPING,ShoppingItemEditActivity::class)
         }
+    }
+
+    // help functions
+    private fun showShoppingItemEditScreen(itemId: Int){
+        Intent(activity, ShoppingItemEditActivity::class.java)
+            .apply {putExtra("item", itemId) }
+            .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
+    }
+
+    private fun showDeleteActionDialog(
+        context: Context,
+        onYes: (DialogInterface) -> Unit = {},
+        onNo: (DialogInterface) -> Unit = {}
+    ){
+        AlertDialog.Builder(context)
+            .setMessage(R.string.shopping_list_delete_question)
+            .setPositiveButton(R.string.answer_yes) { dialog, _ ->
+                onYes.invoke(dialog)
+            }
+            .setNegativeButton(R.string.answer_no) { dialog, _ ->
+                onNo.invoke(dialog)
+            }.show()
     }
 
     //functions for searchviewhandler

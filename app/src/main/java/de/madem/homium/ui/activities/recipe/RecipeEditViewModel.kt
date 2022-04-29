@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class RecipeEditViewModelFactory(private val recipeId: Int?): ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RecipeEditViewModel::class.java)) {
             return RecipeEditViewModel(recipeId) as T
         }
