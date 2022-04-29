@@ -2,18 +2,18 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("kotlin-android")
-    id("kotlin-android-extensions")
     //room apply for kotlin
     id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
     defaultConfig {
         applicationId = "de.madem.homium"
-        minSdkVersion(21)
-        targetSdkVersion(31)
+        minSdk = 21
+        targetSdk= 31
         versionCode = 5
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -52,7 +52,8 @@ dependencies {
         installTestLibraries()
         installOnboardingLibraries()
         installSplashscreenLibraries()
-        installStrangeRecyclerViewSwipeDecorator()
+        installRecyclerViewSwipeDecorator()
+        installDaggerHilt()
     }
 }
 

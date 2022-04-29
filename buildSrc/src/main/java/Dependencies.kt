@@ -1,11 +1,15 @@
 import AppDependencyVersions.androidXNavigation
+import AppDependencyVersions.hilt
+import AppDependencyVersions.kotlin
 import AppDependencyVersions.room
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 
 
 object AppDependencyVersions {
+    const val kotlin = "1.5.31"
     const val androidXNavigation = "2.3.5"
     const val room = "2.3.0"
+    const val hilt = "2.38.1"
 }
 
 class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
@@ -57,8 +61,13 @@ class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
         implementation("com.github.AppIntro:AppIntro:5.1.0")
     }
 
-    fun installStrangeRecyclerViewSwipeDecorator() = with(scope) {
+    fun installRecyclerViewSwipeDecorator() = with(scope) {
         implementation("com.github.xabaras:RecyclerViewSwipeDecorator:1.3")
+    }
+
+    fun installDaggerHilt() = with(scope) {
+        implementation("com.google.dagger:hilt-android:$hilt")
+        kapt("com.google.dagger:hilt-compiler:$hilt")
     }
 
 
