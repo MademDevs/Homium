@@ -4,13 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import de.madem.homium.R
-import de.madem.homium.application.HomiumApplication
+import javax.inject.Inject
 
-class SettingsViewModel : ViewModel() {
-
-    //fields
-    private val accessContext = HomiumApplication.appContext!!
-
+class SettingsViewModel @Inject constructor(): ViewModel() {
 
     //Live Data
     private val _vibrationAllowed = MutableLiveData<Boolean>().apply {

@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.di.utils.RecipeEditViewModelAssistedFactory
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -15,16 +18,22 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class RecipeEditViewModelFactory(private val recipeId: Int?): ViewModelProvider.Factory {
+class RecipeEditViewModelFactory(
+    private val assistedFactory: RecipeEditViewModelAssistedFactory,
+    private val recipeId: Int?
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RecipeEditViewModel::class.java)) {
-            return RecipeEditViewModel(recipeId) as T
+            return assistedFactory.create(recipeId) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
-class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
+class RecipeEditViewModel @AssistedInject constructor(@Assisted private val recipeId: Int?) :
+    ViewModel() {
 
     private var _recipe = MutableLiveData<Recipe>()
     val recipe: LiveData<Recipe>
@@ -43,7 +52,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     //var shallDiscardPictureChanges = true
 
     init {
-        if(recipeId == null) {
+        if (recipeId == null) {
             _recipe.value = Recipe("", "", 0)
             _ingredients.value = mutableListOf()
             _descriptions.value = mutableListOf()
@@ -84,13 +93,13 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     }
 
     fun editImagePath(path: String) {
-        val recipe : Recipe = _recipe.value ?: return
+        val recipe: Recipe = _recipe.value ?: return
 
         //marking old file if possible
         val oldPath = recipe.image ?: ""
-        if(oldPath.isNotEmpty() && oldPath.isNotBlank()){
+        if (oldPath.isNotEmpty() && oldPath.isNotBlank()) {
             val oldFile = File(oldPath)
-            if(oldFile.exists()){
+            if (oldFile.exists()) {
                 oldImageFiles.add(oldFile)
             }
         }
@@ -113,7 +122,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
 
     fun editDescription(index: Int, name: String) {
         val descriptions = _descriptions.value ?: return
-        if(index >= descriptions.size) return
+        if (index >= descriptions.size) return
 
         _descriptions.value?.get(index)?.description = name
     }
@@ -121,7 +130,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
     //THIS FUNCTION SHOULD always be called from a Background Thread
     suspend fun addDataToDatabase() = coroutineScope {
         launch {
-            oldImageFiles.forEach{
+            oldImageFiles.forEach {
                 deleteImageFile(it)
             }
         }
@@ -131,7 +140,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
             changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
             _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
             _descriptions.value?.forEach {
-                if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                if (it.description.isNotEmpty() && it.description.isNotBlank()) {
                     database.recipeDao().insertDescription(it)
                 }
             }
@@ -144,7 +153,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
                 database.recipeDao().insertIngredient(it)
             }
             _descriptions.value?.forEach {
-                if(it.description.isNotEmpty() && it.description.isNotBlank()) {
+                if (it.description.isNotEmpty() && it.description.isNotBlank()) {
                     database.recipeDao().insertDescription(it)
                 }
             }
@@ -152,14 +161,14 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
 
     }
 
-    fun discardPictureChanges(){
+    fun discardPictureChanges() {
         _recipe.value.notNull { recipe ->
-            if(firstImagePath != recipe.image){
+            if (firstImagePath != recipe.image) {
                 //if picture is another than original then add current to old ones and remove original from old ones
                 val path = recipe.image
-                if(path.isNotEmpty() && path.isNotBlank()){
+                if (path.isNotEmpty() && path.isNotBlank()) {
                     val oldFile = File(path)
-                    if(oldFile.exists()){
+                    if (oldFile.exists()) {
                         oldImageFiles.add(oldFile)
                     }
                 }
@@ -169,7 +178,7 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
 
                 //deleting all other files
                 CoroutineBackgroundTask<Unit>().executeInBackground {
-                    oldImageFiles.forEach{
+                    oldImageFiles.forEach {
                         deleteImageFile(it)
                     }
                 }.start()
@@ -184,13 +193,13 @@ class RecipeEditViewModel(private val recipeId: Int?): ViewModel() {
         _descriptions.value?.forEach { it.recipeID = id }
     }
 
-    private fun deleteImageFile(file: File){
+    private fun deleteImageFile(file: File) {
         file.delete()
 
-        if(file.exists()){
+        if (file.exists()) {
             file.canonicalFile.delete()
 
-            if(file.exists()){
+            if (file.exists()) {
                 HomiumApplication.appContext?.deleteFile(file.name)
             }
         }

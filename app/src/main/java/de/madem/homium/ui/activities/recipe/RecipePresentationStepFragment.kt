@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.databinding.FragmentPresentationStepBinding
 import de.madem.homium.databinding.FragmentPresentationStepCardBinding
@@ -32,7 +32,7 @@ class RecipePresentationStepFragment : Fragment() {
             }
     }
 
-    private lateinit var viewModel: StepViewModel
+    private val viewModel: StepViewModel by viewModels()
     private lateinit var binding: StepBinding
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, sis: Bundle?): View? {
@@ -45,11 +45,8 @@ class RecipePresentationStepFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         //init view model
-        viewModel = ViewModelProviders.of(this).get(StepViewModel::class.java).apply {
-
-            //get text from bundle and add it to view model
-            textToDisplay.value = arguments?.getString("text") ?: ""
-        }
+        //get text from bundle and add it to view model
+        viewModel.textToDisplay.value = arguments?.getString("text") ?: ""
     }
 
     override fun onViewCreated(view: View, sis: Bundle?) {

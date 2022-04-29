@@ -54,14 +54,6 @@
             android:name=".ui.activities.onboarding.OnboardingActivity"
             android:exported="false"
             android:theme="@style/NoActionBarTheme">
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
         </activity>
         <activity
             android:name=".ui.activities.shoppingitem.ShoppingItemEditActivity"
@@ -77,21 +69,19 @@
             android:theme="@style/NoActionBarTheme" />
         <activity
             android:name=".ui.activities.main.MainActivity"
-            android:exported="false"
-            android:label="@string/app_name">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.inventoryedit.InventoryItemEditActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.main.MainActivity"></activity>
+            android:parentActivityName=".ui.activities.main.MainActivity" />
         <activity
             android:name=".ui.activities.recipe.RecipePresentationActivity"
             android:exported="false"
-            android:parentActivityName=".ui.activities.main.MainActivity"></activity>
+            android:parentActivityName=".ui.activities.main.MainActivity" />
     </application>
 
 </manifest>

@@ -7,25 +7,29 @@ import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.REQUEST_CODE_INVENTORY
-import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
-import de.madem.homium.utilities.extensions.*
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.extensions.switchToActivityForResult
+import de.madem.homium.utilities.extensions.vibrate
 
+@AndroidEntryPoint
 class InventoryFragment : Fragment(), SearchViewHandler {
 
     //private lateinit var binding: ResultPro
     private lateinit var actionModeHandler: InventoryActionModeHandler
-    private lateinit var inventoryViewModel: InventoryViewModel
+    private val inventoryViewModel: InventoryViewModel by viewModels()
     private lateinit var root: View
 
     private lateinit var inventoryAdapter : InventoryItemListAdapter
@@ -35,10 +39,8 @@ class InventoryFragment : Fragment(), SearchViewHandler {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        inventoryViewModel = ViewModelProviders.of(this).get(InventoryViewModel::class.java)
+    ): View {
         root = inflater.inflate(R.layout.fragment_inventory, container, false)
-
         return root
     }
 
@@ -93,7 +95,7 @@ class InventoryFragment : Fragment(), SearchViewHandler {
     }
 
     private fun createActionMode() {
-        actionModeHandler = InventoryActionModeHandler(context!!)
+        actionModeHandler = InventoryActionModeHandler(requireActivity())
 
         with(actionModeHandler) {
             clickDeleteButtonHandler = {

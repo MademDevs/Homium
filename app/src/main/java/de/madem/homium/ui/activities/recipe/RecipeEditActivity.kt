@@ -11,19 +11,19 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.constants.*
 import de.madem.homium.databinding.ActivityRecipeEditBinding
+import de.madem.homium.di.utils.RecipeEditViewModelAssistedFactory
 import de.madem.homium.managers.adapters.IngredientsAdapter
 import de.madem.homium.managers.adapters.RecipeDescriptionAdapter
 import de.madem.homium.models.RecipeDescription
@@ -36,11 +36,16 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RecipeEditActivity: AppCompatActivity() {
 
     private lateinit var recipeEditViewModel: RecipeEditViewModel
-    private lateinit var recipeEditViewModelFactory: RecipeEditViewModelFactory
+
+    @Inject
+    lateinit var vmAssistedFactory: RecipeEditViewModelAssistedFactory
+
     private lateinit var binding: ActivityRecipeEditBinding
     private var recipeId: Int? = null
     private var picturePath = ""
@@ -58,8 +63,10 @@ class RecipeEditActivity: AppCompatActivity() {
             recipeId = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_RECIPE_ID, -1)
             supportActionBar?.title = resources.getString(R.string.recipeEdit_title_edit)
         }
-        recipeEditViewModelFactory = RecipeEditViewModelFactory(recipeId)
-        recipeEditViewModel = ViewModelProviders.of(this, recipeEditViewModelFactory).get(RecipeEditViewModel::class.java)
+        val vm : RecipeEditViewModel by viewModels {
+            RecipeEditViewModelFactory(vmAssistedFactory, recipeId)
+        }
+        recipeEditViewModel = vm
         initGuiComponents()
     }
 

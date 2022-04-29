@@ -2,11 +2,14 @@ package de.madem.homium.ui.fragments.shopping
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.ShoppingItem
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class ShoppingViewModel : ViewModel() {
+@HiltViewModel
+class ShoppingViewModel @Inject constructor(): ViewModel() {
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)

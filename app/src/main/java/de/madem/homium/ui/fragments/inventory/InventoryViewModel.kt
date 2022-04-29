@@ -10,8 +10,9 @@ import de.madem.homium.utilities.InventoryItemAmountClassifier
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class InventoryViewModel : ViewModel() {
+class InventoryViewModel @Inject constructor(): ViewModel() {
 
     //private properties
     private val dao = AppDatabase.getInstance().inventoryDao()

@@ -8,19 +8,21 @@ import android.graphics.Canvas
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.*
+import de.madem.homium.constants.REQUEST_CODE_SHOPPING
+import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.ViewRefresher
@@ -29,17 +31,21 @@ import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.*
+import de.madem.homium.utilities.extensions.notNull
+import de.madem.homium.utilities.extensions.showToastShort
+import de.madem.homium.utilities.extensions.switchToActivityForResult
+import de.madem.homium.utilities.extensions.vibrate
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ShoppingFragment : Fragment(), SearchViewHandler {
 
     //fields
-    private lateinit var shoppingViewModel: ShoppingViewModel
+    private val shoppingViewModel: ShoppingViewModel by viewModels()
     private lateinit var root: View
     private lateinit var actionModeHandler: ShoppingActionModeHandler
     private lateinit var databaseDao: ItemDao
@@ -111,12 +117,8 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
 
     //on create view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        //getting view model
-        shoppingViewModel = ViewModelProviders.of(this).get(ShoppingViewModel::class.java)
         ViewRefresher.shoppingRefresher = {
             refreshViewModelData()
-
         }
 
         //getting root layout
@@ -318,7 +320,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     }
 
     private fun registerActionMode() {
-        actionModeHandler = ShoppingActionModeHandler(requireContext())
+        actionModeHandler = ShoppingActionModeHandler(requireActivity())
 
         with(actionModeHandler) {
 
