@@ -7,15 +7,15 @@ import de.madem.homium.models.Recipe
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import kotlinx.coroutines.Job
 import java.io.File
+import javax.inject.Inject
 
-class RecipesViewModel : ViewModel() {
+class RecipesViewModel @Inject constructor(): ViewModel() {
 
     private val viewModelJob = Job()
     private val db = AppDatabase.getInstance()
 
     val recipeList = MutableLiveData<List<Recipe>>().apply {
-        value = listOf(
-            )
+        value = listOf()
     }
 
     override fun onCleared() {

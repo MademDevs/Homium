@@ -8,24 +8,21 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.*
+import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
+import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
 import de.madem.homium.databinding.FragmentSettingsBinding
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.getSetting
-import de.madem.homium.utilities.extensions.notNull
-import de.madem.homium.utilities.extensions.putSetting
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import java.lang.ref.WeakReference
 
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
     //viewmodel
-    private lateinit var settingsViewModel: SettingsViewModel
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     //binding
     private lateinit var binding: FragmentSettingsBinding
@@ -38,9 +35,7 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        settingsViewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_settings, container, false
         )

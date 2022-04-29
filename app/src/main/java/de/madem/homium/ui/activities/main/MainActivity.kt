@@ -7,13 +7,13 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.BuildConfig
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SPEECH
@@ -27,10 +27,9 @@ import de.madem.homium.utilities.RecipeImporter
 import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.whenSearchViewHandler
-import java.lang.Exception
 import java.util.*
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeImporter() {
 
     //fields

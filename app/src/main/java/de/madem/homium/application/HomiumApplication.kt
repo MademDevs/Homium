@@ -3,8 +3,9 @@ package de.madem.homium.application
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
-import kotlinx.coroutines.withContext
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class HomiumApplication : Application() {
 
     companion object{

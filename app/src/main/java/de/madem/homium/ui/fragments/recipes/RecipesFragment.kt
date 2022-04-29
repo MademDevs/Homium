@@ -6,33 +6,26 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
-import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED
-import de.madem.homium.application.HomiumApplication
 import de.madem.homium.constants.IMPORT_RECIPE_DIALOG_TAG
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
 import de.madem.homium.ui.dialogs.RecipeImportDialog
-import de.madem.homium.ui.dialogs.RecipeImportDialogListener
-import de.madem.homium.utilities.*
+import de.madem.homium.utilities.ConfirmDialog
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.vibrate
@@ -40,9 +33,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
+@AndroidEntryPoint
 class RecipesFragment : Fragment(), SearchViewHandler{
 
-    private lateinit var recipesViewModel: RecipesViewModel
+    private val recipesViewModel: RecipesViewModel by viewModels()
     private lateinit var root: View
     private lateinit var db: AppDatabase
     private lateinit var actionModeHandler: RecipeActionModeHandler
@@ -113,8 +107,6 @@ class RecipesFragment : Fragment(), SearchViewHandler{
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        recipesViewModel =
-            ViewModelProvider(this).get(RecipesViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_recipes, container, false)
 
         registerRecyclerView()
@@ -127,7 +119,7 @@ class RecipesFragment : Fragment(), SearchViewHandler{
 
     private fun registerActionMode() {
         fun onDeleteButtonClicked(itemHolders: Collection<RecipeActionModeHandler.ItemHolder>) {
-            ConfirmDialog.show(context!!, R.string.recipe_actionmode_delete_question) {
+            ConfirmDialog.show(requireContext(), R.string.recipe_actionmode_delete_question) {
                 onConfirm = {
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
@@ -171,7 +163,7 @@ class RecipesFragment : Fragment(), SearchViewHandler{
         }
 
         //init action mode
-        actionModeHandler = RecipeActionModeHandler(context!!)
+        actionModeHandler = RecipeActionModeHandler(requireActivity())
 
         //init action mode buttons
         with(actionModeHandler) {

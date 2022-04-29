@@ -1,7 +1,8 @@
 package de.madem.homium.ui.activities.test
 
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import de.madem.homium.R
@@ -9,10 +10,8 @@ import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 import de.madem.homium.speech.SpeechAssistent
-import kotlinx.android.synthetic.main.activity_test.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class TestActivity : AppCompatActivity() {
@@ -29,14 +28,13 @@ class TestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
 
-
-        btn_clear.setOnClickListener {
+        findViewById<Button>(R.id.btn_clear).setOnClickListener {
             GlobalScope.launch(IO) {
                 AppDatabase.getInstance().inventoryDao().clearInventory()
             }
         }
 
-        btn_dummy.setOnClickListener {
+        findViewById<Button>(R.id.btn_dummy).setOnClickListener {
             GlobalScope.launch(IO) {
                 val list = mutableListOf<InventoryItem>().apply {
                     add(InventoryItem("Apfel", 1, Units.ITEM.getString(this@TestActivity), "Kühlschrank"))
