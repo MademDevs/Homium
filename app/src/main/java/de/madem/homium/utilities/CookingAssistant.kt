@@ -37,15 +37,15 @@ typealias AnalysisResult = Pair<List<ShoppingItem>,List<InventoryQuantityOperati
 
 
 
-class CookingAssistant(private val contextReference: WeakReference<Context>) {
+class CookingAssistant(private val contextReference: WeakReference<Context>, db: AppDatabase) {
 
     //fields
-    private val recipeDao = AppDatabase.getInstance().recipeDao()
-    private val inventoryDao = AppDatabase.getInstance().inventoryDao()
-    private val shoppingDao = AppDatabase.getInstance().itemDao()
+    private val recipeDao = db.recipeDao()
+    private val inventoryDao = db.inventoryDao()
+    private val shoppingDao = db.itemDao()
 
     private val unitConverter : UnitConverter = UnitConverter()
-    private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter)
+    private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter, db.inventoryDao())
 
     //public functions
     fun cookRecipe(recipe: Recipe){

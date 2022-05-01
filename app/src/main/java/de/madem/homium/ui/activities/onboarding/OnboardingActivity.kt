@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.*
+import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.DatabaseInitializer
 import de.madem.homium.ui.activities.main.MainActivity
 import de.madem.homium.ui.fragments.onboarding.*
@@ -15,8 +17,14 @@ import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.putSetting
 import de.madem.homium.utilities.extensions.switchToActivity
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OnboardingActivity : AppIntro() {
+
+    //TODO Change Initialization Login in different Branch to avoid DB-References in UI-Controllers
+    @Inject
+    lateinit var db : AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +37,13 @@ class OnboardingActivity : AppIntro() {
 
         if(!dataBaseInitialized){
             //init database
-            DatabaseInitializer(applicationContext) {
+            DatabaseInitializer(applicationContext, db) {
                 println("INFO FOR DEVELOPPERS: DATABASE INITIALIZED!")
                 putSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DATABASE_INITIALIZED,true)
             }
 
             initAppSettings()
-
             showIntroSlides()
-
         }
         else{
 

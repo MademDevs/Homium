@@ -9,13 +9,15 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ShoppingViewModel @Inject constructor(): ViewModel() {
+class ShoppingViewModel @Inject constructor(
+    database: AppDatabase
+): ViewModel() {
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
-    private val shoppingItemDao = AppDatabase.getInstance().itemDao()
+    private val shoppingItemDao = database.itemDao()
 
     //list with all shopping items
     val shoppingItemList = MutableLiveData<List<ShoppingItem>>().apply {
@@ -47,6 +49,15 @@ class ShoppingViewModel @Inject constructor(): ViewModel() {
 
         //run callback in ui scope
         uiScope.launch { callback() }
+    }
+
+    fun deleteShoppingItem(item: ShoppingItem) = ioScope.launch {
+        shoppingItemDao.deleteShoppingItemById(item.uid)
+    }
+
+    suspend fun getAllCheckedShoppingItems() : List<ShoppingItem> = coroutineScope {
+        val itemsDeferred = async(Dispatchers.IO) { shoppingItemDao.getAllCheckedShoppingItem() }
+        return@coroutineScope itemsDeferred.await()
     }
 
     override fun onCleared() {

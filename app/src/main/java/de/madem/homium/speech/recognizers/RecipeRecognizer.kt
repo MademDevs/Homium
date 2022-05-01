@@ -7,7 +7,7 @@ import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_NAME
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.RecipeDao
 import de.madem.homium.models.Recipe
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
 import de.madem.homium.ui.activities.recipe.RecipePresentationActivity
@@ -21,10 +21,10 @@ import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 import kotlin.reflect.KClass
 
-class RecipeRecognizer(private val contextReference : WeakReference<Context>) : PatternRecognizer{
-
-    //fields
-    val recipeDao = AppDatabase.getInstance().recipeDao()
+class RecipeRecognizer(
+    private val contextReference : WeakReference<Context>,
+    private val recipeDao : RecipeDao
+) : PatternRecognizer{
 
     //companion
     companion object{

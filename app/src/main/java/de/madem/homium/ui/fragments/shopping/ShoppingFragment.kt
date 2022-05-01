@@ -23,8 +23,6 @@ import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
-import de.madem.homium.databases.AppDatabase
-import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
@@ -40,6 +38,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShoppingFragment : Fragment(), SearchViewHandler {
@@ -48,17 +47,14 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     private val shoppingViewModel: ShoppingViewModel by viewModels()
     private lateinit var root: View
     private lateinit var actionModeHandler: ShoppingActionModeHandler
-    private lateinit var databaseDao: ItemDao
+
+    @Inject
+    lateinit var shoppingToInventoryHandler : ShoppingToInventoryHandler
 
     private var searchViewUtil : Pair<SearchView,MenuItem>? = null
 
     //GUI
     private lateinit var recyclerViewAdapter : ShoppingItemListAdapter
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        databaseDao = AppDatabase.getInstance().itemDao()
-    }
 
     override fun onResume() {
         super.onResume()
@@ -252,9 +248,8 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                     onYes = { dialog ->
                             CoroutineBackgroundTask<Unit>()
                                 .executeInBackground {
-                                    databaseDao.deleteShoppingItemById(
-                                        recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition].uid
-                                    )
+                                    val item = recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition]
+                                    shoppingViewModel.deleteShoppingItem(item)
                                 }
                                 .onDone {
                                     refreshViewModelData()
@@ -288,12 +283,12 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
 
             GlobalScope.launch(IO) {
                 //get checked items
-                val checkedItems = databaseDao.getAllCheckedShoppingItem()
+                val checkedItems = shoppingViewModel.getAllCheckedShoppingItems()
 
                 GlobalScope.launch(Main) {
 
                     //handle shopping to inventory handler
-                    ShoppingToInventoryHandler(requireContext()).handleShoppingItems(checkedItems) {
+                    shoppingToInventoryHandler.handleShoppingItems(checkedItems) {
 
                         //delete checked items
                         shoppingViewModel.deleteAllCheckedItems {
@@ -337,9 +332,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                             .executeInBackground {
                                 val shoppingCart = itemHolders.map { it.shoppingItem }
 
-                                shoppingCart.forEach {
-                                    databaseDao.deleteShoppingItemById(it.uid)
-                                }
+                                shoppingCart.forEach { shoppingViewModel.deleteShoppingItem(it) }
                             }
                             .onDone {
                                 finishActionMode()

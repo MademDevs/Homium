@@ -13,13 +13,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
-import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.utilities.pictures.BitmapUtil
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.utilities.pictures.BitmapUtil
 
-class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>)
+class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<Recipe>>, private val onFetchIngredientsByRecipeId: (Int) -> List<RecipeIngredient>)
     : RecyclerView.Adapter<RecipesListAdapter.RecipesViewHolder>(), Filterable {
 
     var data = liveData.value?.toMutableList() ?: mutableListOf()
@@ -123,7 +122,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                 else{
 
                     val filterArg = searchText.toString().toLowerCase().trim()
-                    dataBackup.forEach {rec ->
+                    dataBackup.forEach { rec ->
                         val name = rec.name.toLowerCase()
                         val nameMatches = name.contains(filterArg)
 
@@ -132,8 +131,7 @@ class RecipesListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<List<R
                             resultList.add(rec)
                         }
                         else{
-                            val dao = AppDatabase.getInstance().recipeDao()
-                            val ingredients = dao.getIngredientByRecipeId(rec.uid)
+                            val ingredients = onFetchIngredientsByRecipeId(rec.uid)
 
                             val ingredientSucess = searchInIngredients(filterArg, ingredients)
                             if(ingredientSucess){

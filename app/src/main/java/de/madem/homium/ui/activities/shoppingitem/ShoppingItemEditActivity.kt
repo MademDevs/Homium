@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.constants.BIG_UNITS_VALUES
 import de.madem.homium.constants.SMALL_UNITS_VALUES
@@ -21,7 +22,9 @@ import de.madem.homium.utilities.extensions.finishWithBooleanResult
 import de.madem.homium.utilities.extensions.hideKeyboard
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ShoppingItemEditActivity : AppCompatActivity() {
 
     //GUI Components
@@ -33,7 +36,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
 
     //fields
-    private val db = AppDatabase.getInstance()
+    //TODO: switch to ViewModel to get rid of DB-Reference in UI-Controller
+    @Inject
+    lateinit var db : AppDatabase
     private lateinit var bigUnits : Array<String>
     private lateinit var smallUnits : Array<String>
     private var itemid: Int = -1
@@ -229,14 +234,12 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         //init txt autocomplete
         autoCmplTxtName = findViewById(R.id.shopping_item_edit_autoCmplTxt_name)
 
-        CoroutineBackgroundTask<List<Product>>()
-            .executeInBackground {
+        CoroutineBackgroundTask<List<Product>>().executeInBackground {
             val result = db.itemDao().getAllProduct()
             return@executeInBackground result
         }.onDone {result ->
             val productNameList = result.map { it.name }
             autoCmplTxtName.setAdapter(ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line, productNameList))
-
         }.start()
 
 

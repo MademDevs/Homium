@@ -4,17 +4,14 @@ import android.app.AlertDialog
 import android.content.Context
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.ShoppingItem
-import de.madem.homium.utilities.extensions.getSetting
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ShoppingToInventoryHandler(private val context: Context) {
-
+class ShoppingToInventoryHandler(private val context: Context, private val db: AppDatabase) {
     private fun getCheckedRadio(): Int {
         var checkedRadioId: Int = HomiumSettings.shoppingToInventory/*context.getSetting(
             SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,
@@ -58,7 +55,7 @@ class ShoppingToInventoryHandler(private val context: Context) {
 
     private fun putShoppingItemsIntoInventory(shoppingCart: List<ShoppingItem>) {
         GlobalScope.launch(IO) {
-            val inventoryDao = AppDatabase.getInstance().inventoryDao()
+            val inventoryDao = db.inventoryDao()
             val currentInventoryItems = inventoryDao.fetchAllInventoryItems()
 
             shoppingCart.forEach { shoppingItem ->

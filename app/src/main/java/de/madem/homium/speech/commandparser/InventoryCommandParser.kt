@@ -3,7 +3,7 @@ package de.madem.homium.speech.commandparser
 import android.content.Context
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.Units
@@ -11,8 +11,12 @@ import de.madem.homium.utilities.extensions.capitalizeEachWord
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.lang.ref.WeakReference
+import java.util.*
 
-class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
+class InventoryCommandParser(
+    private val contextRef :WeakReference<Context>,
+    private val shoppingDao: ItemDao
+) {
 
     companion object{
         private const val fridgeConst = "Kühlschrank"
@@ -91,7 +95,7 @@ class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
         if(unit.contains(Units.PACK.getString())){
             unit = unit.replace("en","")
         }
-        else if (!(Units.stringShortcuts().contains(unit.toLowerCase()) || Units.stringValueArray().contains(unit))){
+        else if (!(Units.stringShortcuts().contains(unit.lowercase(Locale.getDefault())) || Units.stringValueArray().contains(unit))){
             return null
         }
 
@@ -111,7 +115,7 @@ class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
         val name = args[1].trim().capitalizeEachWord()
 
         val matchingProductsDeffered = async<List<Product>> {
-            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+            shoppingDao.getProductsByNameOrPlural(name)
         }
 
 
@@ -147,7 +151,7 @@ class InventoryCommandParser(private val contextRef :WeakReference<Context>) {
 
     suspend fun parseInventoryWithoutLocationUnitCount(nameIn : String) : InventoryItem? = coroutineScope {
         val productsDeffered = async<List<Product>> {
-            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(nameIn.capitalize())
+            shoppingDao.getProductsByNameOrPlural(nameIn.capitalize())
         }
 
         if(nameIn.isNotBlank() && nameIn.isNotEmpty()){

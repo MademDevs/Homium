@@ -32,8 +32,10 @@ class RecipeEditViewModelFactory(
     }
 }
 
-class RecipeEditViewModel @AssistedInject constructor(@Assisted private val recipeId: Int?) :
-    ViewModel() {
+class RecipeEditViewModel @AssistedInject constructor(
+    @Assisted private val recipeId: Int?,
+    database: AppDatabase
+) : ViewModel() {
 
     private var _recipe = MutableLiveData<Recipe>()
     val recipe: LiveData<Recipe>
@@ -44,7 +46,8 @@ class RecipeEditViewModel @AssistedInject constructor(@Assisted private val reci
     private var _descriptions = MutableLiveData<MutableList<RecipeDescription>>()
     val descriptions: LiveData<MutableList<RecipeDescription>>
         get() = _descriptions
-    private val database = AppDatabase.getInstance()
+
+    private val recipeDao = database.recipeDao()
 
     //handling image files
     private val oldImageFiles = mutableSetOf<File>()
@@ -69,17 +72,17 @@ class RecipeEditViewModel @AssistedInject constructor(@Assisted private val reci
     private fun getRecipeFromDatabaseAndSetValues() {
         println("getRecipeFromDatabaseAndSetValues() called")
         CoroutineBackgroundTask<Recipe>()
-            .executeInBackground { database.recipeDao().getRecipeById(recipeId!!) }
+            .executeInBackground { recipeDao.getRecipeById(recipeId!!) }
             .onDone { _recipe.value = it; firstImagePath = it.image }
             .start()
         CoroutineBackgroundTask<List<RecipeIngredient>>()
-            .executeInBackground { database.recipeDao().getIngredientByRecipeId(recipeId!!) }
+            .executeInBackground { recipeDao.getIngredientByRecipeId(recipeId!!) }
             .onDone {
                 _ingredients.value = it.toMutableList()
             }
             .start()
         CoroutineBackgroundTask<List<RecipeDescription>>()
-            .executeInBackground { database.recipeDao().getDescriptionByRecipeId(recipeId!!) }
+            .executeInBackground { recipeDao.getDescriptionByRecipeId(recipeId!!) }
             .onDone {
                 _descriptions.value = it.toMutableList()
             }
@@ -136,25 +139,25 @@ class RecipeEditViewModel @AssistedInject constructor(@Assisted private val reci
         }
 
         if (recipeId == null) {
-            var newRecipeId = database.recipeDao().insertRecipe(_recipe.value!!)
+            var newRecipeId = recipeDao.insertRecipe(_recipe.value!!)
             changeIngredientsAndDescriptionsRecipeId(newRecipeId.toInt())
-            _ingredients.value?.forEach { database.recipeDao().insertIngredient(it) }
+            _ingredients.value?.forEach { recipeDao.insertIngredient(it) }
             _descriptions.value?.forEach {
                 if (it.description.isNotEmpty() && it.description.isNotBlank()) {
-                    database.recipeDao().insertDescription(it)
+                    recipeDao.insertDescription(it)
                 }
             }
         } else {
             changeIngredientsAndDescriptionsRecipeId(recipeId)
-            database.recipeDao().deleteIngredientByRecipeId(recipeId)
-            database.recipeDao().deleteDescriptionByRecipeId(recipeId)
-            database.recipeDao().updateRecipe(_recipe.value!!)
+            recipeDao.deleteIngredientByRecipeId(recipeId)
+            recipeDao.deleteDescriptionByRecipeId(recipeId)
+            recipeDao.updateRecipe(_recipe.value!!)
             _ingredients.value?.forEach {
-                database.recipeDao().insertIngredient(it)
+                recipeDao.insertIngredient(it)
             }
             _descriptions.value?.forEach {
                 if (it.description.isNotEmpty() && it.description.isNotBlank()) {
-                    database.recipeDao().insertDescription(it)
+                    recipeDao.insertDescription(it)
                 }
             }
         }
