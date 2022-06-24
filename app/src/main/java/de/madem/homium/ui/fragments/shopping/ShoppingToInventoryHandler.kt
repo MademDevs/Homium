@@ -2,6 +2,8 @@ package de.madem.homium.ui.fragments.shopping
 
 import android.app.AlertDialog
 import android.content.Context
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.databases.AppDatabase
@@ -11,7 +13,10 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ShoppingToInventoryHandler(private val context: Context, private val db: AppDatabase) {
+class ShoppingToInventoryHandler @AssistedInject constructor(
+    @Assisted private val context: Context,
+    private val db: AppDatabase
+) {
     private fun getCheckedRadio(): Int {
         var checkedRadioId: Int = HomiumSettings.shoppingToInventory/*context.getSetting(
             SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,

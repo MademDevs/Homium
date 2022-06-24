@@ -23,6 +23,7 @@ import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
+import de.madem.homium.di.utils.ShoppingToInventoryHandlerAssistedFactory
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
@@ -48,8 +49,12 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     private lateinit var root: View
     private lateinit var actionModeHandler: ShoppingActionModeHandler
 
+
     @Inject
-    lateinit var shoppingToInventoryHandler : ShoppingToInventoryHandler
+    lateinit var shoppingToInventoryHandlerFactory: ShoppingToInventoryHandlerAssistedFactory
+    private val shoppingToInventoryHandler : ShoppingToInventoryHandler by lazy {
+        shoppingToInventoryHandlerFactory.create(this.requireContext())
+    }
 
     private var searchViewUtil : Pair<SearchView,MenuItem>? = null
 
