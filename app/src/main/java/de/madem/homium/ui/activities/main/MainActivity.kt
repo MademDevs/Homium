@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.BuildConfig
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SPEECH
+import de.madem.homium.di.utils.SpeechAssistantAssistedFactory
 import de.madem.homium.exceptions.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistant
 import de.madem.homium.speech.startSpeechRecognition
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener{
 
     //fields
     @Inject
-    lateinit var speechAssistant : SpeechAssistant
+    lateinit var speechAssistantFactory : SpeechAssistantAssistedFactory
+    private val speechAssistant : SpeechAssistant by lazy { speechAssistantFactory.create(this) }
 
     //TODO Change to ViewModel to avoid DB-References in UI-Controller
     @Inject

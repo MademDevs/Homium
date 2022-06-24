@@ -2,6 +2,8 @@ package de.madem.homium.speech
 
 import android.content.Context
 import android.widget.Toast
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.speech.recognizers.InventoryRecognizer
@@ -12,7 +14,10 @@ import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import java.lang.ref.WeakReference
 import java.util.*
 
-class SpeechAssistant(val context: Context, db: AppDatabase) {
+class SpeechAssistant @AssistedInject constructor(
+    @Assisted val context: Context,
+    db: AppDatabase
+) {
 
     //fields
     private val recognizers = listOf<PatternRecognizer>(
