@@ -9,9 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.speech.SpeechAssistant
 import de.madem.homium.ui.fragments.shopping.ShoppingToInventoryHandler
-import de.madem.homium.utilities.CookingAssistant
 import de.madem.homium.utilities.RecipeImporter
-import java.lang.ref.WeakReference
 import javax.inject.Singleton
 
 @Module
@@ -21,12 +19,6 @@ object BusinessLogicModule {
     @Provides
     fun provideSpeechAssistant(@ApplicationContext context: Context, db: AppDatabase): SpeechAssistant {
         return SpeechAssistant(context, db)
-    }
-
-    @Singleton
-    @Provides
-    fun provideCookingAssistant(@ApplicationContext context: Context, db: AppDatabase): CookingAssistant {
-        return CookingAssistant(WeakReference(context), db)
     }
 
     @Singleton

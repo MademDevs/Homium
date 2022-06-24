@@ -18,6 +18,7 @@ import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
 import de.madem.homium.databinding.ActivityRecipePresentationBinding
+import de.madem.homium.di.utils.CookingAssistantAssistedFactory
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -26,6 +27,7 @@ import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.setPictureFromPath
 import de.madem.homium.utilities.extensions.switchToActivityForResult
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,7 +39,11 @@ class RecipePresentationActivity : AppCompatActivity() {
     private lateinit var ingredients: List<RecipeIngredient>
 
     @Inject
-    lateinit var cookingAssistant : CookingAssistant
+    lateinit var cookingAssistantFactory : CookingAssistantAssistedFactory
+    private val cookingAssistant : CookingAssistant by lazy {
+        cookingAssistantFactory.create(WeakReference(this))
+    }
+
     private var allowedToAutoStartCooking : Boolean = false
 
     private lateinit var binding: ActivityRecipePresentationBinding
