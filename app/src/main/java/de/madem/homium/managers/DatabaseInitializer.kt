@@ -4,10 +4,15 @@ import android.content.Context
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import javax.inject.Inject
 
-class DatabaseInitializer(private val context: Context, private val doneCallback: () -> Unit) {
+class DatabaseInitializer @Inject constructor(
+    private val context: Context,
+    database: AppDatabase,
+    private val doneCallback: () -> Unit
+) {
 
-    private val dao = AppDatabase.getInstance().itemDao()
+    private val dao = database.itemDao()
     private val backgroundTask =
         CoroutineBackgroundTask<Unit>()
 

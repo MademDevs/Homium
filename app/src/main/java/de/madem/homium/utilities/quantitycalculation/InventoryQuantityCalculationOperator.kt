@@ -1,18 +1,15 @@
 package de.madem.homium.utilities.quantitycalculation
 
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.InventoryDao
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.InventoryQuantityOperationInformation
 import kotlin.math.abs
 
-class InventoryQuantityCalculationOperator(private val unitConverter: UnitConverter = UnitConverter()) {
-    //fields
-    private val inventoryDao = AppDatabase.getInstance().inventoryDao()
-    private val convertibleUnits = Units.convertibleUnits()
-
-    //functions
-
+class InventoryQuantityCalculationOperator(
+    private val unitConverter: UnitConverter = UnitConverter(),
+    private val inventoryDao : InventoryDao
+) {
     //function, that subtracts quantity from a quantity of inventory elements
     fun subractFromInventory(operationInfo: InventoryQuantityOperationInformation){
         var quantity = operationInfo.info.second

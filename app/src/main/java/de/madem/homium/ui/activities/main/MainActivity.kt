@@ -17,8 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.BuildConfig
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SPEECH
+import de.madem.homium.di.utils.SpeechAssistantAssistedFactory
 import de.madem.homium.exceptions.SpeechRecognitionException
-import de.madem.homium.speech.SpeechAssistent
+import de.madem.homium.speech.SpeechAssistant
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.about.AboutActivity
 import de.madem.homium.ui.activities.test.TestActivity
@@ -28,12 +29,19 @@ import de.madem.homium.utilities.extensions.showToastLong
 import de.madem.homium.utilities.extensions.switchToActivity
 import de.madem.homium.utilities.extensions.whenSearchViewHandler
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeImporter() {
+class MainActivity : AppCompatActivity(), RecipeImportDialogListener{
 
     //fields
-    private var speechAssistent : SpeechAssistent? = null
+    @Inject
+    lateinit var speechAssistantFactory : SpeechAssistantAssistedFactory
+    private val speechAssistant : SpeechAssistant by lazy { speechAssistantFactory.create(this) }
+
+    //TODO Change to ViewModel to avoid DB-References in UI-Controller
+    @Inject
+    lateinit var recipeImporter : RecipeImporter
 
     //oncreate
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,11 +65,6 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeIm
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        //instanciating speech assistent
-        speechAssistent = SpeechAssistent(this)
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -120,7 +123,7 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeIm
                 if(resultOfSpeechRecognition.isNotEmpty() && resultOfSpeechRecognition.isNotBlank()){
                     //calling speech assistent in try catch to ensure that system does not crash no matter what happens
                     try{
-                        speechAssistent?.executeCommand(command = resultOfSpeechRecognition)
+                        speechAssistant?.executeCommand(command = resultOfSpeechRecognition)
                     }
                     catch(ex : Exception){
                        ex.printStackTrace()
@@ -137,5 +140,9 @@ class MainActivity : AppCompatActivity(), RecipeImportDialogListener by RecipeIm
             ?.childFragmentManager?.primaryNavigationFragment.whenSearchViewHandler {
             it.closeSearchView()
         }
+    }
+
+    override fun importRecipe(message: String) {
+        recipeImporter.importRecipe(message)
     }
 }

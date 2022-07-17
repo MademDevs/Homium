@@ -2,17 +2,24 @@ package de.madem.homium.ui.fragments.recipes
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
+import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
-class RecipesViewModel @Inject constructor(): ViewModel() {
+@HiltViewModel
+class RecipesViewModel @Inject constructor(
+    database : AppDatabase
+): ViewModel() {
 
     private val viewModelJob = Job()
-    private val db = AppDatabase.getInstance()
+    private val dao = database.recipeDao()
 
     val recipeList = MutableLiveData<List<Recipe>>().apply {
         value = listOf()
@@ -25,20 +32,17 @@ class RecipesViewModel @Inject constructor(): ViewModel() {
 
     fun reloadRecipes(){
         CoroutineBackgroundTask<List<Recipe>>()
-            .executeInBackground { db.recipeDao().getAllRecipe() }
+            .executeInBackground { dao.getAllRecipe() }
             .onDone { recipeList.value = it }
             .start()
     }
 
-    fun deleteAllRecipes(callback: () -> Unit){
-        CoroutineBackgroundTask<Unit>()
-            .executeInBackground {
-                db.recipeDao().deleteAllRecipe()
-                db.recipeDao().deleteAllIngredient()
-            }
-            .onDone { callback() }
-            .start()
-        deleteImages()
+    fun getIngredientsByRecipeId(id: Int) : List<RecipeIngredient> = dao.getIngredientByRecipeId(id)
+
+    fun deleteRecipe(recipe: Recipe){
+        viewModelScope.launch {
+            dao.deleteRecipe(recipe)
+        }
     }
 
     fun deleteImages() {

@@ -2,6 +2,8 @@ package de.madem.homium.utilities
 
 import android.content.Context
 import android.widget.Toast
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import de.madem.homium.R
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Recipe
@@ -17,35 +19,33 @@ import de.madem.homium.utilities.quantitycalculation.UnitConverter
 import java.lang.ref.WeakReference
 
 
-
-/*
+/**
  * The class InventoryQuantityOperationInformation encapsulates an information for id and quantity
  * returned after calculating with quantities (= Infomation what is the result of a quantity calculation with
  * certain Inventoryitems like "From all Inventoryitems with their ids in List i have to delete this
  * amount with unit and count, but i do not delete it from each element but from the hole itemquantity")
- *
- *
  * */
-inline class InventoryQuantityOperationInformation(val info: Triple<List<Int>,Int,String>)
+@JvmInline
+value class InventoryQuantityOperationInformation(val info: Triple<List<Int>,Int,String>)
 
-/*
+/**
  * The class CookingAssistant is made for cooking elements in Homium and deals with certain operations in Database.
- *
  * */
 
 typealias AnalysisResult = Pair<List<ShoppingItem>,List<InventoryQuantityOperationInformation>>
 
-
-
-class CookingAssistant(private val contextReference: WeakReference<Context>) {
+class CookingAssistant @AssistedInject constructor(
+    @Assisted private val contextReference: WeakReference<Context>,
+    private val db: AppDatabase
+) {
 
     //fields
-    private val recipeDao = AppDatabase.getInstance().recipeDao()
-    private val inventoryDao = AppDatabase.getInstance().inventoryDao()
-    private val shoppingDao = AppDatabase.getInstance().itemDao()
+    private val recipeDao = db.recipeDao()
+    private val inventoryDao = db.inventoryDao()
+    private val shoppingDao = db.itemDao()
 
     private val unitConverter : UnitConverter = UnitConverter()
-    private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter)
+    private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter, db.inventoryDao())
 
     //public functions
     fun cookRecipe(recipe: Recipe){

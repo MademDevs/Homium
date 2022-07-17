@@ -1,16 +1,19 @@
 package de.madem.homium.ui.activities.ingredient
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.constants.*
 import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
+import de.madem.homium.databases.RecipeDao
 import de.madem.homium.models.Product
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.models.Units
@@ -19,7 +22,9 @@ import de.madem.homium.utilities.extensions.finishWithResultData
 import de.madem.homium.utilities.extensions.hideKeyboard
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastShort
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class IngredientEditActivity : AppCompatActivity() {
 
     //fields
@@ -35,12 +40,16 @@ class IngredientEditActivity : AppCompatActivity() {
 
     //gui components
     private lateinit var txtIngredientName : AutoCompleteTextView
-    private lateinit var  pickerCount : NumberPicker
+    private lateinit var pickerCount : NumberPicker
     private lateinit var pickerUnit : NumberPicker
     private lateinit var editTxtCount : EditText
 
     //database
-    private val dao = AppDatabase.getInstance().recipeDao()
+    //TODO change architecture in different branch so that there is no DB-Reference in Ui-Controller
+    @Inject
+    lateinit var database: AppDatabase
+    private lateinit var recipeDao : RecipeDao
+    private lateinit var itemDao : ItemDao
 
     //companion
     companion object{
@@ -63,6 +72,9 @@ class IngredientEditActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ingredient_edit)
+
+        recipeDao = database.recipeDao()
+        itemDao = database.itemDao()
 
         //setup big and small units
         bigUnits = BIG_UNITS_VALUES
@@ -121,7 +133,6 @@ class IngredientEditActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-
         outState.putInt(INSTANCE_STATE_KEY_COUNT_PICKER_VALUE,pickerCount.value)
         outState.putInt(INSTANCE_STATE_KEY_UNIT_PICKER_VALUE,pickerUnit.value)
         outState.putStringArray(INSTANCE_STATE_KEY_COUNT_PICKER_DATA,valuesForCountPicker.toTypedArray())
@@ -137,7 +148,7 @@ class IngredientEditActivity : AppCompatActivity() {
 
         CoroutineBackgroundTask<List<Product>>()
             .executeInBackground {
-                val result = AppDatabase.getInstance().itemDao().getAllProduct()
+                val result = itemDao.getAllProduct()
                 return@executeInBackground result
             }.onDone {result ->
                 val productNameList = result.map { it.name }
@@ -293,7 +304,7 @@ class IngredientEditActivity : AppCompatActivity() {
         if(id >= 0){
            CoroutineBackgroundTask<RecipeIngredient>()
                .executeInBackground{
-                dao.getIngredientById(id)
+                recipeDao.getIngredientById(id)
            }.onDone { result ->
                 result.notNull {
                     ingredient = it
@@ -339,7 +350,7 @@ class IngredientEditActivity : AppCompatActivity() {
 
     private fun setSpinnerDefaultValues(name: String) {
         CoroutineBackgroundTask<Product>()
-            .executeInBackground { AppDatabase.getInstance().itemDao().getProductsByName(name)[0] }
+            .executeInBackground {itemDao.getProductsByName(name)[0] }
             .onDone {
 
                 //setting unit

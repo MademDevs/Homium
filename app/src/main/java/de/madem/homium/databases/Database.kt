@@ -1,10 +1,7 @@
 package de.madem.homium.databases
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import de.madem.homium.application.HomiumApplication
 import de.madem.homium.models.*
 
 
@@ -21,7 +18,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun inventoryDao(): InventoryDao
 
     //Singleton
-    companion object{
+    /*companion object{
         private lateinit var instance: AppDatabase
 
         fun getInstance(context: Context = HomiumApplication.appContext!!): AppDatabase{
@@ -36,5 +33,5 @@ abstract class AppDatabase : RoomDatabase() {
             return instance
         }
 
-    }
+    }*/
 }

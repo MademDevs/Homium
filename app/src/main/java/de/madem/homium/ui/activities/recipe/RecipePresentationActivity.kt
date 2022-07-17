@@ -1,26 +1,24 @@
 package de.madem.homium.ui.activities.recipe
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_COOK_REQUEST
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
 import de.madem.homium.constants.REQUEST_CODE_COOK_RECIPE
 import de.madem.homium.constants.REQUEST_CODE_EDIT_RECIPE_FROM_PRESENTATION
-import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityRecipePresentationBinding
+import de.madem.homium.di.utils.CookingAssistantAssistedFactory
 import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
@@ -30,18 +28,26 @@ import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.setPictureFromPath
 import de.madem.homium.utilities.extensions.switchToActivityForResult
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RecipePresentationActivity : AppCompatActivity() {
 
     private var recipeid = -1
     private var recipe: Recipe? = null
     private lateinit var description: List<RecipeDescription>
     private lateinit var ingredients: List<RecipeIngredient>
-    private lateinit var cookingAssistant : CookingAssistant
+
+    @Inject
+    lateinit var cookingAssistantFactory : CookingAssistantAssistedFactory
+    private val cookingAssistant : CookingAssistant by lazy {
+        cookingAssistantFactory.create(WeakReference(this))
+    }
+
     private var allowedToAutoStartCooking : Boolean = false
 
     private lateinit var binding: ActivityRecipePresentationBinding
-    private lateinit var viewModel : RecipePresentationViewModel
+    private val viewModel : RecipePresentationViewModel by viewModels()
 
     companion object{
         private const val SAVEINSTANCESTATE_KEY_ALLOWED_TO_AUTOSTART_COOKING = "autostartcookingpermission"
@@ -54,10 +60,6 @@ class RecipePresentationActivity : AppCompatActivity() {
             this, R.layout.activity_recipe_presentation
         )
         supportActionBar?.title = resources.getString(R.string.screentitle_recipe_presentation)
-        cookingAssistant = CookingAssistant(WeakReference<Context>(this))
-
-        //setup viewModel
-        setupViewModel()
 
         //getting id right
         val intentId = intent.getIntExtra(
@@ -95,9 +97,7 @@ class RecipePresentationActivity : AppCompatActivity() {
             //nesting coroutines to avaid not initialized properties -> also possible with await?
 
             val op2 = CoroutineBackgroundTask<List<RecipeDescription>>()
-                .executeInBackground {
-                    AppDatabase.getInstance().recipeDao().getDescriptionByRecipeId(recipeid)
-                }
+                .executeInBackground { viewModel.getRecipeDescription() }
                 .onDone {
                     description = it;
                     initGuiElements()
@@ -105,17 +105,13 @@ class RecipePresentationActivity : AppCompatActivity() {
                 }
 
             val op1 = CoroutineBackgroundTask<List<RecipeIngredient>>()
-                .executeInBackground {
-                    AppDatabase.getInstance().recipeDao().getIngredientByRecipeId(recipeid)
-                }
+                .executeInBackground { viewModel.getIngredients() }
                 .onDone { ingredients = it; op2.start() }
 
             CoroutineBackgroundTask<Recipe>()
-                .executeInBackground {
-                    AppDatabase.getInstance().recipeDao().getRecipeById(recipeid)
-                }
+                .executeInBackground { viewModel.getRecipe() }
                 .onDone {
-                    recipe = it;
+                    recipe = it
                     op1.start()
                 }
                 .start()
@@ -130,7 +126,6 @@ class RecipePresentationActivity : AppCompatActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
         return when(item.itemId){
             R.id.presentation_toolbar_edit -> {
                 switchToActivityForResult(
@@ -221,10 +216,6 @@ class RecipePresentationActivity : AppCompatActivity() {
                 else -> "Schritt $position"
         }
 
-    }
-
-    private fun setupViewModel(){
-        viewModel = ViewModelProvider(this)[RecipePresentationViewModel::class.java]
     }
 
     private fun cookRecipe(){

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.utilities.InventoryItemAmountClassifier
@@ -12,10 +13,13 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class InventoryViewModel @Inject constructor(): ViewModel() {
+@HiltViewModel
+class InventoryViewModel @Inject constructor(
+    database: AppDatabase
+): ViewModel() {
 
     //private properties
-    private val dao = AppDatabase.getInstance().inventoryDao()
+    private val dao = database.inventoryDao()
 
     //public properties
     private val _inventoryItems by lazy {

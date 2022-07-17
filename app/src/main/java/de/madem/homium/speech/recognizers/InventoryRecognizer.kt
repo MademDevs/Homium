@@ -5,8 +5,8 @@ import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.InventoryDao
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
@@ -14,16 +14,17 @@ import de.madem.homium.speech.commandparser.InventoryCommandParser
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.capitalizeEachWord
-import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastShort
 import java.lang.ref.WeakReference
 
-class InventoryRecognizer(private val contextRef : WeakReference<Context>) : PatternRecognizer{
+class InventoryRecognizer(
+    private val contextRef : WeakReference<Context>,
+    private val inventoryDao : InventoryDao,
+    private val shoppingDao: ItemDao
+) : PatternRecognizer{
 
-    private val parser = InventoryCommandParser(contextRef)
-    private val inventoryDao = AppDatabase.getInstance().inventoryDao()
-
+    private val parser = InventoryCommandParser(contextRef, shoppingDao)
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern().also { println(it) }
         private val ADD_INVENTORY_ITEM_WITHOUT_LOCATION = Regex("([sS][ei]tze|[nN]ehme) (( )*[(0-9)]+( )*) (${unitsAsRecognitionPattern}) ([a-zA-ZäöüÄÖÜß( )*]+)( auf| in)( die| das)? [iI]nventar(liste)?( auf)?")
@@ -378,7 +379,7 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
             }
 
             if(allShouldBeDeleted){
-                val products = AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+                val products = shoppingDao.getProductsByNameOrPlural(name)
 
                 if(products.isNotEmpty()){
                     inventoryDao.deleteInventoryItemByName(products[0].plural)
@@ -637,7 +638,7 @@ class InventoryRecognizer(private val contextRef : WeakReference<Context>) : Pat
             }
 
             if(allShouldBeDeleted){
-                val products = AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+                val products = shoppingDao.getProductsByNameOrPlural(name)
 
                 if(products.isNotEmpty()){
                     inventoryDao.deleteInventoryItemByNameLocation(products[0].plural,location)

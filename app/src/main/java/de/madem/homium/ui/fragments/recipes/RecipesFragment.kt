@@ -1,6 +1,5 @@
 package de.madem.homium.ui.fragments.recipes
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -17,7 +16,6 @@ import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.IMPORT_RECIPE_DIALOG_TAG
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_RECIPE_ID
-import de.madem.homium.databases.AppDatabase
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.RecipesListAdapter
 import de.madem.homium.ui.activities.recipe.RecipeEditActivity
@@ -38,17 +36,10 @@ class RecipesFragment : Fragment(), SearchViewHandler{
 
     private val recipesViewModel: RecipesViewModel by viewModels()
     private lateinit var root: View
-    private lateinit var db: AppDatabase
     private lateinit var actionModeHandler: RecipeActionModeHandler
 
     private lateinit var adapter : RecipesListAdapter
     private var searchViewUtil : Pair<SearchView,MenuItem>? = null
-
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        db = AppDatabase.getInstance()
-    }
 
     override fun onResume() {
         super.onResume()
@@ -124,7 +115,7 @@ class RecipesFragment : Fragment(), SearchViewHandler{
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
                             itemHolders.map { it.recipe }.forEach {
-                                db.recipeDao().deleteRecipe(it)
+                                recipesViewModel.deleteRecipe(it)
                                 GlobalScope.launch {
                                    //deleting picture
                                     File(it.image).let {file ->
@@ -206,7 +197,11 @@ class RecipesFragment : Fragment(), SearchViewHandler{
         } else {
             recyclerView.layoutManager = GridLayoutManager(context, 3)
         }
-        adapter = RecipesListAdapter(this, recipesViewModel.recipeList)
+        adapter = RecipesListAdapter(this, recipesViewModel.recipeList) { id ->
+            recipesViewModel.getIngredientsByRecipeId(
+                id
+            )
+        }
         recyclerView.adapter = adapter
         adapter.shortClickListener = {recipe, viewHolder ->
             println(recipe.uid)

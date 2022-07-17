@@ -5,8 +5,7 @@ import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.constants.SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_DELETE_QUESTION_SPEECH_ASSISTENT_ALLOWED
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -14,19 +13,16 @@ import de.madem.homium.speech.commandparser.ShoppingCommandParser
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.backgroundtasks.UserRequestedCoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.capitalizeEachWord
-import de.madem.homium.utilities.extensions.getSetting
 import de.madem.homium.utilities.extensions.notNull
 import de.madem.homium.utilities.extensions.showToastShort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 
-class ShoppingRecognizer(private val contextRef: WeakReference<Context>) : PatternRecognizer {
+class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private val itemDao : ItemDao) : PatternRecognizer {
 
-
-    private val itemDao = AppDatabase.getInstance().itemDao()
     private val commandParser =
-        ShoppingCommandParser(contextRef)
+        ShoppingCommandParser(contextRef, itemDao)
 
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern()

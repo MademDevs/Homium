@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.constants.BIG_UNITS_VALUES
 import de.madem.homium.constants.SMALL_UNITS_VALUES
@@ -18,7 +19,9 @@ import de.madem.homium.models.Product
 import de.madem.homium.models.Units
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class InventoryItemEditActivity : AppCompatActivity() {
 
     //GUI Components
@@ -31,7 +34,9 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
 
     //fields
-    private val db = AppDatabase.getInstance()
+    //TODO Change to a viewmodel to avoid DB-References in UI-Controller
+    @Inject
+    lateinit var db : AppDatabase
     private lateinit var bigUnits: Array<String>
     private lateinit var smallUnits: Array<String>
     private var itemid: Int = -1

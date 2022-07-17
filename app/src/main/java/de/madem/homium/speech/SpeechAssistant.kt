@@ -2,27 +2,34 @@ package de.madem.homium.speech
 
 import android.content.Context
 import android.widget.Toast
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import de.madem.homium.R
+import de.madem.homium.databases.AppDatabase
 import de.madem.homium.speech.recognizers.InventoryRecognizer
 import de.madem.homium.speech.recognizers.PatternRecognizer
 import de.madem.homium.speech.recognizers.RecipeRecognizer
 import de.madem.homium.speech.recognizers.ShoppingRecognizer
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import java.lang.ref.WeakReference
+import java.util.*
 
-class SpeechAssistent(val context: Context) {
+class SpeechAssistant @AssistedInject constructor(
+    @Assisted val context: Context,
+    db: AppDatabase
+) {
 
     //fields
-
     private val recognizers = listOf<PatternRecognizer>(
-        ShoppingRecognizer(WeakReference<Context>(context)),
-        InventoryRecognizer(WeakReference<Context>(context)),
-        RecipeRecognizer(WeakReference<Context>(context)))
+        ShoppingRecognizer(WeakReference<Context>(context), db.itemDao()),
+        InventoryRecognizer(WeakReference<Context>(context), db.inventoryDao(), db.itemDao()),
+        RecipeRecognizer(WeakReference<Context>(context), db.recipeDao())
+    )
 
     //public function
     fun executeCommand(command : String){
 
-        val formattedCommand = replaceNumberWords(command.toLowerCase())
+        val formattedCommand = replaceNumberWords(command.lowercase(Locale.getDefault()))
 
         CoroutineBackgroundTask<CoroutineBackgroundTask<Boolean>?>()
             .executeInBackground {

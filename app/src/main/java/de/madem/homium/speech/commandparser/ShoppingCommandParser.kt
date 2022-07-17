@@ -2,7 +2,7 @@ package de.madem.homium.speech.commandparser
 
 import android.content.Context
 import de.madem.homium.R
-import de.madem.homium.databases.AppDatabase
+import de.madem.homium.databases.ItemDao
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -10,7 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.lang.ref.WeakReference
 
-class ShoppingCommandParser(private val contextRef: WeakReference<Context>) {
+class ShoppingCommandParser(private val contextRef: WeakReference<Context>, private val shoppingDao: ItemDao) {
 
     fun parseShoppingItem(splittedWords : List<String>) : ShoppingItem?{
 
@@ -54,7 +54,7 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>) {
         val name = splittedWords[1].trim().split(Regex(" ")).map { it.capitalize() }.joinToString(" ")
 
         val matchingProductsDeffered = async<List<Product>> {
-            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(name)
+            shoppingDao.getProductsByNameOrPlural(name)
         }
 
 
@@ -89,7 +89,7 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>) {
     suspend fun parseShoppingItemWithoutUnitWithoutAmount(nameIn : String) : ShoppingItem? = coroutineScope{
 
         val productsDeffered = async<List<Product>> {
-            AppDatabase.getInstance().itemDao().getProductsByNameOrPlural(nameIn.capitalize())
+            shoppingDao.getProductsByNameOrPlural(nameIn.capitalize())
         }
 
         if(nameIn.isNotBlank() && nameIn.isNotEmpty()){

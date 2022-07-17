@@ -9,14 +9,12 @@ import de.madem.homium.models.Recipe
 import de.madem.homium.models.RecipeDescription
 import de.madem.homium.models.RecipeIngredient
 import de.madem.homium.models.Units
-import de.madem.homium.speech.recognizers.ShoppingRecognizer
 import de.madem.homium.ui.dialogs.RecipeImportDialogListener
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.notNull
-import de.madem.homium.utilities.extensions.showToastLong
 import kotlinx.coroutines.launch
 
-class RecipeImporter : RecipeImportDialogListener {
+class RecipeImporter(private val db : AppDatabase) : RecipeImportDialogListener {
     companion object{
         private const val EMPTY = ""
         private val recognitionPattern = Regex("[\\n\\t ]*([0-9a-zA-ZäöüÄÖÜ\\- ]+)[:]?[\\n]*(Zutat(en)?)?[:]?[\\n]*((- [1-9]* (${Units.asSpeechRecognitionPattern()}) [a-zA-ZäöüÄÖÜ\\- ]+[\\n]?)*)[\\n]*(Beschreibung(en)?)?[:]?[\\n]*(([1-9]*\\) [0-9a-zA-ZäöüÄÖÜ\\- ]+[\\n]*)*)")
@@ -77,7 +75,7 @@ class RecipeImporter : RecipeImportDialogListener {
                 false
             }
             else{
-                val recipeDao = AppDatabase.getInstance(cntxt).recipeDao()
+                val recipeDao = db.recipeDao()
                 //adding recipe
                 val id = recipeDao.insertRecipe(data.first)
 
