@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.utilities.InventoryItemAmountClassifier
+import de.madem.homium.utilities.extensions.collectFor
+import kotlinx.coroutines.flow.Flow
 
-class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<List<InventoryItem>>)
+class InventoryItemListAdapter(private val owner: LifecycleOwner, inventoryItemFlow: Flow<List<InventoryItem>>)
     : RecyclerView.Adapter<InventoryItemListAdapter.InventoryItemViewHolder>(), Filterable {
 
     companion object {
@@ -26,17 +26,16 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
             field = value
         }
 
-    var data = liveData.value?.toMutableList() ?: mutableListOf()
+    var data = mutableListOf<InventoryItem>()
     private var dataBackup = MutableList(data.size){data[it]}
 
 
-
     init {
-        liveData.observe(owner, Observer { list ->
-            data = list.toMutableList()
-            dataBackup = list.toMutableList()
+        inventoryItemFlow.collectFor(owner) {
+            data = it.toMutableList()
+            dataBackup = it.toMutableList()
             notifyDataSetChanged()
-        })
+        }
     }
 
     //fields
@@ -116,10 +115,10 @@ class InventoryItemListAdapter(val owner: LifecycleOwner, liveData: LiveData<Lis
                 resultList.addAll(dataBackup)
             }
             else{
-                val filterArgs = constraint.toString().toLowerCase().trim().split(" ")
+                val filterArgs = constraint.toString().lowercase().trim().split(" ")
                 dataBackup.forEach { item ->
-                    val name = item.name.trim().toLowerCase()
-                    val unit = item.unit.trim().toLowerCase()
+                    val name = item.name.trim().lowercase()
+                    val unit = item.unit.trim().lowercase()
                     val cnt = item.count.toString()
                     var matches = true
                     for(arg in filterArgs) {

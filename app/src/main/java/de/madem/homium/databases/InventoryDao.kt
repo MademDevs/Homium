@@ -4,13 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import de.madem.homium.models.InventoryItem
-import java.util.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface InventoryDao {
 
     @Query("SELECT * FROM inventoryItem")
-    fun fetchAllInventoryItems(): List<InventoryItem>
+    fun fetchAllInventoryItemsOld(): List<InventoryItem>
+
+    @Query("SELECT * FROM inventoryItem")
+    fun fetchAllInventoryItems(): Flow<List<InventoryItem>>
 
     @Query("SELECT * FROM inventoryItem WHERE uid = :id")
     fun fetchInventoryItemById(id: Int): InventoryItem

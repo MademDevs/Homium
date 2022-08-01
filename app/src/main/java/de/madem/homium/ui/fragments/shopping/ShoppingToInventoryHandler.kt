@@ -61,7 +61,7 @@ class ShoppingToInventoryHandler @AssistedInject constructor(
     private fun putShoppingItemsIntoInventory(shoppingCart: List<ShoppingItem>) {
         GlobalScope.launch(IO) {
             val inventoryDao = db.inventoryDao()
-            val currentInventoryItems = inventoryDao.fetchAllInventoryItems()
+            val currentInventoryItems = inventoryDao.fetchAllInventoryItemsOld()
 
             shoppingCart.forEach { shoppingItem ->
 
