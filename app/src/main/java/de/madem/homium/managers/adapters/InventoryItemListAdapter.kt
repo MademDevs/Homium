@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.madem.homium.R
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.utilities.InventoryItemAmountClassifier
-import de.madem.homium.utilities.extensions.collectFor
+import de.madem.homium.utilities.extensions.onCollect
 import kotlinx.coroutines.flow.Flow
 
 class InventoryItemListAdapter(private val owner: LifecycleOwner, inventoryItemFlow: Flow<List<InventoryItem>>)
@@ -31,7 +31,7 @@ class InventoryItemListAdapter(private val owner: LifecycleOwner, inventoryItemF
 
 
     init {
-        inventoryItemFlow.collectFor(owner) {
+        inventoryItemFlow.onCollect(owner) {
             data = it.toMutableList()
             dataBackup = it.toMutableList()
             notifyDataSetChanged()

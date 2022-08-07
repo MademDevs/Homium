@@ -8,6 +8,6 @@ interface InventoryRepository {
     fun getAllInventoryItems(): Flow<List<InventoryItem>>
 
     //TODO: Add return type
-    fun deleteInventoryItemById(id: Int)
+    suspend fun deleteInventoryItemById(id: Int)
 
 }

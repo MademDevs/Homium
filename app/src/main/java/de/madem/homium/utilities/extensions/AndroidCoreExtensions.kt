@@ -20,7 +20,6 @@ import de.madem.homium.constants.SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.pictures.BitmapUtil
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
@@ -269,9 +268,9 @@ fun Fragment?.whenSearchViewHandler(action: (SearchViewHandler) -> Unit){
     }
 }
 
-fun <T> Flow<T>.collectFor(viewLifecycleOwner: LifecycleOwner, onEmit: suspend (T) -> Unit) {
+fun <T> Flow<T>.onCollect(viewLifecycleOwner: LifecycleOwner, onEmit: suspend (T) -> Unit) {
     viewLifecycleOwner.lifecycleScope.launch {
-        this@collectFor.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+        this@onCollect.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect { onEmit(it) }
     }
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface InventoryDao {
 
+    @Deprecated(message = "fetchAllInventoryItems with flow should be used")
     @Query("SELECT * FROM inventoryItem")
     fun fetchAllInventoryItemsOld(): List<InventoryItem>
 

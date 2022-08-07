@@ -12,7 +12,7 @@ class RoomInventoryRepository(
         return dao.fetchAllInventoryItems()
     }
 
-    override fun deleteInventoryItemById(id: Int) {
+    override suspend fun deleteInventoryItemById(id: Int) {
         dao.deleteInventoryItemById(id)
     }
 
