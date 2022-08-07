@@ -15,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.REQUEST_CODE_INVENTORY
-import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.InventoryItemListAdapter
 import de.madem.homium.ui.activities.inventoryedit.InventoryItemEditActivity
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
@@ -89,9 +88,6 @@ class InventoryFragment : Fragment(), SearchViewHandler {
 
     override fun onResume() {
         super.onResume()
-
-        inventoryViewModel.reloadInventoryItems()
-        ViewRefresher.inventoryRefresher = inventoryViewModel::reloadInventoryItems
     }
 
     private fun createActionMode() {
@@ -110,7 +106,6 @@ class InventoryFragment : Fragment(), SearchViewHandler {
                             showToastShort(R.string.notification_delete_inventoryitem_sucess)
                             dialog.dismiss()
                             finishActionMode()
-                            inventoryViewModel.reloadInventoryItems()
                         }
                     }
                     .setNegativeButton(R.string.answer_no) { dialog, _ ->

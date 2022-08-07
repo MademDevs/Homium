@@ -14,13 +14,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import de.madem.homium.R
 import de.madem.homium.constants.SHAREDPREFERENCE_NAMESPACEKEY_SETTINGS
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.pictures.BitmapUtil
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 fun <T : Any> Fragment.switchToActivity(clazz: KClass<T>) {
@@ -265,5 +265,12 @@ fun Fragment?.whenSearchViewHandler(action: (SearchViewHandler) -> Unit){
     val s = this as? SearchViewHandler
     s.notNull {
         action.invoke(it)
+    }
+}
+
+fun <T> Flow<T>.onCollect(viewLifecycleOwner: LifecycleOwner, onEmit: suspend (T) -> Unit) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        this@onCollect.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { onEmit(it) }
     }
 }

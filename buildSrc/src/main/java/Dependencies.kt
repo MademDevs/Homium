@@ -27,6 +27,7 @@ class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
         implementation("androidx.constraintlayout:constraintlayout:2.1.0")
         implementation("androidx.vectordrawable:vectordrawable:1.1.0")
         implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
         implementation("androidx.legacy:legacy-support-v4:1.0.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0-beta01")
     }
@@ -48,6 +49,7 @@ class AppDependencyInstaller(private val scope: DependencyHandlerScope) {
 
     fun installRoomLibraries() = with(scope) {
         implementation("androidx.room:room-runtime:$room")
+        implementation("androidx.room:room-ktx:$room")
         kapt("androidx.room:room-compiler:$room")
     }
 
