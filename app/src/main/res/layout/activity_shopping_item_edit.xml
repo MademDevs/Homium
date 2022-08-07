@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".ui.activities.shoppingitem.ShoppingItemEditActivity">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_width="match_parent"
@@ -17,128 +18,95 @@
             android:id="@+id/shopping_item_edit_txtView_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
+            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginHorizontal="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/shopping_title_edit_name"
+            android:textColor="@color/colorAccent"
             android:textSize="18sp"
-            android:textColor="@color/colorAccent">
-
-        </TextView>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <AutoCompleteTextView
             android:id="@+id/shopping_item_edit_autoCmplTxt_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_txtView_name"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginHorizontal="8dp"
             android:autofillHints="@string/shopping_hint_edit_name"
             android:completionThreshold="1"
             android:hint="@string/shopping_hint_edit_name"
+            android:imeOptions="flagNoExtractUi"
             android:inputType="text"
-            android:imeOptions="flagNoExtractUi">
-
-        </AutoCompleteTextView>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shopping_item_edit_txtView_name" />
 
         <TextView
             android:id="@+id/shopping_item_edit_txtView_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/shopping_item_edit_autoCmplTxt_name"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/question_amount"
             android:textColor="@color/colorAccent"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="8dp"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toBottomOf="@+id/shopping_item_edit_autoCmplTxt_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <LinearLayout
+        <NumberPicker
+            android:id="@+id/shopping_item_edit_numPick_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:descendantFocusability="blocksDescendants"
+            app:layout_constraintEnd_toStartOf="@+id/shopping_item_edit_numPick_unit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shopping_item_edit_txtView_amount" />
+
+        <NumberPicker
+            android:id="@+id/shopping_item_edit_numPick_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:descendantFocusability="blocksDescendants"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/shopping_item_edit_numPick_count"
+            app:layout_constraintTop_toBottomOf="@id/shopping_item_edit_txtView_amount"
+            />
+
+        <Button
+            android:id="@+id/shopping_item_edit_btn_delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/shopping_item_edit_txtView_amount"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/numpick_lin_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:orientation="horizontal">
-
-                <NumberPicker
-                    android:id="@+id/shopping_item_edit_numPick_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:descendantFocusability="blocksDescendants"
-                    android:layout_marginLeft="64dp"
-                    android:layout_marginStart="64dp">
-                </NumberPicker>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <NumberPicker
-                    android:id="@+id/shopping_item_edit_numPick_unit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:descendantFocusability="blocksDescendants"
-                    android:layout_marginRight="64dp"
-                    android:layout_marginEnd="64dp">
-                </NumberPicker>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp">
-
-                <Button
-                    android:id="@+id/shopping_item_edit_btn_delete"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@android:color/holo_red_dark"
-                    android:text="@string/shopping_btn_edit_delete"
-                    android:textColor="@android:color/background_light"
-                    android:layout_gravity="bottom">
-                </Button>
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/holo_red_dark"
+            android:text="@string/shopping_btn_edit_delete"
+            android:textColor="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1"
+            app:layout_constraintTop_toBottomOf="@+id/shopping_item_edit_numPick_count" />
 
         <EditText
             android:id="@+id/shopping_item_edit_editTxt_count"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_below="@+id/shopping_item_edit_txtView_amount"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="64dp"
-            android:layout_marginLeft="64dp"
-            android:layout_marginTop="96dp"
-            android:ems="10"
-            android:inputType="number|numberDecimal" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no"
+            android:inputType="number|numberDecimal"
+            app:layout_constraintStart_toStartOf="@id/shopping_item_edit_numPick_count"
+            app:layout_constraintEnd_toEndOf="@id/shopping_item_edit_numPick_count"
+            app:layout_constraintBottom_toBottomOf="@id/shopping_item_edit_numPick_count"
+            app:layout_constraintTop_toTopOf="@id/shopping_item_edit_numPick_count"/>
 
-
-    </RelativeLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

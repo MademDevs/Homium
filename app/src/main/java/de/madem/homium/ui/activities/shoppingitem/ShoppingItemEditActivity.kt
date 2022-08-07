@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -44,8 +45,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     private var itemid: Int = -1
 
     companion object{
-        private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index";
-        private const val SAVEINSTANCESTATE_COUNT = "sist_count";
+        private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index"
+        private const val SAVEINSTANCESTATE_COUNT = "sist_count"
 
     }
 
@@ -110,9 +111,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             numPickerCount.value = smallUnits.indexOf(countValue)
         }
         else{
-            numPickerCount.isVisible = false
+            numPickerCount.visibility = View.INVISIBLE
             editTextCount.setText(countValue)
-            editTextCount.isVisible = true;
+            editTextCount.visibility = View.VISIBLE
         }
 
     }
@@ -278,15 +279,15 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         editTextCount = findViewById<EditText>(R.id.shopping_item_edit_editTxt_count).also {
-            it.isVisible = false
+            it.visibility = View.GONE
             if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 it.setOnLongClickListener {
-                    editTextCount.isVisible = false
-                    numPickerCount.isVisible = true
+                    editTextCount.visibility = View.GONE
+                    numPickerCount.visibility = View.VISIBLE
                     true
                 }
             } else {
-                it.isVisible = true
+                it.visibility = View.VISIBLE
             }
         }
     }
@@ -307,8 +308,8 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     }
 
     private fun assignValueFromPickerToEditText(value : String) : Boolean{
-        numPickerCount.isVisible = false
-        editTextCount.isVisible = true
+        numPickerCount.visibility = View.INVISIBLE
+        editTextCount.visibility = View.VISIBLE
         editTextCount.text = Editable.Factory.getInstance().newEditable(value)
         return true
     }
