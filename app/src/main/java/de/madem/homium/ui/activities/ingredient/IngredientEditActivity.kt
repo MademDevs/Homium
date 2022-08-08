@@ -10,13 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
-import de.madem.homium.constants.*
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_INGREDIENT_COUNT
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_INGREDIENT_ID
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_INGREDIENT_NAME
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_INGREDIENT_UNIT
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.databases.ItemDao
 import de.madem.homium.databases.RecipeDao
-import de.madem.homium.models.Product
-import de.madem.homium.models.RecipeIngredient
-import de.madem.homium.models.Units
+import de.madem.homium.databases.ShoppingDao
+import de.madem.homium.models.*
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.finishWithResultData
 import de.madem.homium.utilities.extensions.hideKeyboard
@@ -49,7 +50,7 @@ class IngredientEditActivity : AppCompatActivity() {
     @Inject
     lateinit var database: AppDatabase
     private lateinit var recipeDao : RecipeDao
-    private lateinit var itemDao : ItemDao
+    private lateinit var shoppingDao : ShoppingDao
 
     //companion
     companion object{
@@ -74,7 +75,7 @@ class IngredientEditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_ingredient_edit)
 
         recipeDao = database.recipeDao()
-        itemDao = database.itemDao()
+        shoppingDao = database.shoppingDao()
 
         //setup big and small units
         bigUnits = BIG_UNITS_VALUES
@@ -148,7 +149,7 @@ class IngredientEditActivity : AppCompatActivity() {
 
         CoroutineBackgroundTask<List<Product>>()
             .executeInBackground {
-                val result = itemDao.getAllProduct()
+                val result = shoppingDao.getAllProduct()
                 return@executeInBackground result
             }.onDone {result ->
                 val productNameList = result.map { it.name }
@@ -350,7 +351,7 @@ class IngredientEditActivity : AppCompatActivity() {
 
     private fun setSpinnerDefaultValues(name: String) {
         CoroutineBackgroundTask<Product>()
-            .executeInBackground {itemDao.getProductsByName(name)[0] }
+            .executeInBackground {shoppingDao.getProductsByName(name)[0] }
             .onDone {
 
                 //setting unit

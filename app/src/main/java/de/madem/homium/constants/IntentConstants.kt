@@ -1,7 +1,7 @@
 package de.madem.homium.constants
 
 //Constants for data transfer
-const val INTENT_DATA_TRANSFER_EDIT_SHOPPINGITEM = "intent_data_transfer_edit_shoppingitem"
+const val INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID = "intent_data_transfer_edit_shopping_item_id"
 const val INTENT_DATA_TRANSFER_EDIT_INGREDIENT_NAME = "intent_data_transfer_edit_ingredient_name"
 const val INTENT_DATA_TRANSFER_EDIT_INGREDIENT_UNIT = "intent_data_transfer_edit_ingredient_unit"
 const val INTENT_DATA_TRANSFER_EDIT_INGREDIENT_COUNT = "intent_data_transfer_edit_ingredient_count"

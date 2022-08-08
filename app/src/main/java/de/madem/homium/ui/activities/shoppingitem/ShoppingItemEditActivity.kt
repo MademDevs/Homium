@@ -1,8 +1,10 @@
 package de.madem.homium.ui.activities.shoppingitem
 
 import android.app.Activity
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -14,21 +16,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
-import de.madem.homium.constants.BIG_UNITS_VALUES
-import de.madem.homium.constants.SMALL_UNITS_VALUES
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityShoppingItemEditBinding
-import de.madem.homium.models.Product
-import de.madem.homium.models.ShoppingItem
-import de.madem.homium.models.Units
+import de.madem.homium.models.*
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.finishWithBooleanResult
-import de.madem.homium.utilities.extensions.hideKeyboard
-import de.madem.homium.utilities.extensions.notNull
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import de.madem.homium.utilities.extensions.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -48,34 +44,32 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index"
         private const val SAVEINSTANCESTATE_COUNT = "sist_count"
 
+        private val LOG_TAG : String = ShoppingItemEditActivity::class.simpleName ?: ""
+
     }
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityShoppingItemEditBinding.inflate(layoutInflater).also {
-            setContentView(it.root)
-        }
-
 
         //getting data from ressources
         bigUnits = BIG_UNITS_VALUES
         smallUnits = SMALL_UNITS_VALUES
 
 
+        binding = ActivityShoppingItemEditBinding.inflate(layoutInflater).also {
+            setContentView(it.root)
+            setupViewModel(it)
+            initGuiComponents(it)
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
 
-        initGuiComponents()
-        itemid = intent.getIntExtra("item", -1)
+        itemid = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, -1)
         if(itemid >= 0) {
-            binding?.shoppingItemEditBtnDelete?.isVisible = true
             setShoppingItemToElements(itemid)
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shoppingitem_edit)
-        } else {
-            supportActionBar?.title = resources.getString(R.string.screentitle_edit_shopppingitem_add)
-            binding?.shoppingItemEditBtnDelete?.isVisible = false
         }
 
         updateSpinnerOnItemSelected()
@@ -154,12 +148,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     private fun setShoppingItemToElements(id: Int) {
         CoroutineBackgroundTask<ShoppingItem>()
-            .executeInBackground { db.itemDao().getShoppingItemById(id) }
+            .executeInBackground { db.shoppingDao().getShoppingItemByIdSync(id) }
             .onDone {
                 binding.notNull { binding ->
-                    //setting name
-                    binding.shoppingItemEditAutoCmplTxtName.text = Editable.Factory.getInstance().newEditable(it.name)
-
                     //setting unit
                     binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit)
 
@@ -189,7 +180,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     //private fuctions
     private fun setSpinnerDefaultValues(name: String) {
         CoroutineBackgroundTask<Product>()
-            .executeInBackground { db.itemDao().getProductsByName(name)[0] }
+            .executeInBackground { db.shoppingDao().getProductsByName(name)[0] }
             .onDone {
                 binding.notNull { binding ->
                     //setting unit
@@ -228,7 +219,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     }
 
 
-    private fun initGuiComponents() = binding.notNull { binding ->
+    private fun initGuiComponents(binding: ActivityShoppingItemEditBinding){
         //init delete button
         binding.shoppingItemEditBtnDelete.setOnClickListener{
             AlertDialog.Builder(this)
@@ -237,7 +228,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
                             if(itemid >= 0) {
-                                db.itemDao().deleteShoppingItemById(itemid)
+                                db.shoppingDao().deleteShoppingItemById(itemid)
                             }
                         }
                         .onDone {
@@ -255,7 +246,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         //init txt autocomplete
         CoroutineBackgroundTask<List<Product>>().executeInBackground {
-            val result = db.itemDao().getAllProduct()
+            val result = db.shoppingDao().getAllProduct()
             return@executeInBackground result
         }.onDone {result ->
             val productNameList = result.map { it.name }
@@ -314,6 +305,10 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 ed.visibility = View.VISIBLE
             }
         }
+
+        binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
+            viewModel.setEditItemTitle(it?.toString() ?: "")
+        }
     }
 
     private fun setValuesForNumPickerCount(numberPickerUnit: NumberPicker){
@@ -340,15 +335,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getProducts():List<Product> {
-        var list = listOf<Product>()
-        GlobalScope.launch {
-            list = db.itemDao().getAllProduct()
-        }
-        Toast.makeText(this, "Prdocts geladen ${list.size}",Toast.LENGTH_SHORT).show()
-        return list
-    }
-
     private fun getAmount(): Int? = binding?.let {
         val numPickerCount = it.shoppingItemEditNumPickCount
         if(numPickerCount.isVisible) {
@@ -363,6 +349,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return Units.stringValueArray(this)[numPickerUnit?.value ?: 0]
     }
 
+    @Deprecated("Transfer logic into ViewModel")
     private fun getItemTitle(): String {
         return binding?.shoppingItemEditAutoCmplTxtName?.text?.toString() ?: ""
     }
@@ -381,10 +368,10 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             CoroutineBackgroundTask<Unit>()
                 .executeInBackground {
                 if(itemid >= 0){
-                    db.itemDao().updateShoppingItemById(itemid, title, amount, unit)
+                    db.shoppingDao().updateShoppingItemById(itemid, title, amount, unit)
                 }
                 else{
-                    db.itemDao().insertShopping(item)
+                    db.shoppingDao().insertShopping(item)
                 }
             }.onDone {
                 finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
@@ -393,6 +380,24 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
         else{
             Toast.makeText(this, resources.getString(R.string.errormsg_invalid_parameters),Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupViewModel(binding: ActivityShoppingItemEditBinding) {
+        viewModel.actionTitleResId.onCollect(this) { resId ->
+            try {
+                supportActionBar?.title = resources.getString(resId)
+            } catch (ex: Resources.NotFoundException) {
+                Log.e(LOG_TAG, ex.message, ex)
+            }
+        }
+
+        viewModel.showDeleteButton.onCollect(this) {
+            binding.shoppingItemEditBtnDelete.isVisible = it
+        }
+
+        viewModel.displayedEditItemTitle.onCollect(this) { title ->
+            binding.shoppingItemEditAutoCmplTxtName.setDistinctText(title)
         }
     }
 }

@@ -5,24 +5,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
-import java.util.*
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
-interface ItemDao {
-
-    /*function:
-    @Query/Insert/Delete for type of SQL-Query
-    (SQL query itself)
-    fun functionName(): returnType
-    examples:
-    @Delete
-    fun delete(item: ShoppingItem)
-    @Query("SELECT * FROM shoppingitem WHERE uid IN (:shoppingItemIds)")
-    fun loadAllByIds(shoppingItemIds: IntArray): List<ShoppingItem>
-    @Query("SELECT * FROM shoppingItem WHERE name LIKE :name")
-    fun findByName(name: String): ShoppingItem
-     */
+interface ShoppingDao {
 
     @Query("SELECT * FROM product")
     fun getAllProduct(): List<Product>
@@ -51,7 +38,6 @@ interface ItemDao {
     @Query("DELETE FROM shoppingItem")
     fun deleteAllShopping()
 
-
     //Search for Items -> if partial String (not full name), has to be %String%
 
     @Query("DELETE FROM product WHERE name LIKE :deleteItem")
@@ -73,8 +59,12 @@ interface ItemDao {
     @Query("SELECT COUNT(*) FROM product")
     fun productSize() : Int
 
+    @Deprecated("Use getShoppingItemById instead")
     @Query("SELECT * FROM shoppingItem WHERE uid = :id")
-    fun getShoppingItemById(id: Int) : ShoppingItem
+    fun getShoppingItemByIdSync(id: Int) : ShoppingItem
+
+    @Query("SELECT * FROM shoppingItem WHERE uid = :id")
+    fun getShoppingItemById(id: Int) : Flow<ShoppingItem?>
 
     @Query("UPDATE shoppingItem SET name = :name, count = :count, unit = :unit WHERE uid = :id")
     fun updateShoppingItemById(id: Int, name: String, count: Int, unit: String)

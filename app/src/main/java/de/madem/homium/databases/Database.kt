@@ -12,7 +12,7 @@ import de.madem.homium.models.*
 abstract class AppDatabase : RoomDatabase() {
 
     //userDao for accessing database content
-    abstract fun itemDao(): ItemDao
+    abstract fun shoppingDao(): ShoppingDao
 
     abstract fun recipeDao(): RecipeDao
     abstract fun inventoryDao(): InventoryDao

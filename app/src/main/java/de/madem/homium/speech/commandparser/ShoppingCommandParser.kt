@@ -2,7 +2,7 @@ package de.madem.homium.speech.commandparser
 
 import android.content.Context
 import de.madem.homium.R
-import de.madem.homium.databases.ItemDao
+import de.madem.homium.databases.ShoppingDao
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -10,7 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.lang.ref.WeakReference
 
-class ShoppingCommandParser(private val contextRef: WeakReference<Context>, private val shoppingDao: ItemDao) {
+class ShoppingCommandParser(private val contextRef: WeakReference<Context>, private val shoppingDao: ShoppingDao) {
 
     fun parseShoppingItem(splittedWords : List<String>) : ShoppingItem?{
 

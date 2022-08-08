@@ -12,7 +12,7 @@ class DatabaseInitializer @Inject constructor(
     private val doneCallback: () -> Unit
 ) {
 
-    private val dao = database.itemDao()
+    private val dao = database.shoppingDao()
     private val backgroundTask =
         CoroutineBackgroundTask<Unit>()
 

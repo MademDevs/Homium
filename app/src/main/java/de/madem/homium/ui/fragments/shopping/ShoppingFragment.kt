@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
+import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
 import de.madem.homium.di.utils.ShoppingToInventoryHandlerAssistedFactory
@@ -379,7 +380,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     // help functions
     private fun showShoppingItemEditScreen(itemId: Int){
         Intent(activity, ShoppingItemEditActivity::class.java)
-            .apply {putExtra("item", itemId) }
+            .apply {putExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, itemId) }
             .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
     }
 

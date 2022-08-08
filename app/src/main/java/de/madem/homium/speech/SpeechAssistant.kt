@@ -21,8 +21,8 @@ class SpeechAssistant @AssistedInject constructor(
 
     //fields
     private val recognizers = listOf<PatternRecognizer>(
-        ShoppingRecognizer(WeakReference<Context>(context), db.itemDao()),
-        InventoryRecognizer(WeakReference<Context>(context), db.inventoryDao(), db.itemDao()),
+        ShoppingRecognizer(WeakReference<Context>(context), db.shoppingDao()),
+        InventoryRecognizer(WeakReference<Context>(context), db.inventoryDao(), db.shoppingDao()),
         RecipeRecognizer(WeakReference<Context>(context), db.recipeDao())
     )
 

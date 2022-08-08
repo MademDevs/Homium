@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -272,5 +273,11 @@ fun <T> Flow<T>.onCollect(viewLifecycleOwner: LifecycleOwner, onEmit: suspend (T
     viewLifecycleOwner.lifecycleScope.launch {
         this@onCollect.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect { onEmit(it) }
+    }
+}
+
+fun EditText.setDistinctText(text: CharSequence){
+    if(this.text.toString() != text.toString()) {
+        this.setText(text)
     }
 }

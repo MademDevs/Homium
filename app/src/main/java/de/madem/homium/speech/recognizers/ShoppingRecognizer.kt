@@ -5,7 +5,7 @@ import android.widget.Toast
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.application.HomiumSettings
-import de.madem.homium.databases.ItemDao
+import de.madem.homium.databases.ShoppingDao
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -19,10 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 
-class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private val itemDao : ItemDao) : PatternRecognizer {
+class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private val shoppingDao : ShoppingDao) : PatternRecognizer {
 
     private val commandParser =
-        ShoppingCommandParser(contextRef, itemDao)
+        ShoppingCommandParser(contextRef, shoppingDao)
 
     companion object{
         private val unitsAsRecognitionPattern = Units.asSpeechRecognitionPattern()
@@ -68,7 +68,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             val result = commandParser.parseShoppingItem(params)
 
             if(result != null){
-                itemDao.insertShopping(result)
+                shoppingDao.insertShopping(result)
                 withContext(Dispatchers.Main){
                     contextRef.get().notNull {
                         Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_added),
@@ -115,7 +115,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             var sucess = false
 
             parsedItem.notNull {
-                itemDao.insertShopping(it)
+                shoppingDao.insertShopping(it)
                 sucess = true
             }
 
@@ -153,7 +153,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             var sucess = false
 
             parsedItem.notNull {
-                itemDao.insertShopping(it)
+                shoppingDao.insertShopping(it)
                 sucess = true
             }
 
@@ -192,8 +192,8 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
         }
 
         val backgroundFunc : () -> Boolean = {
-            if(itemDao.shoppingListSize() != 0){
-                itemDao.deleteAllShopping()
+            if(shoppingDao.shoppingListSize() != 0){
+                shoppingDao.deleteAllShopping()
                 true
             }
             else{
@@ -254,20 +254,20 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
 
         //creating functions and return right task
         val backgroundFunc : () -> Boolean = backgroundFunc@{
-            if(!(itemDao.getAllShoppingNames().contains(name))){
+            if(!(shoppingDao.getAllShoppingNames().contains(name))){
                 return@backgroundFunc false
             }
 
             if(allShouldBeDeleted){
-                val products = itemDao.getProductsByNameOrPlural(name)
+                val products = shoppingDao.getProductsByNameOrPlural(name)
 
                 if(products.isNotEmpty()){
-                    itemDao.deleteShoppingByName(products[0].plural)
-                    itemDao.deleteShoppingByName(products[0].name)
+                    shoppingDao.deleteShoppingByName(products[0].plural)
+                    shoppingDao.deleteShoppingByName(products[0].name)
                 }
             }
 
-            itemDao.deleteShoppingByName(name)
+            shoppingDao.deleteShoppingByName(name)
 
             return@backgroundFunc true
          }
@@ -330,14 +330,14 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
 
         //creating functions for execution
         val backgroundFunc : () -> Boolean = backgroundFunc@{
-            if(!(itemDao.getAllShoppingNames().contains(params[2].capitalizeEachWord()))){
+            if(!(shoppingDao.getAllShoppingNames().contains(params[2].capitalizeEachWord()))){
                 return@backgroundFunc false
             }
 
             val item : ShoppingItem?= commandParser.parseShoppingItem(params)
 
             if(item != null){
-                itemDao.deleteShoppingByNameCountUnit(item.name,item.count,item.unit)
+                shoppingDao.deleteShoppingByNameCountUnit(item.name,item.count,item.unit)
                 return@backgroundFunc true
             }
             else{
@@ -399,12 +399,12 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             val searchCount = params.first().trim().toIntOrNull()
             val searchName = params.last().trim().capitalizeEachWord()
 
-            if(!(itemDao.getAllShoppingNames().contains(searchName))){
+            if(!(shoppingDao.getAllShoppingNames().contains(searchName))){
                 return@backgroundFunc false
             }
 
             if(searchCount != null){
-                itemDao.deleteShoppingItemByNameCount(searchName,searchCount)
+                shoppingDao.deleteShoppingItemByNameCount(searchName,searchCount)
                 return@backgroundFunc true
             }
             else{

@@ -6,7 +6,7 @@ import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.databases.InventoryDao
-import de.madem.homium.databases.ItemDao
+import de.madem.homium.databases.ShoppingDao
 import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Units
@@ -21,7 +21,7 @@ import java.lang.ref.WeakReference
 class InventoryRecognizer(
     private val contextRef : WeakReference<Context>,
     private val inventoryDao : InventoryDao,
-    private val shoppingDao: ItemDao
+    private val shoppingDao: ShoppingDao
 ) : PatternRecognizer{
 
     private val parser = InventoryCommandParser(contextRef, shoppingDao)

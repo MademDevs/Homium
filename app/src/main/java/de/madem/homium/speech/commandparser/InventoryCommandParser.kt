@@ -3,7 +3,7 @@ package de.madem.homium.speech.commandparser
 import android.content.Context
 import de.madem.homium.R
 import de.madem.homium.application.HomiumApplication
-import de.madem.homium.databases.ItemDao
+import de.madem.homium.databases.ShoppingDao
 import de.madem.homium.models.InventoryItem
 import de.madem.homium.models.Product
 import de.madem.homium.models.Units
@@ -15,7 +15,7 @@ import java.util.*
 
 class InventoryCommandParser(
     private val contextRef :WeakReference<Context>,
-    private val shoppingDao: ItemDao
+    private val shoppingDao: ShoppingDao
 ) {
 
     companion object{

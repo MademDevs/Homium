@@ -17,7 +17,7 @@ class ShoppingViewModel @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
-    private val shoppingItemDao = database.itemDao()
+    private val shoppingItemDao = database.shoppingDao()
 
     //list with all shopping items
     val shoppingItemList = MutableLiveData<List<ShoppingItem>>().apply {

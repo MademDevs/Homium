@@ -42,7 +42,7 @@ class CookingAssistant @AssistedInject constructor(
     //fields
     private val recipeDao = db.recipeDao()
     private val inventoryDao = db.inventoryDao()
-    private val shoppingDao = db.itemDao()
+    private val shoppingDao = db.shoppingDao()
 
     private val unitConverter : UnitConverter = UnitConverter()
     private val inventoryQuantityOperator = InventoryQuantityCalculationOperator(unitConverter, db.inventoryDao())

@@ -11,12 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
-import de.madem.homium.constants.BIG_UNITS_VALUES
-import de.madem.homium.constants.SMALL_UNITS_VALUES
 import de.madem.homium.databases.AppDatabase
-import de.madem.homium.models.InventoryItem
-import de.madem.homium.models.Product
-import de.madem.homium.models.Units
+import de.madem.homium.models.*
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.*
 import javax.inject.Inject
@@ -178,7 +174,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
     //private fuctions
     private fun setSpinnerDefaultValues(name: String) {
         CoroutineBackgroundTask<Product>()
-            .executeInBackground { db.itemDao().getProductsByName(name)[0] }
+            .executeInBackground { db.shoppingDao().getProductsByName(name)[0] }
             .onDone {
 
                 //setting unit
@@ -244,7 +240,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
 
         CoroutineBackgroundTask<List<Product>>()
             .executeInBackground {
-            val result = db.itemDao().getAllProduct()
+            val result = db.shoppingDao().getAllProduct()
             return@executeInBackground result
         }.onDone { result ->
             val productNameList = result.map { it.name }
