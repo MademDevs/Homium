@@ -67,14 +67,14 @@ class ShoppingToInventoryHandler @AssistedInject constructor(
 
                 val inventoryItem = currentInventoryItems.firstOrNull { inventoryItem ->
                     inventoryItem.name.equals(shoppingItem.name, true) &&
-                            inventoryItem.unit == shoppingItem.unit
+                            inventoryItem.unit == shoppingItem.unit.getString()
                 }
 
                 if (inventoryItem == null) {
                     //create new inventory item
                     with(shoppingItem) {
                         inventoryDao.insertInventoryItems(
-                            InventoryItem(name, count, unit, "")
+                            InventoryItem(name, count, unit.getString(), "")
                         )
                     }
 

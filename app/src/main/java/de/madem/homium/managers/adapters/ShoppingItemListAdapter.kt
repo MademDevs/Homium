@@ -1,6 +1,5 @@
 package de.madem.homium.managers.adapters
 
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,7 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
                 val filterArgs = constraint.toString().toLowerCase().trim().split(" ")
                 dataBackup.forEach { item ->
                     val name = item.name.trim().toLowerCase()
-                    val unit = item.unit.trim().toLowerCase()
+                    val unit = item.unit.getString().trim().toLowerCase()
                     val cnt = item.count.toString()
                     var matches = true
                     for(arg in filterArgs) {
@@ -112,7 +111,7 @@ class ShoppingItemListAdapter(owner: LifecycleOwner, liveData: MutableLiveData<L
             txtTitle.text = shoppingItem.name
             txtQuantityUnit.text = quantityUnitTemplate
                 .replace("quantity",shoppingItem.count.toString())
-                .replace("unit",shoppingItem.unit)
+                .replace("unit",shoppingItem.unit.getString())
 
             //set view checked
             applyCheck(shoppingItem.checked)

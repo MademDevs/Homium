@@ -83,9 +83,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         binding.notNull {
-            //unit index
-            outState.putInt(SAVEINSTANCESTATE_UNIT_INDEX, it.shoppingItemEditNumPickUnit.value)
-
             //count value
             val numPickerCount = it.shoppingItemEditNumPickCount
             if(numPickerCount.isVisible){
@@ -103,10 +100,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         //unit value
         binding.notNull {
             val numPickerCount = it.shoppingItemEditNumPickCount
-            val numPickerUnit = it.shoppingItemEditNumPickUnit
             val editTextCount = it.shoppingItemEditEditTxtCount
-
-            numPickerUnit.value = savedInstanceState.getInt(SAVEINSTANCESTATE_UNIT_INDEX)
 
             //count value
             val countValue = savedInstanceState.getString(SAVEINSTANCESTATE_COUNT) ?: smallUnits[0]
@@ -152,7 +146,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             .onDone {
                 binding.notNull { binding ->
                     //setting unit
-                    binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+                    //binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit)
 
                     val editTextCount = binding.shoppingItemEditEditTxtCount
                     val numPickerCount = binding.shoppingItemEditNumPickCount
@@ -177,7 +171,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     }
 
-    //private fuctions
+    //private functions
     private fun setSpinnerDefaultValues(name: String) {
         CoroutineBackgroundTask<Product>()
             .executeInBackground { db.shoppingDao().getProductsByName(name)[0] }
@@ -201,7 +195,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         else{
                             assignValueFromPickerToEditText(it.amount)
                         }
-
                     }
                 }
             }
@@ -268,29 +261,25 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             it.minValue = 0
             it.maxValue = units.size-1
             it.displayedValues = units
-            it.value = 0
         }
 
         val numPickerCount = binding.shoppingItemEditNumPickCount
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            //getting data for picker
-            numPickerCount.isSaveFromParentEnabled = false
-            numPickerCount.isSaveEnabled = false
-            numPickerCount.minValue = 0
-            numPickerCount.maxValue = smallUnits.size-1
-            numPickerCount.value = 0
-            numPickerCount.displayedValues = smallUnits
-            numPickerCount.setOnLongClickListener {
-                assignValueFromPickerToEditText(numPickerCount.displayedValues[numPickerCount.value])
+        //getting data for picker
+        numPickerCount.isSaveFromParentEnabled = false
+        numPickerCount.isSaveEnabled = false
+        numPickerCount.minValue = 0
+        numPickerCount.maxValue = smallUnits.size-1
+        numPickerCount.value = 0
+        numPickerCount.displayedValues = smallUnits
+        numPickerCount.setOnLongClickListener {
+            assignValueFromPickerToEditText(numPickerCount.displayedValues[numPickerCount.value])
 
-            }
+        }
 
-            numPickerUnit.setOnValueChangedListener { npUnit, i, i2 ->
-                println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
-                setValuesForNumPickerCount(npUnit)
-            }
-        } else {
-            numPickerCount.isVisible = false
+        numPickerUnit.setOnValueChangedListener { npUnit, _, newIdx ->
+            println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
+            viewModel.setSelectedUnitByIndex(newIdx)
+            setValuesForNumPickerCount(npUnit)
         }
 
         binding.shoppingItemEditEditTxtCount.also { ed ->
@@ -307,7 +296,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
-            viewModel.setEditItemTitle(it?.toString() ?: "")
+            viewModel.setEditItemName(it?.toString() ?: "")
         }
     }
 
@@ -363,7 +352,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
         if(title.isNotBlank() && title.isNotEmpty() && amount != null){
             //all input components are valid -> creating object and put it into database via coroutine
-            val item = ShoppingItem(title, amount, unit)
+            val item = ShoppingItem(title, amount, Units.unitOf(unit) ?: Units.default)
 
             CoroutineBackgroundTask<Unit>()
                 .executeInBackground {
@@ -396,8 +385,14 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             binding.shoppingItemEditBtnDelete.isVisible = it
         }
 
-        viewModel.displayedEditItemTitle.onCollect(this) { title ->
+        viewModel.editItemName.onCollect(this) { title ->
             binding.shoppingItemEditAutoCmplTxtName.setDistinctText(title)
+        }
+
+        viewModel.selectedUnitIndex.onCollect(this) {
+            if(it in viewModel.units.indices) {
+                binding.shoppingItemEditNumPickUnit.setDistinctValue(it)
+            }
         }
     }
 }

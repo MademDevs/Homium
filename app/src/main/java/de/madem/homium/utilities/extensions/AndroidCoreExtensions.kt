@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
@@ -279,5 +280,11 @@ fun <T> Flow<T>.onCollect(viewLifecycleOwner: LifecycleOwner, onEmit: suspend (T
 fun EditText.setDistinctText(text: CharSequence){
     if(this.text.toString() != text.toString()) {
         this.setText(text)
+    }
+}
+
+fun NumberPicker.setDistinctValue(value: Int) {
+    if(this.value != value) {
+        this.value = value
     }
 }

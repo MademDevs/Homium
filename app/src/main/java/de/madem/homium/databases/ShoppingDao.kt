@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
+import de.madem.homium.models.Units
 import kotlinx.coroutines.flow.Flow
 
 
@@ -47,7 +48,7 @@ interface ShoppingDao {
     fun deleteShoppingByName(deleteItem: String)
 
     @Query("DELETE FROM shoppingItem WHERE name LIKE :itemName AND unit LIKE :itemUnit AND count = :itemCount")
-    fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: String)
+    fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: Units)
 
     //return List -> iterate and adapt view -> auto-completion
     @Query("SELECT * FROM product WHERE name LIKE :getItem")

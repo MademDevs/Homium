@@ -40,7 +40,7 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>, priv
         //quantity
         val quantity = splittedWords[0].trim().toIntOrNull() ?: return null //replaceNumberWords(splittedWords[0]).toIntOrNull() ?: return null
         println("QUANTITY = $quantity")
-        return ShoppingItem(name,quantity,Units.shortCutToLongValue(unit))
+        return ShoppingItem(name,quantity,Units.unitOf(Units.shortCutToLongValue(unit)) ?: Units.default)
 
     }
 
@@ -67,17 +67,17 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>, priv
             val productResult = matchingProductsDeffered.await()
 
             if(productResult.isEmpty()){
-                return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString())
+                return@coroutineScope ShoppingItem(name,amount,Units.ITEM)
             }
             else{
                 val productNameIndex = productResult.map { it.name }.indexOf(name)
                 val productPluralNameIndex = productResult.map { it.plural }.indexOf(name)
                 if(productNameIndex >= 0 || productPluralNameIndex >= 0) {
                     val newUnit = if(productPluralNameIndex < 0) productResult[productNameIndex].unit else productResult[productPluralNameIndex].unit
-                    return@coroutineScope ShoppingItem(name,amount,newUnit)
+                    return@coroutineScope ShoppingItem(name,amount,Units.unitOf(newUnit) ?: Units.default)
                 }
                 else{
-                    return@coroutineScope ShoppingItem(name,amount,Units.ITEM.getString())
+                    return@coroutineScope ShoppingItem(name,amount,Units.ITEM)
                 }
             }
         }
@@ -104,16 +104,16 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>, priv
                 productNameIndex >= 0 -> {
                     val newUnit = productResult[productNameIndex].unit
                     val newQuantity = productResult[productNameIndex].amount.toIntOrNull() ?: 1
-                    ShoppingItem(name,newQuantity,newUnit)
+                    ShoppingItem(name,newQuantity,Units.unitOf(newUnit) ?: Units.default)
                 }
                 productPluralIndex >= 0 -> {
                     val newUnit = productResult[productPluralIndex].unit
                     val newQuantity = productResult[productPluralIndex].amount.toIntOrNull()?.takeIf { it > 1 } ?: 2
-                    ShoppingItem(name,newQuantity,newUnit)
+                    ShoppingItem(name,newQuantity,Units.unitOf(newUnit) ?: Units.default)
 
                 }
                 else -> {
-                    ShoppingItem(name,1,Units.ITEM.getString())
+                    ShoppingItem(name,1,Units.ITEM)
                 }
             }
 

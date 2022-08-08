@@ -94,7 +94,11 @@ class CookingAssistant @AssistedInject constructor(
                 //case that there is less in inventory than needed in ingredient
                 if(quantitySum < ingredient.count){
                     val countDifference : Int = ingredient.count - quantitySum
-                    missingShoppingItems.add(ShoppingItem(ingredient.name,countDifference,ingredient.unit))
+                    missingShoppingItems.add(ShoppingItem(
+                        ingredient.name,
+                        countDifference,
+                        Units.unitOf(ingredient.unit) ?: Units.default)
+                    )
                 }
                 //case that there is more in inventory than needed in ingredient
                 else{
@@ -138,10 +142,22 @@ class CookingAssistant @AssistedInject constructor(
                     val countDifference = ingredientCount - quantitySumInInventory
                     if(allowedToScaleBack(countDifference,ingredientOriginUnit)){
                         val backConvert = unitConverter.convertUnit(Pair(countDifference,ingredientUnit.getString()),ingredientOriginUnit)
-                        missingShoppingItems.add(ShoppingItem(ingredient.name,backConvert.first,backConvert.second))
+                        missingShoppingItems.add(
+                            ShoppingItem(
+                                ingredient.name,
+                                backConvert.first,
+                                Units.unitOf(backConvert.second) ?: Units.default
+                            )
+                        )
                     }
                     else{
-                        missingShoppingItems.add(ShoppingItem(ingredient.name,countDifference,ingredientUnit.getString()))
+                        missingShoppingItems.add(
+                            ShoppingItem(
+                                ingredient.name,
+                                countDifference,
+                                Units.unitOf(ingredientUnit.getString()) ?: Units.default
+                            )
+                        )
                     }
 
                 }

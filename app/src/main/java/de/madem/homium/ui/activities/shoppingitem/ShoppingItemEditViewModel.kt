@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.models.ShoppingItem
+import de.madem.homium.models.Units
 import de.madem.homium.repositories.ShoppingRepository
 import de.madem.homium.utilities.extensions.notNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,29 +33,52 @@ class ShoppingItemEditViewModel @Inject constructor(
     }
         .map { it?.data }
         .onEach { item ->
-            item.notNull { editItemTitle.emit(it.name) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+            item.notNull { shoppingItem ->
+                //name
+                setEditItemName(shoppingItem.name)
+                //unit
+                setSelectedUnit(shoppingItem.unit)
 
-    private val editItemTitle = MutableStateFlow("")
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
+
+    private val _editItemName = MutableStateFlow("")
+    private val _selectedUnit : MutableStateFlow<Units> = MutableStateFlow(Units.default)
     //endregion
 
     //region exposed data for UI
+    val units : Array<Units>
+        get() = Units.values()
+
     val actionTitleResId: Flow<Int> = itemIdFlow.map {
         if (it == null)
             R.string.screentitle_edit_shopppingitem_add
         else
             R.string.screentitle_edit_shoppingitem_edit
     }
-    val displayedEditItemTitle: Flow<String> = editItemTitle
+    val editItemName: Flow<String> = _editItemName
     val showDeleteButton: Flow<Boolean> = existingShoppingItem.map { it != null }
+    val selectedUnitIndex : Flow<Int> = _selectedUnit.map { units.indexOf(it) }
     //endregion
 
     //region functions
-    fun setEditItemTitle(newTitle: String) {
-        viewModelScope.launch {
-            if (editItemTitle.value != newTitle) {
-                editItemTitle.emit(newTitle)
-            }
+    fun setEditItemName(newTitle: String) {
+        if (_editItemName.value != newTitle) {
+            viewModelScope.launch { _editItemName.emit(newTitle) }
+        }
+    }
+
+    private fun setSelectedUnit(unit: Units) {
+        if(_selectedUnit.value == unit) {
+            return
+        }
+
+        viewModelScope.launch { _selectedUnit.emit(unit) }
+    }
+
+    fun setSelectedUnitByIndex(index: Int) {
+        if(index in units.indices) {
+            setSelectedUnit(units[index])
         }
     }
     //endregion

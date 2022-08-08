@@ -17,6 +17,7 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
     //companion
     companion object{
 
+        //TODO convert this function into an extension or something like that to get rid of the context
         fun stringValueArray(context: Context = HomiumApplication.appContext!!) : Array<String>{
             return values().map { it.getString(context) }.toTypedArray()
         }
@@ -82,6 +83,8 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return values().firstOrNull { context.getString(it.resourceId) == text }
         }
 
+        val default: Units
+            get() = ITEM
     }
 
     //functions
