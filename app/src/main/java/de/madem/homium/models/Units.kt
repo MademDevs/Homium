@@ -134,8 +134,8 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
     }
 }
 
-val SMALL_UNITS_VALUES : Array<String> = Array<String>(15){(it+1).toString()};
-val BIG_UNITS_VALUES : Array<String> = sequence<String> {
+val BIG_UNITS_AND_NON_CONVERTABLE_DATASET : Array<String> = Array(15){(it+1).toString()};
+val SMALL_UNITS_DATASET : Array<String> = sequence {
     var start = 50
     yield(start.toString())
 
@@ -150,3 +150,6 @@ val BIG_UNITS_VALUES : Array<String> = sequence<String> {
     }
 
 }.toList().toTypedArray()
+
+val Units.dataset : Array<String>
+    get() = if (isSmallUnit()) SMALL_UNITS_DATASET else BIG_UNITS_AND_NON_CONVERTABLE_DATASET

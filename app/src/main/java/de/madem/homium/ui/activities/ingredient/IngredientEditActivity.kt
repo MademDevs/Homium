@@ -78,8 +78,8 @@ class IngredientEditActivity : AppCompatActivity() {
         shoppingDao = database.shoppingDao()
 
         //setup big and small units
-        bigUnits = BIG_UNITS_VALUES
-        smallUnits = SMALL_UNITS_VALUES
+        bigUnits = SMALL_UNITS_DATASET
+        smallUnits = BIG_UNITS_AND_NON_CONVERTABLE_DATASET
 
         //setup Actionbar
         setupActionbar()

@@ -49,8 +49,8 @@ class InventoryItemEditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_inventory_item_edit)
 
         //getting data from ressources
-        bigUnits = BIG_UNITS_VALUES
-        smallUnits = SMALL_UNITS_VALUES
+        bigUnits = SMALL_UNITS_DATASET
+        smallUnits = BIG_UNITS_AND_NON_CONVERTABLE_DATASET
 
         //init action bar
         initActionbar()
