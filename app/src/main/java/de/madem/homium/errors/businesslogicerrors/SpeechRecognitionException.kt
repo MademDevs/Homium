@@ -1,5 +1,3 @@
-package de.madem.homium.exceptions
-
-import java.lang.Exception
+package de.madem.homium.errors.businesslogicerrors
 
 class SpeechRecognitionException(msg : String) : Exception(msg)

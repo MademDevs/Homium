@@ -112,7 +112,7 @@
     <string name="recipe_actionmode_delete_question">Sollen die ausgewählten Rezepte wirklich gelöscht werden?</string>
     <string name="recipe_import">Rezept importieren</string>
     <string name="recipe_import_text">Hast du ein Homium-Rezept als Text geschickt bekommen? Dann füge es hier ein und übernehme es in deine Rezeptverwaltung.</string>
-    <string name="recipe_import_hint">Hier den Nachrichtentext einfügen...</string>
+    <string name="recipe_import_hint">Hier den Nachrichtentext einfügen…</string>
 
     <!--recipe edit texts-->
     <string name="recipe_title">Rezept-Name</string>

@@ -199,7 +199,7 @@ class CookingAssistant @AssistedInject constructor(
                     return@executeInBackground false
                 }
                 else{
-                    shoppingDao.insertShopping(*(missingItems.toTypedArray()))
+                    shoppingDao.insertShoppingItem(*(missingItems.toTypedArray()))
                     return@executeInBackground true
                 }
             }.onDone { success ->

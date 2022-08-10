@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
-import de.madem.homium.exceptions.NoDeletionWithNotExistingShoppingItemException
+import de.madem.homium.errors.businesslogicerrors.NoDeletionWithNotExistingShoppingItemException
+import de.madem.homium.errors.presentationerrors.ValidationException
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
@@ -14,14 +15,16 @@ import de.madem.homium.models.dataset
 import de.madem.homium.repositories.ProductRepository
 import de.madem.homium.repositories.ShoppingRepository
 import de.madem.homium.utilities.AppResult
+import de.madem.homium.utilities.extensions.forwardErrors
+import de.madem.homium.utilities.extensions.forwardNullableErrors
 import de.madem.homium.utilities.extensions.notNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO Implement logic for handling process death with savedstatehandle
-//TODO maybe handle errors
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingItemEditViewModel @Inject constructor(
@@ -35,6 +38,8 @@ class ShoppingItemEditViewModel @Inject constructor(
     }
 
     //region private Properties
+    private val operationErrors: Channel<Throwable> = Channel()
+
     private val itemIdFlow: Flow<Int?> = flowOf(
         savedStateHandle.get<Int>(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID)
     )
@@ -42,6 +47,7 @@ class ShoppingItemEditViewModel @Inject constructor(
     private val existingShoppingItem: StateFlow<ShoppingItem?> = itemIdFlow.flatMapLatest { id ->
         if (id == null) flowOf(null) else shoppingRepository.getShoppingItemById(id)
     }
+        .forwardNullableErrors(operationErrors)
         .map { it?.data }
         .onEach { item ->
             item.notNull { shoppingItem ->
@@ -82,7 +88,10 @@ class ShoppingItemEditViewModel @Inject constructor(
 
     val allProducts : Flow<List<Product>> = productRepository
         .getAllProducts()
+        .forwardErrors(operationErrors)
         .map { it.data ?: emptyList() }
+
+    val errors : Flow<Throwable> = operationErrors.receiveAsFlow()
     //endregion
 
     init {
@@ -216,6 +225,7 @@ class ShoppingItemEditViewModel @Inject constructor(
     fun loadProductByName(name: String) {
         productRepository
             .getProductsByName(name)
+            .forwardErrors(operationErrors)
             .onEach {
                 val firstProduct = it.data?.firstOrNull() ?: return@onEach
                 setEditItemName(firstProduct.name)
@@ -227,18 +237,38 @@ class ShoppingItemEditViewModel @Inject constructor(
 
     fun deleteShoppingItem() : Flow<Boolean> = itemIdFlow.map { id ->
         if(id != null) {
-            val result = shoppingRepository.deleteShoppingItemById(id)
-            result is AppResult.Success
+            shoppingRepository.deleteShoppingItemById(id)
         }
         else {
-            AppResult.Error<Unit>(NoDeletionWithNotExistingShoppingItemException())
-            false
+            AppResult.Error(NoDeletionWithNotExistingShoppingItemException())
         }
-    }
+    }.forwardErrors(operationErrors).map { it is AppResult.Success }
+
+    fun mergeShoppingItem() : Flow<Boolean> = itemIdFlow.map<Int?,AppResult<Unit>> { id ->
+        val name = _editItemName.value
+        val unit = _selectedUnit.value
+        val count = _counterState.value.getCounterValue().toIntOrNull()?.takeIf { it >= 0 }
+
+        if(name.isBlank() || count == null) {
+            return@map AppResult.Error<Unit>(ValidationException.InvalidParametersException)
+        }
+
+        if(id == null) {
+            //perform insert
+            val newItem = ShoppingItem(name, count, unit, false)
+            shoppingRepository.insertShoppingItem(newItem)
+        }
+        else {
+            //perform update
+            shoppingRepository.updateShoppingItemById(id, name, count, unit)
+        }
+    }.forwardErrors(operationErrors).map { it is AppResult.Success }
     //endregion
 }
 
 sealed class ShoppingCounterState {
+    abstract fun getCounterValue() : String
+
     data class InRange(val selectedIndex: Int, val dataset: Array<String>) : ShoppingCounterState() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -254,6 +284,9 @@ sealed class ShoppingCounterState {
             return result
         }
 
+        override fun getCounterValue(): String = dataset[selectedIndex]
     }
-    data class Custom(val value: String) : ShoppingCounterState()
+    data class Custom(val value: String) : ShoppingCounterState() {
+        override fun getCounterValue(): String = value
+    }
 }

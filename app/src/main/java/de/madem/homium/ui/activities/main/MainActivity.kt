@@ -18,7 +18,7 @@ import de.madem.homium.BuildConfig
 import de.madem.homium.R
 import de.madem.homium.constants.REQUEST_CODE_SPEECH
 import de.madem.homium.di.utils.SpeechAssistantAssistedFactory
-import de.madem.homium.exceptions.SpeechRecognitionException
+import de.madem.homium.errors.businesslogicerrors.SpeechRecognitionException
 import de.madem.homium.speech.SpeechAssistant
 import de.madem.homium.speech.startSpeechRecognition
 import de.madem.homium.ui.activities.about.AboutActivity

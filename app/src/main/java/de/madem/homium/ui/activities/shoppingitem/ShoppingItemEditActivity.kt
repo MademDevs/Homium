@@ -20,15 +20,15 @@ import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityShoppingItemEditBinding
-import de.madem.homium.models.ShoppingItem
-import de.madem.homium.models.Units
-import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
+import de.madem.homium.errors.businesslogicerrors.DeletionFailedException
+import de.madem.homium.errors.presentationerrors.ValidationException
 import de.madem.homium.utilities.extensions.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShoppingItemEditActivity : AppCompatActivity() {
     //fields
+    //TODO delete binding field
     private var binding: ActivityShoppingItemEditBinding? = null
     private val viewModel : ShoppingItemEditViewModel by viewModels()
 
@@ -68,7 +68,14 @@ class ShoppingItemEditActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.shopping_item_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
+            R.id.shopping_item_edit_actionbar_confirm -> {
+                viewModel.mergeShoppingItem().onCollect(this) { success ->
+                    if(success) {
+                        //TODO change to normal finish and reactive approach
+                        finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+                    }
+                }
+            }
             android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
         }
         return super.onOptionsItemSelected(item)
@@ -89,7 +96,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                         if(success) {
                             Toast.makeText(
                                 this,
-                                resources.getString(R.string.notification_delete_shoppingitem_sucess),
+                                R.string.notification_delete_shoppingitem_sucess,
                                 Toast.LENGTH_SHORT
                             ).show()
                             dialog.dismiss()
@@ -158,55 +165,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAmount(): Int? = binding?.let {
-        val numPickerCount = it.shoppingItemEditNumPickCount
-        if(numPickerCount.isVisible) {
-            return numPickerCount.displayedValues[numPickerCount.value].toIntOrNull()
-        } else {
-            return it.shoppingItemEditEditTxtCount.text.toString().toIntOrNull()
-        }
-    }
-
-    private fun getUnit(): String {
-        val numPickerUnit = binding?.shoppingItemEditNumPickUnit
-        return Units.stringValueArray(this)[numPickerUnit?.value ?: 0]
-    }
-
-    @Deprecated("Transfer logic into ViewModel")
-    private fun getItemTitle(): String {
-        return binding?.shoppingItemEditAutoCmplTxtName?.text?.toString() ?: ""
-    }
-
-    //TODO move to vm
-    private fun addOrUpdateToDatabaseIfPossible() {
-
-        //check if all input components are valid
-        val title = getItemTitle()
-        val amount = getAmount()
-        val unit = getUnit()
-
-        if(title.isNotBlank() && title.isNotEmpty() && amount != null){
-            //all input components are valid -> creating object and put it into database via coroutine
-            val item = ShoppingItem(title, amount, Units.unitOf(unit) ?: Units.default)
-
-            CoroutineBackgroundTask<Unit>()
-                .executeInBackground {
-                if(itemid >= 0){
-                    db.shoppingDao().updateShoppingItemById(itemid, title, amount, unit)
-                }
-                else{
-                    db.shoppingDao().insertShopping(item)
-                }
-            }.onDone {
-                finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
-            }.start()
-
-        }
-        else{
-            Toast.makeText(this, resources.getString(R.string.errormsg_invalid_parameters),Toast.LENGTH_LONG).show()
-        }
-    }
-
     private fun setupViewModel(binding: ActivityShoppingItemEditBinding) {
         viewModel.actionTitleResId.onCollect(this) { resId ->
             try {
@@ -263,6 +221,15 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     productNameList
                 )
             )
+        }
+
+        viewModel.errors.onCollect(this) {
+            val errMsgResId = when(it) {
+                is DeletionFailedException -> R.string.errormsg_delete_shopping_failed
+                is ValidationException -> it.errMsgResId
+                else -> R.string.error
+            }
+            Toast.makeText(this, errMsgResId, Toast.LENGTH_SHORT).show()
         }
     }
 }

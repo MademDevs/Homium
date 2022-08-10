@@ -32,7 +32,7 @@ interface ShoppingDao {
     fun insertProduct(vararg item: Product)
 
     @Insert
-    fun insertShopping(vararg item: ShoppingItem)
+    suspend fun insertShoppingItem(vararg item: ShoppingItem)
 
     @Query("DELETE FROM product")
     fun deleteAllProduct()
@@ -69,7 +69,7 @@ interface ShoppingDao {
     fun getShoppingItemById(id: Int) : Flow<ShoppingItem?>
 
     @Query("UPDATE shoppingItem SET name = :name, count = :count, unit = :unit WHERE uid = :id")
-    fun updateShoppingItemById(id: Int, name: String, count: Int, unit: String)
+    suspend fun updateShoppingItemById(id: Int, name: String, count: Int, unit: Units)
 
     @Query("DELETE FROM shoppingItem WHERE uid = :id")
     suspend fun deleteShoppingItemById(id: Int)

@@ -3,7 +3,7 @@ package de.madem.homium.speech
 import android.app.Activity
 import android.content.Intent
 import android.speech.RecognizerIntent
-import de.madem.homium.exceptions.SpeechRecognitionException
+import de.madem.homium.errors.businesslogicerrors.SpeechRecognitionException
 import java.util.*
 
 fun Activity.startSpeechRecognition(requestCode: Int, locale: Locale){

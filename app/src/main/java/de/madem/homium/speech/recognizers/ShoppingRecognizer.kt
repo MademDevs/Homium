@@ -68,7 +68,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             val result = commandParser.parseShoppingItem(params)
 
             if(result != null){
-                shoppingDao.insertShopping(result)
+                shoppingDao.insertShoppingItem(result)
                 withContext(Dispatchers.Main){
                     contextRef.get().notNull {
                         Toast.makeText(it,getStringRessource(R.string.assistent_msg_shoppingitem_added),
@@ -115,7 +115,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             var sucess = false
 
             parsedItem.notNull {
-                shoppingDao.insertShopping(it)
+                shoppingDao.insertShoppingItem(it)
                 sucess = true
             }
 
@@ -153,7 +153,7 @@ class ShoppingRecognizer(private val contextRef: WeakReference<Context>, private
             var sucess = false
 
             parsedItem.notNull {
-                shoppingDao.insertShopping(it)
+                shoppingDao.insertShoppingItem(it)
                 sucess = true
             }
 
