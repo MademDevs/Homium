@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface ShoppingRepository {
     //TODO Documentation
     fun getShoppingItemById(id: Int) : Flow<AppResult<ShoppingItem>>
+    suspend fun deleteShoppingItemById(id: Int) : AppResult<Unit>
 }

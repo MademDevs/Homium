@@ -85,19 +85,18 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setMessage(R.string.shopping_item_delete_question)
                 .setPositiveButton(R.string.answer_yes) { dialog, _ ->
-                    CoroutineBackgroundTask<Unit>()
-                        .executeInBackground {
-                            if(itemid >= 0) {
-                                //TODO move to vm
-                                db.shoppingDao().deleteShoppingItemById(itemid)
-                            }
-                        }
-                        .onDone {
-                            Toast.makeText(this,resources.getString(R.string.notification_delete_shoppingitem_sucess),Toast.LENGTH_SHORT).show()
+                    viewModel.deleteShoppingItem().onCollect(this) { success ->
+                        if(success) {
+                            Toast.makeText(
+                                this,
+                                resources.getString(R.string.notification_delete_shoppingitem_sucess),
+                                Toast.LENGTH_SHORT
+                            ).show()
                             dialog.dismiss()
+                            //TODO exchange with reactive approach and just calling finish
                             finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
                         }
-                        .start()
+                    }
                 }
                 .setNegativeButton(R.string.answer_no) { dialog, _ ->
                     dialog.dismiss()

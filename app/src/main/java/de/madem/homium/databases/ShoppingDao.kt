@@ -72,7 +72,7 @@ interface ShoppingDao {
     fun updateShoppingItemById(id: Int, name: String, count: Int, unit: String)
 
     @Query("DELETE FROM shoppingItem WHERE uid = :id")
-    fun deleteShoppingItemById(id: Int)
+    suspend fun deleteShoppingItemById(id: Int)
 
     @Query("DELETE FROM shoppingItem WHERE name = :name AND count = :count")
     fun deleteShoppingItemByNameCount(name : String,count: Int)

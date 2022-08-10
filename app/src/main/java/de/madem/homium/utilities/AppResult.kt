@@ -10,7 +10,7 @@ sealed class AppResult<T>(open val data: T?) {
 
 fun <T> T.toSuccessResult() = AppResult.Success(this)
 
-fun <T> Throwable.toErrorLoading(data: T? = null) = AppResult.Error(this, data)
+fun <T> Throwable.toErrorResult(data: T? = null) = AppResult.Error(this, data)
 
 suspend fun <T> FlowCollector<AppResult<T>>.emitLoading(data: T? = null) {
     emit(AppResult.Loading(data))

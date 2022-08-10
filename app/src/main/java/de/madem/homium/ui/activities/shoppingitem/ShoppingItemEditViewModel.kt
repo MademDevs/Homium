@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
+import de.madem.homium.exceptions.NoDeletionWithNotExistingShoppingItemException
 import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.models.dataset
 import de.madem.homium.repositories.ProductRepository
 import de.madem.homium.repositories.ShoppingRepository
+import de.madem.homium.utilities.AppResult
 import de.madem.homium.utilities.extensions.notNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -23,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingItemEditViewModel @Inject constructor(
-    shoppingRepository: ShoppingRepository,
+    private val shoppingRepository: ShoppingRepository,
     private val productRepository : ProductRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -221,6 +223,17 @@ class ShoppingItemEditViewModel @Inject constructor(
                 setCounterState(firstProduct.amount, firstProduct.unit)
             }
             .launchIn(viewModelScope)
+    }
+
+    fun deleteShoppingItem() : Flow<Boolean> = itemIdFlow.map { id ->
+        if(id != null) {
+            val result = shoppingRepository.deleteShoppingItemById(id)
+            result is AppResult.Success
+        }
+        else {
+            AppResult.Error<Unit>(NoDeletionWithNotExistingShoppingItemException())
+            false
+        }
     }
     //endregion
 }
