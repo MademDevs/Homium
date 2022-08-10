@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO Implement logic for handling process death with savedstatehandle
+//TODO maybe handle errors
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingItemEditViewModel @Inject constructor(
@@ -48,6 +49,8 @@ class ShoppingItemEditViewModel @Inject constructor(
     private val _counterState : MutableStateFlow<ShoppingCounterState> = MutableStateFlow(
         ShoppingCounterState.InRange(0, _selectedUnit.value.dataset)
     )
+
+    private var lastInRangeCounterStateIndex: Int? = null
     //endregion
 
     //region exposed data for UI
@@ -98,16 +101,56 @@ class ShoppingItemEditViewModel @Inject constructor(
                 is ShoppingCounterState.InRange -> {
                     //only set new index if its in range of the current dataset
                     if(newIndex in currentCounterState.dataset.indices) {
-                        _counterState.emit(currentCounterState.copy(selectedIndex = newIndex))
+                        setCounterState(currentCounterState.copy(selectedIndex = newIndex))
                     }
                 }
                 is ShoppingCounterState.Custom -> {
                     //change type and selected index
                     //get dataset from currently selected unit
-                    _counterState.emit(
-                        ShoppingCounterState.InRange(newIndex, _selectedUnit.value.dataset)
-                    )
+                    setCounterState(ShoppingCounterState.InRange(newIndex, _selectedUnit.value.dataset))
                 }
+            }
+        }
+    }
+
+    fun setCounterStateToInRangeType() {
+        viewModelScope.launch {
+            val currentDataSet = _selectedUnit.value.dataset
+            val currentCounterState = _counterState.value
+            if(currentCounterState is ShoppingCounterState.Custom) {
+                val currentValIndex = currentDataSet.indexOf(currentCounterState.value)
+                val newStateIndex = if(currentValIndex in currentDataSet.indices)
+                    currentValIndex
+                else
+                    0
+                setCounterState(ShoppingCounterState.InRange(newStateIndex, currentDataSet))
+            }
+        }
+    }
+
+    fun setCounterStateCustomWithValue(value: String) {
+        viewModelScope.launch {
+            when(val currentCounterState = _counterState.value) {
+                is ShoppingCounterState.InRange -> {
+                    // Switch State to Custom State
+                    setCounterState(ShoppingCounterState.Custom(value))
+                }
+                is ShoppingCounterState.Custom -> {
+                    if(currentCounterState.value != value) {
+                        setCounterState(ShoppingCounterState.Custom(value))
+                    }
+                }
+            }
+        }
+    }
+
+    fun setCounterStateToCustomType() {
+        viewModelScope.launch {
+            val currentCounterState = _counterState.value
+            if(currentCounterState is ShoppingCounterState.InRange) {
+                // Switch State to Custom State and apply value from currently selected index
+                val value = currentCounterState.dataset[currentCounterState.selectedIndex]
+                setCounterState(ShoppingCounterState.Custom(value))
             }
         }
     }
@@ -122,9 +165,17 @@ class ShoppingItemEditViewModel @Inject constructor(
         val currentCounterState = _counterState.value
         if(currentCounterState is ShoppingCounterState.InRange) {
             if(oldUnit.isSmallUnit().xor(newUnit.isSmallUnit())) {
-                _counterState.emit(currentCounterState.copy(dataset = newUnit.dataset))
+                setCounterState(currentCounterState.copy(dataset = newUnit.dataset))
             }
         }
+    }
+
+    private suspend fun setCounterState(state: ShoppingCounterState) {
+        val currentState = _counterState.value
+        if(currentState is ShoppingCounterState.InRange) {
+            lastInRangeCounterStateIndex = currentState.selectedIndex
+        }
+        _counterState.emit(state)
     }
     //endregion
 }

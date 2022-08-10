@@ -65,59 +65,12 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-
         itemid = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, -1)
-        if(itemid >= 0) {
-            setShoppingItemToElements(itemid)
-        }
-
-        updateSpinnerOnItemSelected()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         binding = null
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        binding.notNull {
-            //count value
-            val numPickerCount = it.shoppingItemEditNumPickCount
-            if(numPickerCount.isVisible){
-                //outState.putString(SAVEINSTANCESTATE_COUNT, numPickerCount.displayedValues[numPickerCount.value])
-            }
-            else{
-                outState.putString(SAVEINSTANCESTATE_COUNT, it.shoppingItemEditEditTxtCount.text.toString())
-            }
-        }
-
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        //unit value
-        binding.notNull {
-            val numPickerCount = it.shoppingItemEditNumPickCount
-            val editTextCount = it.shoppingItemEditEditTxtCount
-
-            //count value
-            val countValue = savedInstanceState.getString(SAVEINSTANCESTATE_COUNT) ?: smallUnits[0]
-
-            if(bigUnits.contains(countValue)){
-                //numPickerCount.displayedValues = bigUnits
-                //numPickerCount.value = bigUnits.indexOf(countValue)
-            }
-            else if(smallUnits.contains(countValue)){
-                //numPickerCount.displayedValues = smallUnits
-                //numPickerCount.value = smallUnits.indexOf(countValue)
-            }
-            else{
-                //numPickerCount.visibility = View.INVISIBLE
-                editTextCount.setText(countValue)
-                editTextCount.visibility = View.VISIBLE
-            }
-        }
     }
 
     //optionsMenu
@@ -136,32 +89,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
-
-    }
-
-    private fun setShoppingItemToElements(id: Int) {
-        CoroutineBackgroundTask<ShoppingItem>()
-            .executeInBackground { db.shoppingDao().getShoppingItemByIdSync(id) }
-            .onDone {
-                binding.notNull { binding ->
-                    val editTextCount = binding.shoppingItemEditEditTxtCount
-                    val numPickerCount = binding.shoppingItemEditNumPickCount
-
-                    //setting amount
-                    if(editTextCount.isVisible){
-                        editTextCount.text = Editable.Factory.getInstance().newEditable(it.count.toString())
-                    }
-                    else{
-                        if(numPickerCount.displayedValues.contains(it.count.toString())){
-                            //numPickerCount.value = numPickerCount.displayedValues.indexOf(it.count.toString())
-                        }
-                        else{
-                            assignValueFromPickerToEditText(it.count.toString())
-                        }
-
-                    }
-                }
-            }.start()
 
     }
 
@@ -189,7 +116,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                             numPickerCount.value = numPickerCount.displayedValues.indexOf(it.amount)
                         }
                         else{
-                            assignValueFromPickerToEditText(it.amount)
+                            //assignValueFromPickerToEditText(it.amount)
                         }
                     }
                 }
@@ -197,16 +124,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             .start()
 
     }
-    private fun updateSpinnerOnItemSelected() {
-        binding?.shoppingItemEditAutoCmplTxtName?.notNull {
-            it.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                setSpinnerDefaultValues(selectedItem)
-                hideKeyboard()
-            }
-        }
-    }
-
 
     private fun initGuiComponents(binding: ActivityShoppingItemEditBinding){
         //init delete button
@@ -217,6 +134,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     CoroutineBackgroundTask<Unit>()
                         .executeInBackground {
                             if(itemid >= 0) {
+                                //TODO move to vm
                                 db.shoppingDao().deleteShoppingItemById(itemid)
                             }
                         }
@@ -234,6 +152,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         //init txt autocomplete
+        //TODO move to VM
         CoroutineBackgroundTask<List<Product>>().executeInBackground {
             val result = db.shoppingDao().getAllProduct()
             return@executeInBackground result
@@ -248,61 +167,56 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             )
         }.start()
 
+        binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
+            viewModel.setEditItemName(it?.toString() ?: "")
+        }
+
+        binding.shoppingItemEditAutoCmplTxtName.apply {
+            onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
+                val selectedItem = parent.getItemAtPosition(position).toString()
+                setSpinnerDefaultValues(selectedItem)
+                hideKeyboard()
+            }
+        }
+
 
         //init numberpicker
         val units = viewModel.units.map { resources.getString(it.resourceId) }.toTypedArray()
-        val numPickerUnit = binding.shoppingItemEditNumPickUnit.apply {
+        binding.shoppingItemEditNumPickUnit.apply {
             isSaveFromParentEnabled = false
             isSaveEnabled = false
             minValue = units.indices.first
             maxValue = units.indices.last
-            displayedValues = units
-        }
-
-        val numPickerCount = binding.shoppingItemEditNumPickCount
-        //getting data for picker
-        numPickerCount.isSaveFromParentEnabled = false
-        numPickerCount.isSaveEnabled = false
-        //numPickerCount.minValue = 0
-        //numPickerCount.maxValue = smallUnits.size-1
-        //numPickerCount.value = 0
-        //numPickerCount.displayedValues = smallUnits
-        numPickerCount.setOnLongClickListener {
-            assignValueFromPickerToEditText(numPickerCount.displayedValues[numPickerCount.value])
-        }
-
-        numPickerCount.setOnValueChangedListener { _, _, newVal ->
-            viewModel.setCounterStateInRangeSelectedIndex(newVal)
-        }
-
-        numPickerUnit.setOnValueChangedListener { npUnit, _, newIdx ->
-            println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
-            viewModel.setSelectedUnitByIndex(newIdx)
-        }
-
-        binding.shoppingItemEditEditTxtCount.also { ed ->
-            ed.visibility = View.GONE
-            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                ed.setOnLongClickListener {
-                    ed.visibility = View.GONE
-                    numPickerCount.visibility = View.VISIBLE
-                    true
-                }
-            } else {
-                ed.visibility = View.VISIBLE
+            setDistinctDisplayedValues(units)
+            setOnValueChangedListener { npUnit, _, newIdx ->
+                println("UNIT: index: ${npUnit.value} value : ${npUnit.displayedValues[npUnit.value]}")
+                viewModel.setSelectedUnitByIndex(newIdx)
             }
         }
 
-        binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
-            viewModel.setEditItemName(it?.toString() ?: "")
+        binding.shoppingItemEditNumPickCount.apply {
+            isSaveFromParentEnabled = false
+            isSaveEnabled = false
+            setOnLongClickListener {
+                viewModel.setCounterStateToCustomType()
+                true
+            }
+            setOnValueChangedListener { _, _, newVal ->
+                viewModel.setCounterStateInRangeSelectedIndex(newVal)
+            }
         }
-    }
 
-    private fun assignValueFromPickerToEditText(value : String) : Boolean{
-        binding?.shoppingItemEditNumPickCount?.visibility = View.INVISIBLE
-        binding?.shoppingItemEditEditTxtCount?.visibility = View.VISIBLE
-        binding?.shoppingItemEditEditTxtCount?.text = Editable.Factory.getInstance().newEditable(value)
-        return true
+        binding.shoppingItemEditEditTxtCount.apply {
+            setDistinctVisibility(View.GONE)
+            setOnLongClickListener {
+                hideKeyboard()
+                viewModel.setCounterStateToInRangeType()
+                true
+            }
+            addTextChangedListener {
+                viewModel.setCounterStateCustomWithValue(it?.toString() ?: "")
+            }
+        }
     }
 
     private fun getAmount(): Int? = binding?.let {
@@ -324,6 +238,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         return binding?.shoppingItemEditAutoCmplTxtName?.text?.toString() ?: ""
     }
 
+    //TODO move to vm
     private fun addOrUpdateToDatabaseIfPossible() {
 
         //check if all input components are valid
@@ -380,17 +295,21 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             with(binding){
                 when (cntState) {
                     is ShoppingCounterState.InRange -> {
+                        shoppingItemEditEditTxtCount.setDistinctVisibility(View.INVISIBLE)
+                        shoppingItemEditNumPickCount.setDistinctVisibility(View.VISIBLE)
                         val dataset = cntState.dataset
                         shoppingItemEditNumPickCount.apply {
                             minValue = dataset.indices.first
                             maxValue = dataset.indices.last
-                            displayedValues = dataset
+                            setDistinctDisplayedValues(dataset)
                             setDistinctValue(cntState.selectedIndex)
                         }
-                        //TODO Set visibility of EditText
                     }
                     is ShoppingCounterState.Custom -> {
-                        //TODO handle Custom CounterStates
+                        shoppingItemEditNumPickCount.setDistinctVisibility(View.INVISIBLE)
+
+                        shoppingItemEditEditTxtCount.setDistinctVisibility(View.VISIBLE)
+                        shoppingItemEditEditTxtCount.setDistinctText(cntState.value)
                     }
                 }
             }
