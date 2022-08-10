@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ShoppingDao {
 
+    @Deprecated("Use this function in ProductDao")
     @Query("SELECT * FROM product")
     fun getAllProduct(): List<Product>
 
@@ -50,7 +51,7 @@ interface ShoppingDao {
     @Query("DELETE FROM shoppingItem WHERE name LIKE :itemName AND unit LIKE :itemUnit AND count = :itemCount")
     fun deleteShoppingByNameCountUnit(itemName: String, itemCount : Int, itemUnit: Units)
 
-    //return List -> iterate and adapt view -> auto-completion
+    @Deprecated("Use this function in ProductDao")
     @Query("SELECT * FROM product WHERE name LIKE :getItem")
     fun getProductsByName(getItem: String): List<Product>
 

@@ -3,7 +3,6 @@ package de.madem.homium.ui.activities.shoppingitem
 import android.app.Activity
 import android.content.res.Resources
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -21,7 +20,8 @@ import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityShoppingItemEditBinding
-import de.madem.homium.models.*
+import de.madem.homium.models.ShoppingItem
+import de.madem.homium.models.Units
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import de.madem.homium.utilities.extensions.*
 import javax.inject.Inject
@@ -35,35 +35,20 @@ class ShoppingItemEditActivity : AppCompatActivity() {
     //TODO: switch to ViewModel to get rid of DB-Reference in UI-Controller
     @Inject
     lateinit var db : AppDatabase
-    private lateinit var bigUnits : Array<String>
-    private lateinit var smallUnits : Array<String>
     private var itemid: Int = -1
 
     companion object{
-        private const val SAVEINSTANCESTATE_UNIT_INDEX = "sist_unit_index"
-        private const val SAVEINSTANCESTATE_COUNT = "sist_count"
-
         private val LOG_TAG : String = ShoppingItemEditActivity::class.simpleName ?: ""
-
     }
 
     //ON CREATE
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //getting data from ressources
-        bigUnits = SMALL_UNITS_DATASET
-        smallUnits = BIG_UNITS_AND_NON_CONVERTABLE_DATASET
-
-
         binding = ActivityShoppingItemEditBinding.inflate(layoutInflater).also {
             setContentView(it.root)
             initGuiComponents(it)
             setupViewModel(it)
         }
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
 
         itemid = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, -1)
     }
@@ -78,7 +63,6 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         if(menu != null){
             menuInflater.inflate(R.menu.shoppingitem_edit_actionbar_menu,menu)
         }
-
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -87,45 +71,15 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             R.id.shopping_item_edit_actionbar_confirm ->  addOrUpdateToDatabaseIfPossible()
             android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
         }
-
         return super.onOptionsItemSelected(item)
-
     }
 
     //private functions
-    //TODO move this logic to ViewModel
-    private fun setSpinnerDefaultValues(name: String) {
-        CoroutineBackgroundTask<Product>()
-            .executeInBackground { db.shoppingDao().getProductsByName(name)[0] }
-            .onDone {
-                binding.notNull { binding ->
-                    //setting unit
-                    binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit.getString(this))
-
-                    //setting amount
-                    val editTextCount = binding.shoppingItemEditEditTxtCount
-                    val numPickerCount = binding.shoppingItemEditNumPickCount
-                    if(editTextCount.isVisible){
-                        editTextCount.text = Editable.Factory.getInstance().newEditable(it.amount)
-                    }
-                    else{
-                        //TODO set values to picker
-                        //setValuesForNumPickerCount(binding.shoppingItemEditNumPickUnit)
-
-                        if(numPickerCount.displayedValues.contains(it.amount)){
-                            numPickerCount.value = numPickerCount.displayedValues.indexOf(it.amount)
-                        }
-                        else{
-                            //assignValueFromPickerToEditText(it.amount)
-                        }
-                    }
-                }
-            }
-            .start()
-
-    }
-
     private fun initGuiComponents(binding: ActivityShoppingItemEditBinding){
+        //init Actionbar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
         //init delete button
         binding.shoppingItemEditBtnDelete.setOnClickListener{
             AlertDialog.Builder(this)
@@ -152,33 +106,17 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         //init txt autocomplete
-        //TODO move to VM
-        CoroutineBackgroundTask<List<Product>>().executeInBackground {
-            val result = db.shoppingDao().getAllProduct()
-            return@executeInBackground result
-        }.onDone {result ->
-            val productNameList = result.map { it.name }
-            binding.shoppingItemEditAutoCmplTxtName.setAdapter(
-                ArrayAdapter(
-                    this,
-                    android.R.layout.simple_dropdown_item_1line,
-                    productNameList
-                )
-            )
-        }.start()
-
         binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
             viewModel.setEditItemName(it?.toString() ?: "")
         }
 
         binding.shoppingItemEditAutoCmplTxtName.apply {
             onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                setSpinnerDefaultValues(selectedItem)
+                val productName = parent.getItemAtPosition(position).toString()
+                viewModel.loadProductByName(productName)
                 hideKeyboard()
             }
         }
-
 
         //init numberpicker
         val units = viewModel.units.map { resources.getString(it.resourceId) }.toTypedArray()
@@ -214,7 +152,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 true
             }
             addTextChangedListener {
-                viewModel.setCounterStateCustomWithValue(it?.toString() ?: "")
+                if(this.visibility == View.VISIBLE){
+                    viewModel.setCounterStateCustomWithValue(it?.toString() ?: "")
+                }
             }
         }
     }
@@ -313,6 +253,17 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        viewModel.allProducts.onCollect(this) { products ->
+            val productNameList = products.map { it.name }
+            binding.shoppingItemEditAutoCmplTxtName.setAdapter(
+                ArrayAdapter(
+                    this,
+                    android.R.layout.simple_dropdown_item_1line,
+                    productNameList
+                )
+            )
         }
     }
 }

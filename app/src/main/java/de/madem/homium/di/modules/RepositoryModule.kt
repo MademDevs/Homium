@@ -7,8 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databases.RoomInventoryRepository
+import de.madem.homium.databases.RoomProductRepository
 import de.madem.homium.databases.RoomShoppingRepository
 import de.madem.homium.repositories.InventoryRepository
+import de.madem.homium.repositories.ProductRepository
 import de.madem.homium.repositories.ShoppingRepository
 import javax.inject.Singleton
 
@@ -29,6 +31,13 @@ object RepositoryModule {
     @Provides
     fun provideShoppingRepository(database: AppDatabase): ShoppingRepository {
         return RoomShoppingRepository(database.shoppingDao())
+    }
+
+    @Keep
+    @Singleton
+    @Provides
+    fun provideProductRepository(database: AppDatabase): ProductRepository {
+        return RoomProductRepository(database.productDao())
     }
 
 }

@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 //TODO Add Documentation
 interface ShoppingRepository {
-    //TODO
+    //TODO Documentation
     fun getShoppingItemById(id: Int) : Flow<AppResult<ShoppingItem>>
 }

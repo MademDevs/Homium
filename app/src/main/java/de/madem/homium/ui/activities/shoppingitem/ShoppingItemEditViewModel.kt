@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.madem.homium.R
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
+import de.madem.homium.models.Product
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.models.Units
 import de.madem.homium.models.dataset
+import de.madem.homium.repositories.ProductRepository
 import de.madem.homium.repositories.ShoppingRepository
 import de.madem.homium.utilities.extensions.notNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,8 +24,13 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingItemEditViewModel @Inject constructor(
     shoppingRepository: ShoppingRepository,
+    private val productRepository : ProductRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        private const val STOP_TIMEOUT_MILLIS = 5000L
+    }
 
     //region private Properties
     private val itemIdFlow: Flow<Int?> = flowOf(
@@ -40,9 +47,11 @@ class ShoppingItemEditViewModel @Inject constructor(
                 setEditItemName(shoppingItem.name)
                 //unit
                 setSelectedUnit(shoppingItem.unit)
+                //count
+                setCounterState(shoppingItem.count, shoppingItem.unit)
 
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
 
     private val _editItemName = MutableStateFlow("")
     private val _selectedUnit : MutableStateFlow<Units> = MutableStateFlow(Units.default)
@@ -68,12 +77,20 @@ class ShoppingItemEditViewModel @Inject constructor(
     val selectedUnitIndex : Flow<Int> = _selectedUnit.map { units.indexOf(it) }
 
     val counterState: Flow<ShoppingCounterState> = _counterState
+
+    val allProducts : Flow<List<Product>> = productRepository
+        .getAllProducts()
+        .map { it.data ?: emptyList() }
     //endregion
 
+    init {
+        allProducts.launchIn(viewModelScope)
+    }
+
     //region functions
-    fun setEditItemName(newTitle: String) {
-        if (_editItemName.value != newTitle) {
-            viewModelScope.launch { _editItemName.emit(newTitle) }
+    fun setEditItemName(newName: String) {
+        if (_editItemName.value != newName) {
+            viewModelScope.launch { _editItemName.emit(newName) }
         }
     }
 
@@ -155,6 +172,22 @@ class ShoppingItemEditViewModel @Inject constructor(
         }
     }
 
+    private suspend fun setCounterState(countValue: Int, currentUnit: Units) {
+        setCounterState(countValue.toString(), currentUnit)
+    }
+
+    private suspend fun setCounterState(countValue: String, currentUnit: Units) {
+        val dataset = currentUnit.dataset
+        val indexOfCountVal: Int = dataset.indexOf(countValue)
+        val newCounterState = if(indexOfCountVal in dataset.indices) {
+            ShoppingCounterState.InRange(indexOfCountVal, dataset)
+        }
+        else {
+            ShoppingCounterState.Custom(countValue)
+        }
+        setCounterState(newCounterState)
+    }
+
     /**
      * This function adjusts the counterState if it's InRange, so that Unit-Dataset change according
      * to the new selected Unit. The Unit-Dataset is only changed, when the [Units.isSmallUnit]-
@@ -176,6 +209,18 @@ class ShoppingItemEditViewModel @Inject constructor(
             lastInRangeCounterStateIndex = currentState.selectedIndex
         }
         _counterState.emit(state)
+    }
+
+    fun loadProductByName(name: String) {
+        productRepository
+            .getProductsByName(name)
+            .onEach {
+                val firstProduct = it.data?.firstOrNull() ?: return@onEach
+                setEditItemName(firstProduct.name)
+                setSelectedUnit(firstProduct.unit)
+                setCounterState(firstProduct.amount, firstProduct.unit)
+            }
+            .launchIn(viewModelScope)
     }
     //endregion
 }
