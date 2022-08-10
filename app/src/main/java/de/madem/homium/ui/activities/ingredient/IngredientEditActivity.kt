@@ -355,7 +355,7 @@ class IngredientEditActivity : AppCompatActivity() {
             .onDone {
 
                 //setting unit
-                pickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+                pickerUnit.value = Units.stringValueArray(this).indexOf(it.unit.getString(this))
 
                 //setting amount
                 if(currentPickerCountMode == MODE_COUNT_VIA_TEXT){

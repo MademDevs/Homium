@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 data class Product(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "pluralName") val plural: String,
-    @ColumnInfo(name = "defaultUnit") val unit: String,
+    @ColumnInfo(name = "defaultUnit") val unit: Units = Units.default,
     @ColumnInfo(name = "defaultAmount") val amount: String,
     @PrimaryKey(autoGenerate = true) val uid: Int = 0
 )

@@ -136,7 +136,8 @@ class InventoryCommandParser(
                 val productPluralNameIndex = productResult.map { it.plural }.indexOf(name)
                 if(productNameIndex >= 0 || productPluralNameIndex >= 0) {
                     val newUnit = if(productPluralNameIndex < 0) productResult[productNameIndex].unit else productResult[productPluralNameIndex].unit
-                    return@coroutineScope InventoryItem(name,amount,newUnit,getInventoryDefaultLocation())
+                    val newUnitStr = newUnit.getString(contextRef.get() ?: HomiumApplication.appContext!!)//TODO Remove this once we get rid of the App-Context
+                    return@coroutineScope InventoryItem(name,amount,newUnitStr,getInventoryDefaultLocation())
                 }
                 else{
                     return@coroutineScope InventoryItem(name,amount,Units.ITEM.getString(),getInventoryDefaultLocation())
@@ -162,24 +163,25 @@ class InventoryCommandParser(
 
             val productNameIndex = productResult.map { it.name }.indexOf(name)
             val productPluralIndex = productResult.map { it.plural }.indexOf(name)
+            val context = contextRef.get() ?: HomiumApplication.appContext!! //TODO get rid of this once we use Application Context for that or use Units in Inventory
             return@coroutineScope when {
                 productNameIndex >= 0 -> {
                     val newUnit = productResult[productNameIndex].unit
+                    val newUnitStr = newUnit.getString(context)
                     val newQuantity = productResult[productNameIndex].amount.toIntOrNull() ?: 1
-                    InventoryItem(name,newQuantity,newUnit,getInventoryDefaultLocation())
+                    InventoryItem(name,newQuantity,newUnitStr,getInventoryDefaultLocation())
                 }
                 productPluralIndex >= 0 -> {
                     val newUnit = productResult[productPluralIndex].unit
+                    val newUnitStr = newUnit.getString(context)
                     val newQuantity = productResult[productPluralIndex].amount.toIntOrNull()?.takeIf { it > 1 } ?: 2
-                    InventoryItem(name,newQuantity,newUnit,getInventoryDefaultLocation())
+                    InventoryItem(name,newQuantity,newUnitStr,getInventoryDefaultLocation())
 
                 }
                 else -> {
                     InventoryItem(name,1,Units.ITEM.getString(),getInventoryDefaultLocation())
                 }
             }
-
-
         }
         else{
             return@coroutineScope null

@@ -173,7 +173,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             .onDone {
                 binding.notNull { binding ->
                     //setting unit
-                    binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+                    binding.shoppingItemEditNumPickUnit.value = Units.stringValueArray(this).indexOf(it.unit.getString(this))
 
                     //setting amount
                     val editTextCount = binding.shoppingItemEditEditTxtCount

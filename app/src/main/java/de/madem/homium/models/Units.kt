@@ -34,9 +34,10 @@ enum class Units(val resourceId : Int, val shortCut : String, val bounds : Pair<
             return values().toList().associateWith { it.getString() }
         }
 
-        fun unitOf(str: String) : Units?{
+        //TODO Get Rid of the default Parameter for context once we have refactored the App
+        fun unitOf(str: String, context: Context = HomiumApplication.appContext!!) : Units?{
             values().forEach {
-                if(it.getString() == str){
+                if(it.getString(context) == str){
                     return it
                 }
             }

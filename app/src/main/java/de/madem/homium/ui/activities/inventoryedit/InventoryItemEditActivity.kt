@@ -178,7 +178,7 @@ class InventoryItemEditActivity : AppCompatActivity() {
             .onDone {
 
                 //setting unit
-                numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit)
+                numPickerUnit.value = Units.stringValueArray(this).indexOf(it.unit.getString(this))
 
                 //setting amount
                 if (editTextCount.isVisible) {

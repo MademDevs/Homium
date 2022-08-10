@@ -3,9 +3,11 @@ package de.madem.homium.managers
 import android.content.Context
 import de.madem.homium.databases.AppDatabase
 import de.madem.homium.models.Product
+import de.madem.homium.models.Units
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
 import javax.inject.Inject
 
+//TODO Use this class in Room-Callback
 class DatabaseInitializer @Inject constructor(
     private val context: Context,
     database: AppDatabase,
@@ -32,11 +34,15 @@ class DatabaseInitializer @Inject constructor(
     }
 
     private fun loadProductsFromFile() {
-        var fileReader = context.assets.open("productsCSV.csv").bufferedReader()
+        val fileReader = context.assets.open("productsCSV.csv").bufferedReader()
         var line = fileReader.readLine()
         while(line != null) {
             val splitted = line.split(";")
-            dao.insertProduct(Product(splitted[0],splitted[1], splitted[2], splitted[3]))
+            val name = splitted[0]
+            val plural = splitted[1]
+            val unit = Units.unitOf(splitted[2], context) ?: Units.default
+            val amount = splitted[3]
+            dao.insertProduct(Product(name, plural, unit, amount))
             line = fileReader.readLine()
         }
         println("PRODUCTSIZE: ${dao.productSize()}")

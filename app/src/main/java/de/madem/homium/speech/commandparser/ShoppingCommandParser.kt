@@ -74,7 +74,7 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>, priv
                 val productPluralNameIndex = productResult.map { it.plural }.indexOf(name)
                 if(productNameIndex >= 0 || productPluralNameIndex >= 0) {
                     val newUnit = if(productPluralNameIndex < 0) productResult[productNameIndex].unit else productResult[productPluralNameIndex].unit
-                    return@coroutineScope ShoppingItem(name,amount,Units.unitOf(newUnit) ?: Units.default)
+                    return@coroutineScope ShoppingItem(name,amount,newUnit)
                 }
                 else{
                     return@coroutineScope ShoppingItem(name,amount,Units.ITEM)
@@ -104,12 +104,12 @@ class ShoppingCommandParser(private val contextRef: WeakReference<Context>, priv
                 productNameIndex >= 0 -> {
                     val newUnit = productResult[productNameIndex].unit
                     val newQuantity = productResult[productNameIndex].amount.toIntOrNull() ?: 1
-                    ShoppingItem(name,newQuantity,Units.unitOf(newUnit) ?: Units.default)
+                    ShoppingItem(name,newQuantity,newUnit)
                 }
                 productPluralIndex >= 0 -> {
                     val newUnit = productResult[productPluralIndex].unit
                     val newQuantity = productResult[productPluralIndex].amount.toIntOrNull()?.takeIf { it > 1 } ?: 2
-                    ShoppingItem(name,newQuantity,Units.unitOf(newUnit) ?: Units.default)
+                    ShoppingItem(name,newQuantity,newUnit)
 
                 }
                 else -> {

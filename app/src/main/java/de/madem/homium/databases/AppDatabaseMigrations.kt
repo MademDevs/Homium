@@ -13,23 +13,37 @@ class AppDatabaseMigrations(val context: Context) {
 
 private class MigrationV1ToV2(private val context: Context) : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        //Migrating ShoppingItems Unit values from Res-Strings
+        //Migrating ShoppingItems and Product Unit values from Res-Strings
         val unitsTitlesToUnits = Units.values().associateBy { context.getString(it.resourceId) }
-
         database.beginTransaction()
         try {
-            val idsAndUnitsCursor = database.query("SELECT uid, unit FROM ShoppingItem;")
-            while (idsAndUnitsCursor.moveToNext()) {
-                val id = idsAndUnitsCursor.getInt(0)
-                val unit = idsAndUnitsCursor.getString(1)
-                val resolvedUnit = unitsTitlesToUnits[unit] ?: Units.default
-                val newUnit = resolvedUnit.toString()
-                database.execSQL("UPDATE ShoppingItem SET unit = '$newUnit' WHERE uid = $id;")
-            }
+            migrateUnitsValuesFromResStringToEnumStrings(
+                unitsTitlesToUnits, database, "ShoppingItem"
+            )
+            migrateUnitsValuesFromResStringToEnumStrings(
+                unitsTitlesToUnits, database, "Product", "defaultUnit"
+            )
             database.setTransactionSuccessful()
         }
         finally {
             database.endTransaction()
+        }
+    }
+
+    private fun migrateUnitsValuesFromResStringToEnumStrings(
+        mapping: Map<String, Units>,
+        database: SupportSQLiteDatabase,
+        table: String,
+        unitPropName: String = "unit"
+    ){
+        val shoppingIdsAndUnitsCursor = database
+            .query("SELECT uid, $unitPropName FROM $table;")
+        while (shoppingIdsAndUnitsCursor.moveToNext()) {
+            val id = shoppingIdsAndUnitsCursor.getInt(0)
+            val unit = shoppingIdsAndUnitsCursor.getString(1)
+            val resolvedUnit = mapping[unit] ?: Units.default
+            val newUnit = resolvedUnit.toString()
+            database.execSQL("UPDATE $table SET $unitPropName = '$newUnit' WHERE uid = $id;")
         }
     }
 }
