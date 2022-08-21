@@ -24,9 +24,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO Implement logic for handling process death with savedstatehandle
 @HiltViewModel
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExperimentalCoroutinesApi
 class ShoppingItemEditViewModel @Inject constructor(
     private val shoppingRepository: ShoppingRepository,
     private val productRepository : ProductRepository,

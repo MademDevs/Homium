@@ -17,83 +17,75 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
-import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
-import de.madem.homium.databases.AppDatabase
 import de.madem.homium.databinding.ActivityShoppingItemEditBinding
 import de.madem.homium.errors.businesslogicerrors.DeletionFailedException
 import de.madem.homium.errors.presentationerrors.ValidationException
 import de.madem.homium.utilities.extensions.*
-import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class ShoppingItemEditActivity : AppCompatActivity() {
-    //fields
-    //TODO delete binding field
-    private var binding: ActivityShoppingItemEditBinding? = null
-    private val viewModel : ShoppingItemEditViewModel by viewModels()
-
-    //TODO: switch to ViewModel to get rid of DB-Reference in UI-Controller
-    @Inject
-    lateinit var db : AppDatabase
-    private var itemid: Int = -1
-
-    companion object{
-        private val LOG_TAG : String = ShoppingItemEditActivity::class.simpleName ?: ""
+    companion object {
+        private val LOG_TAG: String =
+            ShoppingItemEditActivity::class.simpleName ?: "ShoppingItemEditActivity"
     }
 
-    //ON CREATE
+    private val viewModel: ShoppingItemEditViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityShoppingItemEditBinding.inflate(layoutInflater).also {
+        ActivityShoppingItemEditBinding.inflate(layoutInflater).also {
             setContentView(it.root)
-            initGuiComponents(it)
-            setupViewModel(it)
+            setupGuiComponents(it)
+            setupViewModelObservers(it)
         }
-
-        itemid = intent.getIntExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, -1)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
-    }
-
-    //optionsMenu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if(menu != null){
-            menuInflater.inflate(R.menu.shoppingitem_edit_actionbar_menu,menu)
+        if (menu != null) {
+            menuInflater.inflate(R.menu.shoppingitem_edit_actionbar_menu, menu)
         }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.shopping_item_edit_actionbar_confirm -> {
                 viewModel.mergeShoppingItem().onCollect(this) { success ->
-                    if(success) {
+                    if (success) {
                         //TODO change to normal finish and reactive approach
-                        finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+                        finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
                     }
                 }
             }
-            android.R.id.home -> finishWithBooleanResult("dataChanged",false, Activity.RESULT_OK)
+            android.R.id.home -> finishWithBooleanResult("dataChanged", false, Activity.RESULT_OK)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    //private functions
-    private fun initGuiComponents(binding: ActivityShoppingItemEditBinding){
-        //init Actionbar
+    //region private functions
+    private fun setupGuiComponents(binding: ActivityShoppingItemEditBinding) {
+        setupActionbar()
+        setupDeleteButton(binding)
+        setupAutoCompleteTextView(binding)
+        setupUnitPicker(binding)
+        setupCountPicker(binding)
+        setupEditTextCount(binding)
+    }
+
+    private fun setupActionbar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
+    }
 
-        //init delete button
-        binding.shoppingItemEditBtnDelete.setOnClickListener{
+    private fun setupDeleteButton(binding: ActivityShoppingItemEditBinding) {
+        binding.shoppingItemEditBtnDelete.setOnClickListener {
             AlertDialog.Builder(this)
                 .setMessage(R.string.shopping_item_delete_question)
                 .setPositiveButton(R.string.answer_yes) { dialog, _ ->
                     viewModel.deleteShoppingItem().onCollect(this) { success ->
-                        if(success) {
+                        if (success) {
                             Toast.makeText(
                                 this,
                                 R.string.notification_delete_shoppingitem_sucess,
@@ -101,30 +93,28 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                             ).show()
                             dialog.dismiss()
                             //TODO exchange with reactive approach and just calling finish
-                            finishWithBooleanResult("dataChanged",true, Activity.RESULT_OK)
+                            finishWithBooleanResult("dataChanged", true, Activity.RESULT_OK)
                         }
                     }
                 }
                 .setNegativeButton(R.string.answer_no) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
-
         }
+    }
 
-        //init txt autocomplete
-        binding.shoppingItemEditAutoCmplTxtName.addTextChangedListener {
-            viewModel.setEditItemName(it?.toString() ?: "")
-        }
-
+    private fun setupAutoCompleteTextView(binding: ActivityShoppingItemEditBinding) {
         binding.shoppingItemEditAutoCmplTxtName.apply {
+            addTextChangedListener { viewModel.setEditItemName(it?.toString() ?: "") }
             onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
                 val productName = parent.getItemAtPosition(position).toString()
                 viewModel.loadProductByName(productName)
                 hideKeyboard()
             }
         }
+    }
 
-        //init numberpicker
+    private fun setupUnitPicker(binding: ActivityShoppingItemEditBinding) {
         val units = viewModel.units.map { resources.getString(it.resourceId) }.toTypedArray()
         binding.shoppingItemEditNumPickUnit.apply {
             isSaveFromParentEnabled = false
@@ -137,7 +127,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 viewModel.setSelectedUnitByIndex(newIdx)
             }
         }
+    }
 
+    private fun setupCountPicker(binding: ActivityShoppingItemEditBinding) {
         binding.shoppingItemEditNumPickCount.apply {
             isSaveFromParentEnabled = false
             isSaveEnabled = false
@@ -149,7 +141,9 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 viewModel.setCounterStateInRangeSelectedIndex(newVal)
             }
         }
+    }
 
+    private fun setupEditTextCount(binding: ActivityShoppingItemEditBinding) {
         binding.shoppingItemEditEditTxtCount.apply {
             setDistinctVisibility(View.GONE)
             setOnLongClickListener {
@@ -158,14 +152,14 @@ class ShoppingItemEditActivity : AppCompatActivity() {
                 true
             }
             addTextChangedListener {
-                if(this.visibility == View.VISIBLE){
+                if (this.visibility == View.VISIBLE) {
                     viewModel.setCounterStateCustomWithValue(it?.toString() ?: "")
                 }
             }
         }
     }
 
-    private fun setupViewModel(binding: ActivityShoppingItemEditBinding) {
+    private fun setupViewModelObservers(binding: ActivityShoppingItemEditBinding) {
         viewModel.actionTitleResId.onCollect(this) { resId ->
             try {
                 supportActionBar?.title = resources.getString(resId)
@@ -183,13 +177,13 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         viewModel.selectedUnitIndex.onCollect(this) {
-            if(it in viewModel.units.indices) {
+            if (it in viewModel.units.indices) {
                 binding.shoppingItemEditNumPickUnit.setDistinctValue(it)
             }
         }
 
         viewModel.counterState.onCollect(this) { cntState ->
-            with(binding){
+            with(binding) {
                 when (cntState) {
                     is ShoppingCounterState.InRange -> {
                         shoppingItemEditEditTxtCount.setDistinctVisibility(View.INVISIBLE)
@@ -224,7 +218,7 @@ class ShoppingItemEditActivity : AppCompatActivity() {
         }
 
         viewModel.errors.onCollect(this) {
-            val errMsgResId = when(it) {
+            val errMsgResId = when (it) {
                 is DeletionFailedException -> R.string.errormsg_delete_shopping_failed
                 is ValidationException -> it.errMsgResId
                 else -> R.string.error
@@ -232,4 +226,5 @@ class ShoppingItemEditActivity : AppCompatActivity() {
             Toast.makeText(this, errMsgResId, Toast.LENGTH_SHORT).show()
         }
     }
+    //endregion
 }
