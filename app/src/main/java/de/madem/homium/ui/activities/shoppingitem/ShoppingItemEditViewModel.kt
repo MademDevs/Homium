@@ -247,6 +247,7 @@ class ShoppingItemEditViewModel @Inject constructor(
         val name = _editItemName.value
         val unit = _selectedUnit.value
         val count = _counterState.value.getCounterValue().toIntOrNull()?.takeIf { it >= 0 }
+        val isChecked = existingShoppingItem.value?.checked ?: false
 
         if(name.isBlank() || count == null) {
             return@map AppResult.Error<Unit>(ValidationException.InvalidParametersException)
@@ -254,12 +255,12 @@ class ShoppingItemEditViewModel @Inject constructor(
 
         if(id == null) {
             //perform insert
-            val newItem = ShoppingItem(name, count, unit, false)
+            val newItem = ShoppingItem(name, count, unit, isChecked)
             shoppingRepository.insertShoppingItem(newItem)
         }
         else {
             //perform update
-            shoppingRepository.updateShoppingItemById(id, name, count, unit)
+            shoppingRepository.updateShoppingItemById(id, name, count, unit, isChecked)
         }
     }.forwardErrors(operationErrors).map { it is AppResult.Success }
     //endregion

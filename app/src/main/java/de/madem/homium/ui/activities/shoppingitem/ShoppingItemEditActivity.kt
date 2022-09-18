@@ -24,7 +24,7 @@ import de.madem.homium.utilities.extensions.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingItemEditActivity : AppCompatActivity() {
     companion object {
         private val LOG_TAG: String =

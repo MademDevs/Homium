@@ -16,8 +16,12 @@ interface ShoppingDao {
     @Query("SELECT * FROM product")
     fun getAllProduct(): List<Product>
 
+    @Deprecated("Use the Flow-Alternative instead -> getAllShoppingItems")
     @Query("SELECT * FROM shoppingItem")
-    fun getAllShopping(): List<ShoppingItem>
+    fun getAllShoppingOld(): List<ShoppingItem>
+
+    @Query("SELECT * FROM shoppingItem")
+    fun getAllShoppingItems() : Flow<List<ShoppingItem>>
 
     @Query("SELECT * FROM shoppingItem WHERE checked = 1")
     fun getAllCheckedShoppingItem(): List<ShoppingItem>
@@ -68,8 +72,8 @@ interface ShoppingDao {
     @Query("SELECT * FROM shoppingItem WHERE uid = :id")
     fun getShoppingItemById(id: Int) : Flow<ShoppingItem?>
 
-    @Query("UPDATE shoppingItem SET name = :name, count = :count, unit = :unit WHERE uid = :id")
-    suspend fun updateShoppingItemById(id: Int, name: String, count: Int, unit: Units)
+    @Query("UPDATE shoppingItem SET name = :name, count = :count, unit = :unit, checked = :checked WHERE uid = :id")
+    suspend fun updateShoppingItemById(id: Int, name: String, count: Int, unit: Units, checked: Boolean)
 
     @Query("DELETE FROM shoppingItem WHERE uid = :id")
     suspend fun deleteShoppingItemById(id: Int)

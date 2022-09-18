@@ -1,6 +1,5 @@
 package de.madem.homium.ui.fragments.shopping
 
-import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -14,27 +13,21 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.madem.homium.R
 import de.madem.homium.application.HomiumSettings
 import de.madem.homium.constants.INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID
 import de.madem.homium.constants.REQUEST_CODE_SHOPPING
 import de.madem.homium.constants.SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED
+import de.madem.homium.databinding.FragmentShoppingBinding
 import de.madem.homium.di.utils.ShoppingToInventoryHandlerAssistedFactory
-import de.madem.homium.managers.ViewRefresher
 import de.madem.homium.managers.adapters.ShoppingItemListAdapter
 import de.madem.homium.models.ShoppingItem
 import de.madem.homium.ui.activities.shoppingitem.ShoppingItemEditActivity
 import de.madem.homium.utilities.android_utilities.SearchViewHandler
 import de.madem.homium.utilities.backgroundtasks.CoroutineBackgroundTask
-import de.madem.homium.utilities.extensions.notNull
-import de.madem.homium.utilities.extensions.showToastShort
-import de.madem.homium.utilities.extensions.switchToActivityForResult
-import de.madem.homium.utilities.extensions.vibrate
+import de.madem.homium.utilities.extensions.*
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -42,12 +35,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//TODO Fox bug that Action-Mode Selection is deleted when checking list item using Actionmode
 @AndroidEntryPoint
 class ShoppingFragment : Fragment(), SearchViewHandler {
 
     //fields
     private val shoppingViewModel: ShoppingViewModel by viewModels()
-    private lateinit var root: View
     private lateinit var actionModeHandler: ShoppingActionModeHandler
 
 
@@ -58,17 +51,6 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     }
 
     private var searchViewUtil : Pair<SearchView,MenuItem>? = null
-
-    //GUI
-    private lateinit var recyclerViewAdapter : ShoppingItemListAdapter
-
-    override fun onResume() {
-        super.onResume()
-
-        //reload shopping items from database
-        refreshViewModelData()
-        println("ON RESUME")
-    }
 
     override fun onPause() {
         super.onPause()
@@ -96,9 +78,10 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if(recyclerViewAdapter.isReadyForFiltering){
+                //TODO Move this Filter-functionality to ViewModel
+                /*if(recyclerViewAdapter.isReadyForFiltering){
                     recyclerViewAdapter.filter.filter(newText)
-                }
+                }*/
                 return false
             }
 
@@ -119,101 +102,72 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
 
     //on create view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        ViewRefresher.shoppingRefresher = {
-            refreshViewModelData()
-        }
-
         //getting root layout
-        root = inflater.inflate(R.layout.fragment_shopping, container, false)
+        val binding = FragmentShoppingBinding.inflate(inflater, container, false)
 
-        registerRecyclerView()
-        registerActionMode()
-        registerSwipeRefresh()
-        registerFloatingActionButton()
+        val recyclerViewAdapter = setupRecyclerView(binding)
+        setupActionModeHandler()
+        setupSwipeRefresh(binding)
+        setupFloatingActionButton(binding)
 
-        return root
-    }
+        setupViewModelObservers(binding, recyclerViewAdapter)
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        println("ON ACTIVITY RESULT")
-        if(requestCode == REQUEST_CODE_SHOPPING){
-            if(resultCode == RESULT_OK){
-                val dataChanged = data?.getBooleanExtra("shoppingListChanged",false) ?: false
-                if(dataChanged){
-                    //shoppingViewModel.reloadShoppingItems(context!!)
-                }
-            }
-        }
-
-        super.onActivityResult(requestCode, resultCode, data)
+        return binding.root
     }
 
     private fun refreshViewModelData(){
-        val sorting = HomiumSettings.shoppingSort//getSetting(SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_SORT,String::class) ?: SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_NORMAL
+        val sorting = HomiumSettings.shoppingSort
 
+        //TODO Fix Sorting change
         if(sorting == SHARED_PREFERENCE_SETTING_VALUE_SHOPPING_SORT_REVERSED){
-            shoppingViewModel.reloadShoppingItems(true)
+            //shoppingViewModel.reloadShoppingItems(true)
         }
         else{
-            shoppingViewModel.reloadShoppingItems()
+            //shoppingViewModel.reloadShoppingItems()
         }
 
         println("refreshViewModelData")
-
-
     }
 
-    private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem, viewHolder: ShoppingItemListAdapter.ShoppingItemViewHolder) {
-        val newCheckStatus = !shoppingItem.checked
-
-        viewHolder.applyCheck(newCheckStatus) //set check status in view
-        shoppingItem.checked = newCheckStatus //set check status in model
-        shoppingViewModel.updateShoppingItem(shoppingItem) //update check status in database
+    //TODO Move this Logic to VM
+    private fun updateShoppingItemCheckStatus(shoppingItem: ShoppingItem) {
+        shoppingViewModel.setShoppingItemCheckState(shoppingItem, !shoppingItem.checked)
     }
 
     //private functions
-    private fun registerRecyclerView(){
-        val recyclerView = root.findViewById<RecyclerView>(R.id.recyclerView_shopping)
-
-        //set layout manager
-        recyclerView.layoutManager = LinearLayoutManager(context)
+    private fun setupRecyclerView(binding: FragmentShoppingBinding) : ShoppingItemListAdapter {
+        val recyclerView = binding.recyclerViewShopping
 
         //init adapter
-        recyclerViewAdapter = ShoppingItemListAdapter(this, shoppingViewModel.shoppingItemList)
-        recyclerView.adapter = recyclerViewAdapter
+        val adapter = ShoppingItemListAdapter(
+            onItemClick = { shoppingItem, viewHolder ->
+                if (actionModeHandler.isActionModeActive()) {
+                    //select item in action mode
+                    actionModeHandler.clickItem(shoppingItem, viewHolder)
+                } else {
+                    //update check status
+                    updateShoppingItemCheckStatus(shoppingItem)
+                }
+            },
+            onItemLongClick = { shoppingItem, viewHolder ->
+                //giving haptic feedback if allowed
+                val vibrationAllowed = HomiumSettings.vibrationEnabled
+                if(vibrationAllowed){
+                    vibrate()
+                }
 
-        //on click listener
-        recyclerViewAdapter.shortClickListener = {shoppingItem, viewHolder ->
-
-            if (actionModeHandler.isActionModeActive()) {
-                //select item in action mode
+                //start action mode
+                actionModeHandler.startActionMode()
                 actionModeHandler.clickItem(shoppingItem, viewHolder)
-            } else {
-
-                //update check status
-                updateShoppingItemCheckStatus(shoppingItem, viewHolder)
+                true
             }
-        }
-
-        recyclerViewAdapter.longClickListener = {shoppingItem, viewHolder ->
-            //giving haptic feedback if allowed
-            val vibrationAllowed = HomiumSettings.vibrationEnabled//getSetting(
-                //SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_VIBRATION_ENABLED,Boolean::class) ?: true
-            if(vibrationAllowed){
-                vibrate()
-            }
-
-            //start action mode
-            actionModeHandler.startActionMode()
-            actionModeHandler.clickItem(shoppingItem, viewHolder)
-            true
-        }
+        )
+        recyclerView.adapter = adapter
 
         //item touch helper
         val itemTouchHelper = ItemTouchHelper(
             object: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
         ){
-
             override fun onChildDraw(
                 c: Canvas,
                 recyclerView: RecyclerView,
@@ -236,9 +190,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                     .decorate()
 
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                println("onchild draw")
             }
-
 
 
             override fun onMove(
@@ -248,48 +200,54 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             ): Boolean  = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.absoluteAdapterPosition
+                val item = adapter.getItemAtPosition(position)
                 if (direction == ItemTouchHelper.LEFT){
                     showDeleteActionDialog(
-                    context = requireContext(),
-                    onYes = { dialog ->
-                            CoroutineBackgroundTask<Unit>()
-                                .executeInBackground {
-                                    val item = recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition]
-                                    shoppingViewModel.deleteShoppingItem(item)
-                                }
-                                .onDone {
-                                    refreshViewModelData()
+                        context = requireContext(),
+                        onYes = { dialog ->
+                            shoppingViewModel
+                                .deleteShoppingItem(item)
+                                .onCollect(viewLifecycleOwner) { success ->
                                     dialog.dismiss()
+                                    if(!success) {
+                                        adapter.notifyItemChanged(position)
+                                    }
                                 }
-                                .start()
                         },
                         onNo = { dialog ->
                             dialog.dismiss()
-                            //TODO: change to more efficent implementation
-                            refreshViewModelData()
+                            adapter.notifyItemChanged(position)
                         }
                     )
                 }
                 else if (direction == ItemTouchHelper.RIGHT){
-                    showShoppingItemEditScreen(recyclerViewAdapter.data[viewHolder.absoluteAdapterPosition].uid)
+                    showShoppingItemEditScreen(item.uid)
                 }
             }
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+        return adapter
     }
 
-    private fun registerSwipeRefresh() {
+    private fun setupSwipeRefresh(binding: FragmentShoppingBinding) {
         //swipe refresh layout
-        val swipeRefresh = root.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh_shopping)
+        val swipeRefresh = binding.swipeRefreshShopping
 
         swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this.requireContext(),R.color.colorPrimaryDark))
         swipeRefresh.setOnRefreshListener {
-            swipeRefresh.isRefreshing = true
+            shoppingViewModel.setRefreshing(true)
 
             GlobalScope.launch(IO) {
                 //get checked items
-                val checkedItems = shoppingViewModel.getAllCheckedShoppingItems()
+                val checkedItems = shoppingViewModel
+                    .getAllCheckedShoppingItems()
+                    .takeIf { it.isNotEmpty() }
+                    ?: kotlin.run {
+                        shoppingViewModel.setRefreshing(false)
+                        return@launch
+                    }
 
                 GlobalScope.launch(Main) {
 
@@ -297,14 +255,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
                     shoppingToInventoryHandler.handleShoppingItems(checkedItems) {
 
                         //delete checked items
-                        shoppingViewModel.deleteAllCheckedItems {
-                            GlobalScope.launch(Main) {
-                                swipeRefresh.isRefreshing = false
-                                refreshViewModelData()
-
-                                showToastShort(R.string.notification_remove_bought_shoppingitems)
-                            }
-                        }
+                        shoppingViewModel.deleteAllCheckedItems()
                     }
 
                 }
@@ -320,7 +271,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
         actionModeHandler.onStopActionMode += { swipeRefresh.isEnabled = true }
     }
 
-    private fun registerActionMode() {
+    private fun setupActionModeHandler() {
         actionModeHandler = ShoppingActionModeHandler(requireActivity())
 
         with(actionModeHandler) {
@@ -357,17 +308,15 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
             clickCheckButtonHandler = { itemHolders ->
                 itemHolders.forEachIndexed {index, itemHolder ->
                     //update check status
-                    updateShoppingItemCheckStatus(itemHolder.shoppingItem, itemHolder.adapterViewHolder)
+                    updateShoppingItemCheckStatus(itemHolder.shoppingItem)
                 }
             }
         }
     }
 
-    private fun registerFloatingActionButton() {
+    private fun setupFloatingActionButton(binding: FragmentShoppingBinding) {
         //floating action button
-        val btnAddShoppingItem = root.findViewById<FloatingActionButton>(
-            R.id.floatingActionButton_addShoppingItem
-        )
+        val btnAddShoppingItem = binding.floatingActionButtonAddShoppingItem
 
         btnAddShoppingItem.setOnClickListener {
             //close search view
@@ -377,10 +326,25 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
         }
     }
 
+    private fun setupViewModelObservers(binding: FragmentShoppingBinding, recyclerViewAdapter: ShoppingItemListAdapter) {
+        shoppingViewModel.shoppingItems.onCollect(viewLifecycleOwner) { shoppingItems ->
+            recyclerViewAdapter.submitList(shoppingItems)
+            binding.swipeRefreshShopping.isRefreshing = false
+        }
+
+        shoppingViewModel.toastNotifications.onCollect(viewLifecycleOwner) { msgResId ->
+            showToastShort(msgResId)
+        }
+
+        shoppingViewModel.isRefreshing.onCollect(viewLifecycleOwner) { isRefreshing ->
+            binding.swipeRefreshShopping.isRefreshing = isRefreshing
+        }
+    }
+
     // help functions
     private fun showShoppingItemEditScreen(itemId: Int){
         Intent(activity, ShoppingItemEditActivity::class.java)
-            .apply {putExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, itemId) }
+            .apply { putExtra(INTENT_DATA_TRANSFER_EDIT_SHOPPING_ITEM_ID, itemId) }
             .also { startActivityForResult(it, REQUEST_CODE_SHOPPING) }
     }
 
@@ -410,7 +374,7 @@ class ShoppingFragment : Fragment(), SearchViewHandler {
     //functions for sharing shopping list
     private fun shareShoppingList(){
         CoroutineBackgroundTask<String>().executeInBackground {
-            val shoppingList = shoppingViewModel.shoppingItemList.value ?: listOf()
+            val shoppingList = shoppingViewModel.shoppingItems.value
             return@executeInBackground "${resources.getString(R.string.share_text_shopping)} \n- ${shoppingList.joinToString(
                 "\n- ") { it.toString() }}"
         }.onDone {result ->

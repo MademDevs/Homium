@@ -18,10 +18,7 @@ class ShoppingToInventoryHandler @AssistedInject constructor(
     private val db: AppDatabase
 ) {
     private fun getCheckedRadio(): Int {
-        var checkedRadioId: Int = HomiumSettings.shoppingToInventory/*context.getSetting(
-            SHAREDPREFERENCE_SETTINGS_PREFERENCEKEY_SHOPPING_TO_INVENTORY,
-            Int::class
-        ) ?: 0*/
+        var checkedRadioId: Int = HomiumSettings.shoppingToInventory
 
         if (checkedRadioId == 0) {
             checkedRadioId = R.id.radio_check_question

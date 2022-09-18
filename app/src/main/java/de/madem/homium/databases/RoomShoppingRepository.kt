@@ -32,10 +32,15 @@ class RoomShoppingRepository(
             }
             return@map AppResult.Success(it)
         }
-        .onStart {
-            emit(AppResult.Loading())
-        }
+        .onStart { emit(AppResult.Loading()) }
         .flowOn(dispatcher)
+
+    override fun getAllShoppingItems(): Flow<AppResult<List<ShoppingItem>>> = shoppingDao
+        .getAllShoppingItems()
+        .map<List<ShoppingItem>, AppResult<List<ShoppingItem>>> { it.toSuccessResult() }
+        .onStart { emit(AppResult.Loading()) }
+        .flowOn(dispatcher)
+
 
     override suspend fun deleteShoppingItemById(id: Int): AppResult<Unit> {
         return withContext(dispatcher) {
@@ -48,10 +53,21 @@ class RoomShoppingRepository(
         }
     }
 
-    override suspend fun updateShoppingItemById(id: Int, name: String, count: Int, unit: Units) : AppResult<Unit> {
+    override suspend fun deleteAllCheckedShoppingItems(): AppResult<Unit> {
         return withContext(dispatcher) {
             try {
-                shoppingDao.updateShoppingItemById(id, name, count, unit).toSuccessResult()
+                shoppingDao.deleteAllCheckedShoppingItems().toSuccessResult()
+            }
+            catch (ex: Exception) {
+                AppResult.Error(DeletionFailedException("ShoppingItem", "-"))
+            }
+        }
+    }
+
+    override suspend fun updateShoppingItemById(id: Int, name: String, count: Int, unit: Units, isChecked: Boolean) : AppResult<Unit> {
+        return withContext(dispatcher) {
+            try {
+                shoppingDao.updateShoppingItemById(id, name, count, unit,isChecked).toSuccessResult()
             }
             catch (ex: Exception) {
                 AppResult.Error(UpdateFailedException("ShoppingItem", "id = $id"))
